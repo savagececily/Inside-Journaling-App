@@ -231,7 +231,7 @@ public class AuthController : ControllerBase
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claimsList = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.userId), // Use userId (partition key) for consistency
             new Claim(ClaimTypes.Email, user.Email),
@@ -239,6 +239,15 @@ public class AuthController : ControllerBase
             new Claim("ProviderId", user.ProviderId),
             new Claim("Provider", user.Provider)
         };
+
+        // Add admin role if user email is in the admin list
+        if (IsAdminUser(user.Email))
+        {
+            claimsList.Add(new Claim(ClaimTypes.Role, "Admin"));
+            _logger.LogInformation("Admin role granted to user: {Email}", user.Email);
+        }
+
+        var claims = claimsList.ToArray();
 
         var token = new JwtSecurityToken(
             issuer: jwtIssuer,
@@ -249,5 +258,22 @@ public class AuthController : ControllerBase
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private bool IsAdminUser(string email)
+    {
+        // Get admin emails from configuration (comma-separated)
+        var adminEmails = _configuration["AdminEmails"];
+        
+        if (string.IsNullOrEmpty(adminEmails))
+        {
+            return false;
+        }
+
+        var adminList = adminEmails.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(e => e.Trim().ToLowerInvariant())
+            .ToList();
+
+        return adminList.Contains(email.ToLowerInvariant());
     }
 }

@@ -23,6 +23,8 @@ public class UserService : IUserService
     {
         try
         {
+            _logger.LogInformation("Looking up user by providerId={ProviderId}, provider={Provider}", providerId, provider);
+            
             var query = new QueryDefinition(
                 "SELECT * FROM c WHERE c.ProviderId = @providerId AND c.Provider = @provider")
                 .WithParameter("@providerId", providerId)
@@ -31,7 +33,18 @@ public class UserService : IUserService
             var iterator = _usersContainer.GetItemQueryIterator<User>(query);
             var results = await iterator.ReadNextAsync();
             
-            return results.FirstOrDefault();
+            var user = results.FirstOrDefault();
+            
+            if (user != null)
+            {
+                _logger.LogInformation("Found existing user: id={Id}, userId={UserId}, email={Email}", user.id, user.userId, user.Email);
+            }
+            else
+            {
+                _logger.LogInformation("No existing user found for providerId={ProviderId}", providerId);
+            }
+            
+            return user;
         }
         catch (Exception ex)
         {
@@ -64,12 +77,24 @@ public class UserService : IUserService
         {
             user.LastLoginAt = DateTime.UtcNow;
             
+            // Ensure id and userId are consistent
+            if (string.IsNullOrEmpty(user.id))
+            {
+                user.id = user.userId;
+            }
+            
+            _logger.LogInformation("Upserting user: id={Id}, userId={UserId}, provider={Provider}, providerId={ProviderId}", 
+                user.id, user.userId, user.Provider, user.ProviderId);
+            
             var response = await _usersContainer.UpsertItemAsync(user, new PartitionKey(user.userId));
+            
+            _logger.LogInformation("User upserted successfully: id={Id}", response.Resource.id);
+            
             return response.Resource;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating/updating user");
+            _logger.LogError(ex, "Error creating/updating user: id={Id}, userId={UserId}", user.id, user.userId);
             throw;
         }
     }
