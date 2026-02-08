@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MentalHealthJournal.Models;
-using System.Security.Claims;
 using User = MentalHealthJournal.Models.User;
 
 namespace MentalHealthJournal.Server.Controllers;
@@ -191,16 +189,16 @@ public class AdminController : ControllerBase
 
                     if (!dryRun)
                     {
-                        // Delete from old partition
+                        // Delete from old partition (using journalEntryId as partition key)
                         await _journalEntriesContainer.DeleteItemAsync<JournalEntry>(
                             entry.id,
-                            new PartitionKey(oldUserId));
+                            new PartitionKey(entry.journalEntryId));
 
-                        // Insert into new partition
+                        // Update userId and insert into new partition (journalEntryId stays the same)
                         entry.userId = newUserId;
                         await _journalEntriesContainer.CreateItemAsync(
                             entry,
-                            new PartitionKey(newUserId));
+                            new PartitionKey(entry.journalEntryId));
                     }
                 }
             }

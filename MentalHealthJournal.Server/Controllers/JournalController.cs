@@ -259,8 +259,9 @@ namespace MentalHealthJournal.Server.Controllers
                     return BadRequest("Text exceeds maximum length of 10,000 characters.");
                 }
 
-                // Get existing entry to verify ownership
-                var existingEntry = await _cosmosService.GetJournalEntryByIdAsync(id, userId, cancellationToken);
+                // First get all user entries to find the one with this id and verify ownership
+                var userEntries = await _cosmosService.GetEntriesForUserAsync(userId, cancellationToken);
+                var existingEntry = userEntries.FirstOrDefault(e => e.id == id);
                 if (existingEntry == null)
                 {
                     _logger.LogWarning("Entry {EntryId} not found for user {UserId}", id, userId);
@@ -316,15 +317,16 @@ namespace MentalHealthJournal.Server.Controllers
 
             try
             {
-                // Verify entry exists and belongs to user before deleting
-                var existingEntry = await _cosmosService.GetJournalEntryByIdAsync(id, userId, cancellationToken);
+                // First get all user entries to find the one with this id and verify ownership
+                var userEntries = await _cosmosService.GetEntriesForUserAsync(userId, cancellationToken);
+                var existingEntry = userEntries.FirstOrDefault(e => e.id == id);
                 if (existingEntry == null)
                 {
                     _logger.LogWarning("Entry {EntryId} not found for deletion by user {UserId}", id, userId);
                     return NotFound("Journal entry not found.");
                 }
 
-                await _cosmosService.DeleteJournalEntryAsync(id, userId, cancellationToken);
+                await _cosmosService.DeleteJournalEntryAsync(id, existingEntry.journalEntryId, cancellationToken);
                 _logger.LogInformation("Successfully deleted entry {EntryId} for user {UserId}", id, userId);
 
                 // Update streak as part of the request, but treat failures as non-fatal

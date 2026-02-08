@@ -31,25 +31,33 @@ public class UserService : IUserService
                 .WithParameter("@provider", provider);
 
             var iterator = _usersContainer.GetItemQueryIterator<User>(query);
-            var results = await iterator.ReadNextAsync();
             
-            var user = results.FirstOrDefault();
-            
-            if (user != null)
+            // Iterate through all pages to ensure we don't miss results
+            while (iterator.HasMoreResults)
             {
-                _logger.LogInformation("Found existing user: id={Id}, userId={UserId}, email={Email}", user.id, user.userId, user.Email);
-            }
-            else
-            {
-                _logger.LogInformation("No existing user found for providerId={ProviderId}", providerId);
+                var results = await iterator.ReadNextAsync();
+                var user = results.FirstOrDefault();
+                
+                if (user != null)
+                {
+                    _logger.LogInformation("Found existing user: id={Id}, userId={UserId}, email={Email}", user.id, user.userId, user.Email);
+                    return user;
+                }
             }
             
-            return user;
+            _logger.LogInformation("No existing user found for providerId={ProviderId}", providerId);
+            return null;
+        }
+        catch (CosmosException ex)
+        {
+            _logger.LogError(ex, "Cosmos DB error getting user by provider ID: providerId={ProviderId}, provider={Provider}, StatusCode={StatusCode}", 
+                providerId, provider, ex.StatusCode);
+            throw new InvalidOperationException($"Failed to retrieve user from database: {ex.Message}", ex);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting user by provider ID");
-            return null;
+            _logger.LogError(ex, "Unexpected error getting user by provider ID: providerId={ProviderId}, provider={Provider}", providerId, provider);
+            throw;
         }
     }
 

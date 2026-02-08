@@ -7,7 +7,6 @@ using System.Security.Claims;
 using System.Text;
 using MentalHealthJournal.Models;
 using MentalHealthJournal.Services;
-using Microsoft.Extensions.Logging;
 
 namespace MentalHealthJournal.Server.Controllers;
 
@@ -65,16 +64,24 @@ public class AuthController : ControllerBase
                 // Update last login
                 user = existingUser;
                 user.LastLoginAt = DateTime.UtcNow;
+                
+                // Ensure email and name are up to date from provider
+                user.Email = payload.Email;
+                user.Name = payload.Name;
+                user.ProfilePictureUrl = payload.Picture;
+                
                 user = await _userService.CreateOrUpdateUserAsync(user);
             }
             else
             {
-                // Create new user
-                var newUserId = Guid.NewGuid().ToString();
+                // Create new user with deterministic ID to prevent duplicates
+                // Use a hash of provider + providerId to ensure consistent userId across requests
+                var deterministicId = GenerateDeterministicUserId("google", payload.Subject);
+                
                 user = new User
                 {
-                    id = newUserId,
-                    userId = newUserId,
+                    id = deterministicId,
+                    userId = deterministicId,
                     Email = payload.Email,
                     Name = payload.Name,
                     ProfilePictureUrl = payload.Picture,
@@ -83,7 +90,12 @@ public class AuthController : ControllerBase
                     CreatedAt = DateTime.UtcNow,
                     LastLoginAt = DateTime.UtcNow
                 };
+                
+                // Use upsert to handle race conditions - if another request already created this user, it will update instead
                 user = await _userService.CreateOrUpdateUserAsync(user);
+                
+                _logger.LogInformation("Created new user with deterministic ID: {UserId} for ProviderId: {ProviderId}", 
+                    deterministicId, payload.Subject);
             }
 
             // Generate JWT token
@@ -275,5 +287,20 @@ public class AuthController : ControllerBase
             .ToList();
 
         return adminList.Contains(email.ToLowerInvariant());
+    }
+
+    private string GenerateDeterministicUserId(string provider, string providerId)
+    {
+        // Create a deterministic GUID based on provider and providerId
+        // This ensures the same user always gets the same userId, preventing duplicates
+        var input = $"{provider}:{providerId}";
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+        
+        // Use first 16 bytes of hash to create a GUID
+        var guidBytes = new byte[16];
+        Array.Copy(hash, guidBytes, 16);
+        
+        return new Guid(guidBytes).ToString();
     }
 }
