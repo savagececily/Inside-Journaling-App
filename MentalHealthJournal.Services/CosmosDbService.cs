@@ -25,7 +25,7 @@ namespace MentalHealthJournal.Services
             try
             {
                 _logger.LogInformation("Saving journal entry for user {UserId}", journalEntry.userId);
-               await _container.CreateItemAsync(journalEntry, new PartitionKey(journalEntry.userId), cancellationToken: cancellationToken);
+               await _container.CreateItemAsync(journalEntry, new PartitionKey(journalEntry.journalEntryId), cancellationToken: cancellationToken);
                 _logger.LogInformation("Journal entry saved successfully for user {UserId}", journalEntry.userId);
             }
             catch (CosmosException ex)
@@ -50,10 +50,7 @@ namespace MentalHealthJournal.Services
 
                 var results = new List<JournalEntry>();
 
-                var iterator = _container.GetItemQueryIterator<JournalEntry>(query, requestOptions: new QueryRequestOptions
-                {
-                    PartitionKey = new PartitionKey(userId)
-                });
+                var iterator = _container.GetItemQueryIterator<JournalEntry>(query);
 
                 while (iterator.HasMoreResults)
                 {
@@ -76,27 +73,27 @@ namespace MentalHealthJournal.Services
             }
         }
 
-        public async Task<JournalEntry?> GetJournalEntryByIdAsync(string entryId, string userId, CancellationToken cancellationToken = default)
+        public async Task<JournalEntry?> GetJournalEntryByIdAsync(string entryId, string journalEntryId, CancellationToken cancellationToken = default)
         {
             try
             {
-                _logger.LogInformation("Retrieving journal entry {EntryId} for user {UserId}", entryId, userId);
-                var response = await _container.ReadItemAsync<JournalEntry>(entryId, new PartitionKey(userId), cancellationToken: cancellationToken);
+                _logger.LogInformation("Retrieving journal entry {EntryId} with partition key {JournalEntryId}", entryId, journalEntryId);
+                var response = await _container.ReadItemAsync<JournalEntry>(entryId, new PartitionKey(journalEntryId), cancellationToken: cancellationToken);
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                _logger.LogWarning("Journal entry {EntryId} not found for user {UserId}", entryId, userId);
+                _logger.LogWarning("Journal entry {EntryId} not found with partition key {JournalEntryId}", entryId, journalEntryId);
                 return null;
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Cosmos DB error retrieving journal entry {EntryId} for user {UserId}. Status: {Status}", entryId, userId, ex.StatusCode);
+                _logger.LogError(ex, "Cosmos DB error retrieving journal entry {EntryId} with partition key {JournalEntryId}. Status: {Status}", entryId, journalEntryId, ex.StatusCode);
                 throw new InvalidOperationException($"Failed to retrieve journal entry: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving journal entry {EntryId} for user {UserId}", entryId, userId);
+                _logger.LogError(ex, "Error retrieving journal entry {EntryId} with partition key {JournalEntryId}", entryId, journalEntryId);
                 throw;
             }
         }
@@ -106,7 +103,7 @@ namespace MentalHealthJournal.Services
             try
             {
                 _logger.LogInformation("Updating journal entry {EntryId} for user {UserId}", journalEntry.id, journalEntry.userId);
-                var response = await _container.ReplaceItemAsync(journalEntry, journalEntry.id, new PartitionKey(journalEntry.userId), cancellationToken: cancellationToken);
+                var response = await _container.ReplaceItemAsync(journalEntry, journalEntry.id, new PartitionKey(journalEntry.journalEntryId), cancellationToken: cancellationToken);
                 _logger.LogInformation("Journal entry {EntryId} updated successfully for user {UserId}", journalEntry.id, journalEntry.userId);
                 return response.Resource;
             }
@@ -122,27 +119,27 @@ namespace MentalHealthJournal.Services
             }
         }
 
-        public async Task DeleteJournalEntryAsync(string entryId, string userId, CancellationToken cancellationToken = default)
+        public async Task DeleteJournalEntryAsync(string entryId, string journalEntryId, CancellationToken cancellationToken = default)
         {
             try
             {
-                _logger.LogInformation("Deleting journal entry {EntryId} for user {UserId}", entryId, userId);
-                await _container.DeleteItemAsync<JournalEntry>(entryId, new PartitionKey(userId), cancellationToken: cancellationToken);
-                _logger.LogInformation("Journal entry {EntryId} deleted successfully for user {UserId}", entryId, userId);
+                _logger.LogInformation("Deleting journal entry {EntryId} with partition key {JournalEntryId}", entryId, journalEntryId);
+                await _container.DeleteItemAsync<JournalEntry>(entryId, new PartitionKey(journalEntryId), cancellationToken: cancellationToken);
+                _logger.LogInformation("Journal entry {EntryId} deleted successfully with partition key {JournalEntryId}", entryId, journalEntryId);
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                _logger.LogWarning("Journal entry {EntryId} not found for deletion for user {UserId}", entryId, userId);
+                _logger.LogWarning("Journal entry {EntryId} not found for deletion with partition key {JournalEntryId}", entryId, journalEntryId);
                 throw new InvalidOperationException("Journal entry not found");
             }
             catch (CosmosException ex)
             {
-                _logger.LogError(ex, "Cosmos DB error deleting journal entry {EntryId} for user {UserId}. Status: {Status}", entryId, userId, ex.StatusCode);
+                _logger.LogError(ex, "Cosmos DB error deleting journal entry {EntryId} with partition key {JournalEntryId}. Status: {Status}", entryId, journalEntryId, ex.StatusCode);
                 throw new InvalidOperationException($"Failed to delete journal entry: {ex.Message}", ex);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting journal entry {EntryId} for user {UserId}", entryId, userId);
+                _logger.LogError(ex, "Error deleting journal entry {EntryId} with partition key {JournalEntryId}", entryId, journalEntryId);
                 throw;
             }
         }
@@ -165,10 +162,7 @@ namespace MentalHealthJournal.Services
 
                 var results = new List<JournalEntry>();
 
-                var iterator = _container.GetItemQueryIterator<JournalEntry>(query, requestOptions: new QueryRequestOptions
-                {
-                    PartitionKey = new PartitionKey(userId)
-                });
+                var iterator = _container.GetItemQueryIterator<JournalEntry>(query);
 
                 while (iterator.HasMoreResults)
                 {

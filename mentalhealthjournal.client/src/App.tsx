@@ -4,6 +4,7 @@ import { useAuth } from './hooks/useAuth';
 import Login from './components/Login';
 import UsernameSetup from './components/UsernameSetup';
 import About from './About';
+import PrivacyPolicy from './components/PrivacyPolicy';
 import { VoiceRecorder } from './components/VoiceRecorder';
 import { EditEntryModal } from './components/EditEntryModal';
 import CrisisAlert from './components/CrisisAlert';
@@ -78,6 +79,7 @@ function App() {
     const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null);
     const [showCrisisAlert, setShowCrisisAlert] = useState(false);
     const [crisisData, setCrisisData] = useState<{ reason?: string; resources: CrisisResource[] }>({ resources: [] });
+    const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
     // Clean up blob URL when audioBlob changes or component unmounts
     useEffect(() => {
@@ -419,7 +421,15 @@ function App() {
     }
 
     if (!isAuthenticated) {
-        return <Login />;
+        if (showPrivacyPolicy) {
+            return <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />;
+        }
+        
+        return (
+            <Login 
+                onViewPrivacyPolicy={() => setShowPrivacyPolicy(true)}
+            />
+        );
     }
 
     return (

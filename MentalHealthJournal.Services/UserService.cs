@@ -23,20 +23,41 @@ public class UserService : IUserService
     {
         try
         {
+            _logger.LogInformation("Looking up user by providerId={ProviderId}, provider={Provider}", providerId, provider);
+            
             var query = new QueryDefinition(
                 "SELECT * FROM c WHERE c.ProviderId = @providerId AND c.Provider = @provider")
                 .WithParameter("@providerId", providerId)
                 .WithParameter("@provider", provider);
 
             var iterator = _usersContainer.GetItemQueryIterator<User>(query);
-            var results = await iterator.ReadNextAsync();
             
-            return results.FirstOrDefault();
+            // Iterate through all pages to ensure we don't miss results
+            while (iterator.HasMoreResults)
+            {
+                var results = await iterator.ReadNextAsync();
+                var user = results.FirstOrDefault();
+                
+                if (user != null)
+                {
+                    _logger.LogInformation("Found existing user: id={Id}, userId={UserId}, email={Email}", user.id, user.userId, user.Email);
+                    return user;
+                }
+            }
+            
+            _logger.LogInformation("No existing user found for providerId={ProviderId}", providerId);
+            return null;
+        }
+        catch (CosmosException ex)
+        {
+            _logger.LogError(ex, "Cosmos DB error getting user by provider ID: providerId={ProviderId}, provider={Provider}, StatusCode={StatusCode}", 
+                providerId, provider, ex.StatusCode);
+            throw new InvalidOperationException($"Failed to retrieve user from database: {ex.Message}", ex);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting user by provider ID");
-            return null;
+            _logger.LogError(ex, "Unexpected error getting user by provider ID: providerId={ProviderId}, provider={Provider}", providerId, provider);
+            throw;
         }
     }
 
@@ -64,12 +85,24 @@ public class UserService : IUserService
         {
             user.LastLoginAt = DateTime.UtcNow;
             
+            // Ensure id and userId are consistent
+            if (string.IsNullOrEmpty(user.id))
+            {
+                user.id = user.userId;
+            }
+            
+            _logger.LogInformation("Upserting user: id={Id}, userId={UserId}, provider={Provider}, providerId={ProviderId}", 
+                user.id, user.userId, user.Provider, user.ProviderId);
+            
             var response = await _usersContainer.UpsertItemAsync(user, new PartitionKey(user.userId));
+            
+            _logger.LogInformation("User upserted successfully: id={Id}", response.Resource.id);
+            
             return response.Resource;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating/updating user");
+            _logger.LogError(ex, "Error creating/updating user: id={Id}, userId={UserId}", user.id, user.userId);
             throw;
         }
     }
@@ -93,7 +126,7 @@ public class UserService : IUserService
             var existingUser = results.FirstOrDefault();
             
             // Username is available if no one has it, or if the current user has it
-            return existingUser == null || existingUser.id == currentUserId;
+            return existingUser == null || existingUser.userId == currentUserId;
         }
         catch (Exception ex)
         {

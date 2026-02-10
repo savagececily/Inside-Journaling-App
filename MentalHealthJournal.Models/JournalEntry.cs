@@ -1,9 +1,9 @@
-﻿
-namespace MentalHealthJournal.Models
+﻿namespace MentalHealthJournal.Models
 {
     public class JournalEntry
     {
         public string id { get; set; } = Guid.NewGuid().ToString();
+        public string journalEntryId { get; set; } = string.Empty; // partition key
         public string userId { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? Text { get; set; } 
