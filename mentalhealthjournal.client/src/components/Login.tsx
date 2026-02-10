@@ -4,7 +4,11 @@ import { useAuth } from '../hooks/useAuth';
 import { authService } from '../services/authService';
 import './Login.css';
 
-const Login: React.FC = () => {
+interface LoginProps {
+    onViewPrivacyPolicy?: () => void;
+}
+
+const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy }) => {
     const { login } = useAuth();
 
     const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
@@ -53,7 +57,25 @@ const Login: React.FC = () => {
                 </div>
 
                 <div className="login-footer">
-                    <p>By signing in, you agree to our terms of service and privacy policy.</p>
+                    <p>
+                        By signing in, you agree to our terms of service and{' '}
+                        <a 
+                            href="#" 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (onViewPrivacyPolicy) {
+                                    onViewPrivacyPolicy();
+                                }
+                            }}
+                            style={{ 
+                                color: '#4285f4', 
+                                textDecoration: 'underline',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            privacy policy
+                        </a>.
+                    </p>
                 </div>
             </div>
         </div>
