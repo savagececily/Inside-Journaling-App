@@ -20,7 +20,10 @@ export function StreakCounter({ token }: StreakCounterProps) {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch('/api/journal/streak', {
+            // Get user's timezone offset in minutes (negative for west of UTC)
+            const timezoneOffsetMinutes = -new Date().getTimezoneOffset();
+            
+            const response = await fetch(`/api/journal/streak?timezoneOffsetMinutes=${timezoneOffsetMinutes}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

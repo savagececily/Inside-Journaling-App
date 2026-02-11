@@ -15,4 +15,5 @@ public class User
     public int CurrentStreak { get; set; } = 0; // Number of consecutive days with entries
     public int LongestStreak { get; set; } = 0; // Best streak ever achieved
     public DateTime? LastStreakUpdateDate { get; set; } // Date of last streak calculation (UTC date only)
+    public int TimezoneOffsetMinutes { get; set; } = 0; // User's timezone offset from UTC in minutes (e.g., -480 for PST)
 }

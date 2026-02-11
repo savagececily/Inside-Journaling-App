@@ -20,6 +20,7 @@ namespace MentalHealthJournal.Server.Controllers
         private readonly ICosmosDbService _cosmosService;
         private readonly IDataExportService _exportService;
         private readonly IStreakService _streakService;
+        private readonly IUserService _userService;
 
         public JournalController(ILogger<JournalController> logger, 
             IJournalAnalysisService analysisService, 
@@ -27,7 +28,8 @@ namespace MentalHealthJournal.Server.Controllers
             IBlobStorageService blobService,
             ICosmosDbService cosmosService,
             IDataExportService exportService,
-            IStreakService streakService)
+            IStreakService streakService,
+            IUserService userService)
         {
             _logger = logger;
             _analysisService = analysisService;
@@ -36,6 +38,7 @@ namespace MentalHealthJournal.Server.Controllers
             _cosmosService = cosmosService;
             _exportService = exportService;
             _streakService = streakService;
+            _userService = userService;
             
             _logger.LogInformation("JournalController initialized");
         }
@@ -463,7 +466,7 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         [HttpGet("streak")]
-        public async Task<IActionResult> GetStreak(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetStreak([FromQuery] int? timezoneOffsetMinutes, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -475,7 +478,30 @@ namespace MentalHealthJournal.Server.Controllers
 
             try
             {
-                var (currentStreak, longestStreak) = await _streakService.CalculateStreaksAsync(userId, cancellationToken);
+                // Get or update user's timezone offset
+                var user = await _userService.GetUserByIdAsync(userId);
+                int timezoneOffset = 0;
+                
+                if (user != null)
+                {
+                    // If timezone offset is provided and different from stored value, update it
+                    if (timezoneOffsetMinutes.HasValue && user.TimezoneOffsetMinutes != timezoneOffsetMinutes.Value)
+                    {
+                        user.TimezoneOffsetMinutes = timezoneOffsetMinutes.Value;
+                        await _userService.CreateOrUpdateUserAsync(user);
+                        _logger.LogInformation("Updated timezone offset for user {UserId} to {Offset}", userId, timezoneOffsetMinutes.Value);
+                    }
+                    
+                    // Use the provided timezone offset or the stored one
+                    timezoneOffset = timezoneOffsetMinutes ?? user.TimezoneOffsetMinutes;
+                }
+                else if (timezoneOffsetMinutes.HasValue)
+                {
+                    // User doesn't exist yet but we have timezone offset
+                    timezoneOffset = timezoneOffsetMinutes.Value;
+                }
+                
+                var (currentStreak, longestStreak) = await _streakService.CalculateStreaksAsync(userId, timezoneOffset, cancellationToken);
                 
                 _logger.LogInformation("Retrieved streak for user {UserId}: Current={Current}, Longest={Longest}", 
                     userId, currentStreak, longestStreak);
