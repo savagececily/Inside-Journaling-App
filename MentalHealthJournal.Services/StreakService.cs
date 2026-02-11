@@ -103,10 +103,7 @@ namespace MentalHealthJournal.Services
                 var user = await _userService.GetUserByIdAsync(userId);
                 if (user != null && user.LastStreakUpdateDate.HasValue)
                 {
-                    // Use user's timezone for date comparison
-                    var userToday = DateTime.UtcNow.AddMinutes(user.TimezoneOffsetMinutes).Date;
-                    var lastUpdateInUserTz = user.LastStreakUpdateDate.Value.AddMinutes(user.TimezoneOffsetMinutes).Date;
-                    var daysSinceUpdate = (userToday - lastUpdateInUserTz).Days;
+                    var daysSinceUpdate = (DateTime.UtcNow.Date - user.LastStreakUpdateDate.Value).Days;
                     
                     // Only recalculate if it's been at least a day since last update
                     if (daysSinceUpdate == 0)
@@ -116,9 +113,9 @@ namespace MentalHealthJournal.Services
                     }
                 }
                 
-                // Use user's timezone offset if available
-                int timezoneOffset = user?.TimezoneOffsetMinutes ?? 0;
-                var (currentStreak, longestStreak) = await CalculateStreaksAsync(userId, timezoneOffset, cancellationToken);
+                // Calculate streaks using UTC (timezone offset 0)
+                // The actual timezone-adjusted streak will be calculated when the user requests it via GetStreak
+                var (currentStreak, longestStreak) = await CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0, cancellationToken);
                 
                 if (user != null)
                 {
