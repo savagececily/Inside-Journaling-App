@@ -75,8 +75,11 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
                 }
                 else
                 {
+                    var newSessionId = Guid.NewGuid().ToString();
                     session = new ChatSession
                     {
+                        id = newSessionId,
+                        ChatSessionId = newSessionId,
                         UserId = userId,
                         Title = GenerateSessionTitle(request.Message)
                     };
@@ -133,15 +136,15 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
                 // Save session to Cosmos DB
                 await _chatContainer.UpsertItemAsync(
                     session,
-                    new PartitionKey(userId)
+                    new PartitionKey(session.ChatSessionId)
                 );
 
                 _logger.LogInformation("Chat message processed for user {UserId} in session {SessionId}", 
-                    userId, session.Id);
+                    userId, session.id);
 
                 return new ChatResponse
                 {
-                    SessionId = session.Id,
+                    SessionId = session.id,
                     Message = assistantResponse,
                     Timestamp = assistantMessage.Timestamp
                 };
@@ -159,8 +162,15 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
             {
                 var response = await _chatContainer.ReadItemAsync<ChatSession>(
                     sessionId,
-                    new PartitionKey(userId)
+                    new PartitionKey(sessionId)
                 );
+                
+                // Verify the session belongs to the user
+                if (response.Resource.UserId != userId)
+                {
+                    return null;
+                }
+                
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -178,10 +188,7 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
                 ).WithParameter("@userId", userId);
 
                 var sessions = new List<ChatSession>();
-                using var feedIterator = _chatContainer.GetItemQueryIterator<ChatSession>(
-                    query,
-                    requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(userId) }
-                );
+                using var feedIterator = _chatContainer.GetItemQueryIterator<ChatSession>(query);
 
                 while (feedIterator.HasMoreResults)
                 {
@@ -208,7 +215,7 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
                     session.IsActive = false;
                     await _chatContainer.UpsertItemAsync(
                         session,
-                        new PartitionKey(userId)
+                        new PartitionKey(session.ChatSessionId)
                     );
                 }
             }

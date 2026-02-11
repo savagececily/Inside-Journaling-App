@@ -160,9 +160,11 @@ namespace MentalHealthJournal.Tests.Helpers
 
         public static ChatSession CreateChatSession(string? id = null, string userId = "testuser")
         {
+            var sessionId = id ?? Guid.NewGuid().ToString();
             return new ChatSession
             {
-                Id = id ?? Guid.NewGuid().ToString(),
+                id = sessionId,
+                ChatSessionId = sessionId,
                 UserId = userId,
                 Title = "Test Conversation",
                 Messages = new List<ChatMessage>
@@ -181,9 +183,11 @@ namespace MentalHealthJournal.Tests.Helpers
             var sessions = new List<ChatSession>();
             for (int i = 0; i < count; i++)
             {
+                var sessionId = Guid.NewGuid().ToString();
                 sessions.Add(new ChatSession
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    id = sessionId,
+                    ChatSessionId = sessionId,
                     UserId = userId,
                     Title = $"Conversation {i + 1}",
                     Messages = new List<ChatMessage>

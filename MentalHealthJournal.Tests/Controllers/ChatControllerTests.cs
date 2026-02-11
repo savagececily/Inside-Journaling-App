@@ -178,7 +178,8 @@ namespace MentalHealthJournal.Tests.Controllers
             var sessionId = "session-123";
             var expectedSession = new ChatSession
             {
-                Id = sessionId,
+                id = sessionId,
+                ChatSessionId = sessionId,
                 UserId = TestUserId,
                 Title = "Test Conversation",
                 Messages = new List<ChatMessage>
@@ -200,7 +201,7 @@ namespace MentalHealthJournal.Tests.Controllers
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var session = Assert.IsType<ChatSession>(okResult.Value);
-            Assert.Equal(sessionId, session.Id);
+            Assert.Equal(sessionId, session.id);
             Assert.Equal(TestUserId, session.UserId);
             Assert.Equal(2, session.Messages.Count);
         }
@@ -252,7 +253,8 @@ namespace MentalHealthJournal.Tests.Controllers
             {
                 new ChatSession
                 {
-                    Id = "session-1",
+                    id = "session-1",
+                    ChatSessionId = "session-1",
                     UserId = TestUserId,
                     Title = "Conversation 1",
                     LastMessageAt = DateTime.UtcNow,
@@ -260,7 +262,8 @@ namespace MentalHealthJournal.Tests.Controllers
                 },
                 new ChatSession
                 {
-                    Id = "session-2",
+                    id = "session-2",
+                    ChatSessionId = "session-2",
                     UserId = TestUserId,
                     Title = "Conversation 2",
                     LastMessageAt = DateTime.UtcNow.AddHours(-1),

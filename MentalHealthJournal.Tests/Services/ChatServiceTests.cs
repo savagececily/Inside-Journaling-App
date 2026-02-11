@@ -155,7 +155,8 @@ namespace MentalHealthJournal.Tests.Services
             var sessionId = "session-123";
             var expectedSession = new ChatSession
             {
-                Id = sessionId,
+                id = sessionId,
+                ChatSessionId = sessionId,
                 UserId = TestUserId,
                 Title = "Test Conversation",
                 Messages = new List<Models.ChatMessage>
@@ -169,7 +170,7 @@ namespace MentalHealthJournal.Tests.Services
 
             _containerMock.Setup(c => c.ReadItemAsync<ChatSession>(
                 sessionId,
-                It.Is<PartitionKey>(pk => pk.ToString().Contains(TestUserId)),
+                It.Is<PartitionKey>(pk => pk.ToString().Contains(sessionId)),
                 It.IsAny<ItemRequestOptions>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(responseMock.Object);
@@ -179,7 +180,7 @@ namespace MentalHealthJournal.Tests.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(sessionId, result.Id);
+            Assert.Equal(sessionId, result.id);
             Assert.Equal(TestUserId, result.UserId);
             Assert.Single(result.Messages);
         }
@@ -214,7 +215,8 @@ namespace MentalHealthJournal.Tests.Services
             {
                 new ChatSession
                 {
-                    Id = "session-1",
+                    id = "session-1",
+                    ChatSessionId = "session-1",
                     UserId = TestUserId,
                     Title = "Conversation 1",
                     IsActive = true,
@@ -222,7 +224,8 @@ namespace MentalHealthJournal.Tests.Services
                 },
                 new ChatSession
                 {
-                    Id = "session-2",
+                    id = "session-2",
+                    ChatSessionId = "session-2",
                     UserId = TestUserId,
                     Title = "Conversation 2",
                     IsActive = true,
@@ -294,7 +297,8 @@ namespace MentalHealthJournal.Tests.Services
             var sessionId = "session-123";
             var session = new ChatSession
             {
-                Id = sessionId,
+                id = sessionId,
+                ChatSessionId = sessionId,
                 UserId = TestUserId,
                 IsActive = true
             };
@@ -304,15 +308,15 @@ namespace MentalHealthJournal.Tests.Services
 
             _containerMock.Setup(c => c.ReadItemAsync<ChatSession>(
                 sessionId,
-                It.Is<PartitionKey>(pk => pk.ToString().Contains(TestUserId)),
+                It.Is<PartitionKey>(pk => pk.ToString().Contains(sessionId)),
                 It.IsAny<ItemRequestOptions>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(readResponseMock.Object);
 
             var upsertResponseMock = new Mock<ItemResponse<ChatSession>>();
             _containerMock.Setup(c => c.UpsertItemAsync(
-                It.Is<ChatSession>(s => s.Id == sessionId && !s.IsActive),
-                It.Is<PartitionKey>(pk => pk.ToString().Contains(TestUserId)),
+                It.Is<ChatSession>(s => s.id == sessionId && !s.IsActive),
+                It.Is<PartitionKey>(pk => pk.ToString().Contains(sessionId)),
                 It.IsAny<ItemRequestOptions>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(upsertResponseMock.Object);
