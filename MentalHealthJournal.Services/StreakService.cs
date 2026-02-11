@@ -19,7 +19,7 @@ namespace MentalHealthJournal.Services
             _logger = logger;
         }
 
-        public async Task<(int currentStreak, int longestStreak)> CalculateStreaksAsync(string userId, CancellationToken cancellationToken = default)
+        public async Task<(int currentStreak, int longestStreak)> CalculateStreaksAsync(string userId, int timezoneOffsetMinutes = 0, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -30,9 +30,9 @@ namespace MentalHealthJournal.Services
                     return (0, 0);
                 }
 
-                // Get unique dates (in UTC, date part only)
+                // Get unique dates in the user's timezone
                 var entryDates = entries
-                    .Select(e => e.Timestamp.Date)
+                    .Select(e => e.Timestamp.AddMinutes(timezoneOffsetMinutes).Date)
                     .Distinct()
                     .OrderByDescending(d => d)
                     .ToList();
@@ -44,7 +44,7 @@ namespace MentalHealthJournal.Services
 
                 // Calculate current streak
                 int currentStreak = 0;
-                DateTime today = DateTime.UtcNow.Date;
+                DateTime today = DateTime.UtcNow.AddMinutes(timezoneOffsetMinutes).Date;
                 DateTime checkDate = today;
 
                 foreach (var date in entryDates)
@@ -83,8 +83,8 @@ namespace MentalHealthJournal.Services
                 longestStreak = Math.Max(longestStreak, tempStreak);
                 longestStreak = Math.Max(longestStreak, currentStreak);
 
-                _logger.LogInformation("Calculated streaks for user {UserId}: Current={Current}, Longest={Longest}", 
-                    userId, currentStreak, longestStreak);
+                _logger.LogInformation("Calculated streaks for user {UserId} with timezone offset {Offset}: Current={Current}, Longest={Longest}", 
+                    userId, timezoneOffsetMinutes, currentStreak, longestStreak);
 
                 return (currentStreak, longestStreak);
             }
@@ -113,7 +113,9 @@ namespace MentalHealthJournal.Services
                     }
                 }
                 
-                var (currentStreak, longestStreak) = await CalculateStreaksAsync(userId, cancellationToken);
+                // Calculate streaks using UTC (timezone offset 0)
+                // The actual timezone-adjusted streak will be calculated when the user requests it via GetStreak
+                var (currentStreak, longestStreak) = await CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0, cancellationToken);
                 
                 if (user != null)
                 {

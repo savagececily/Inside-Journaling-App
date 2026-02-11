@@ -463,7 +463,7 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         [HttpGet("streak")]
-        public async Task<IActionResult> GetStreak(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetStreak([FromQuery] int? timezoneOffsetMinutes, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -475,7 +475,10 @@ namespace MentalHealthJournal.Server.Controllers
 
             try
             {
-                var (currentStreak, longestStreak) = await _streakService.CalculateStreaksAsync(userId, cancellationToken);
+                // Use the provided timezone offset, defaulting to 0 (UTC) if not provided
+                int timezoneOffset = timezoneOffsetMinutes ?? 0;
+                
+                var (currentStreak, longestStreak) = await _streakService.CalculateStreaksAsync(userId, timezoneOffset, cancellationToken);
                 
                 _logger.LogInformation("Retrieved streak for user {UserId}: Current={Current}, Longest={Longest}", 
                     userId, currentStreak, longestStreak);

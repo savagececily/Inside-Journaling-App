@@ -41,7 +41,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(new List<JournalEntry>());
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(0, result.currentStreak);
@@ -70,7 +70,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(entries);
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(1, result.currentStreak);
@@ -96,7 +96,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(entries);
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(4, result.currentStreak);
@@ -126,7 +126,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(entries);
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(2, result.currentStreak); // Current streak: today and yesterday
@@ -151,7 +151,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(entries);
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(2, result.currentStreak); // Today and yesterday, not 3
@@ -261,7 +261,7 @@ namespace MentalHealthJournal.Tests.Services
                 .ReturnsAsync(entries);
 
             // Act
-            var result = await _streakService.CalculateStreaksAsync(userId);
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: 0);
 
             // Assert
             Assert.Equal(0, result.currentStreak); // No current streak
@@ -288,6 +288,61 @@ namespace MentalHealthJournal.Tests.Services
 
             // Verify no update was attempted (because user is null after the calculation)
             _userServiceMock.Verify(x => x.CreateOrUpdateUserAsync(It.IsAny<User>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task CalculateStreaksAsync_WithTimezoneOffset_CalculatesCorrectly()
+        {
+            // Arrange
+            var userId = "test-user-id";
+            
+            // Use actual current time for testing
+            var utcNow = DateTime.UtcNow;
+            var utcToday = utcNow.Date;
+            
+            // Use -480 minutes (UTC-8) as timezone offset
+            // Note: This represents standard time (PST). During daylight saving time, 
+            // the offset would be -420 minutes (PDT/UTC-7)
+            int timezoneOffset = -480;
+            
+            // Calculate "today" in the user's timezone
+            var userToday = utcToday.AddMinutes(timezoneOffset);
+            
+            // Create entries for consecutive days in user's timezone
+            var entries = new List<JournalEntry>
+            {
+                // Entry for "today" in user's timezone (stored as UTC)
+                new JournalEntry 
+                { 
+                    id = "1", 
+                    userId = userId, 
+                    Text = "Today in user timezone", 
+                    // Convert user's local date to UTC for storage
+                    Timestamp = userToday.AddMinutes(-timezoneOffset)
+                },
+                // Entry for "yesterday" in user's timezone (stored as UTC)
+                new JournalEntry 
+                { 
+                    id = "2", 
+                    userId = userId, 
+                    Text = "Yesterday in user timezone", 
+                    // Convert user's local date to UTC for storage
+                    Timestamp = userToday.AddDays(-1).AddMinutes(-timezoneOffset)
+                }
+            };
+
+            _cosmosServiceMock
+                .Setup(x => x.GetEntriesForUserAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(entries);
+
+            // Act - Use timezone offset
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: timezoneOffset);
+
+            // Assert
+            // The entries were created for consecutive days in the user's timezone, so streak should be 2
+            // This test demonstrates that timezone conversion works correctly
+            Assert.Equal(2, result.currentStreak);
+            Assert.Equal(2, result.longestStreak);
         }
     }
 }
