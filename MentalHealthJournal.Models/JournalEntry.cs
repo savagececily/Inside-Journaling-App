@@ -6,12 +6,13 @@
         {
             id = Guid.NewGuid().ToString();
             journalEntryId = id; // partition key should match id
+            Timestamp = DateTime.UtcNow;
         }
 
         public string id { get; set; } = string.Empty;
         public string journalEntryId { get; set; } = string.Empty; // partition key
         public string userId { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public DateTime Timestamp { get; set; }
         public string? Text { get; set; } 
         public bool IsVoiceEntry { get; set; }
         public string? AudioBlobUrl { get; set; }
