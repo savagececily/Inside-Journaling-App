@@ -85,9 +85,12 @@ public class UserService : IUserService
         {
             user.LastLoginAt = DateTime.UtcNow;
             
-            // Ensure id and userId are consistent
-            if (string.IsNullOrEmpty(user.id))
+            // ALWAYS ensure id and userId are consistent
+            // This fixes any historical data where id != userId
+            if (user.id != user.userId)
             {
+                _logger.LogWarning("Correcting user ID mismatch: id={OldId} -> userId={UserId} for provider={Provider}, providerId={ProviderId}", 
+                    user.id, user.userId, user.Provider, user.ProviderId);
                 user.id = user.userId;
             }
             
