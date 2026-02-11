@@ -2,7 +2,13 @@
 {
     public class JournalEntry
     {
-        public string id { get; set; } = Guid.NewGuid().ToString();
+        public JournalEntry()
+        {
+            id = Guid.NewGuid().ToString();
+            journalEntryId = id; // partition key should match id
+        }
+
+        public string id { get; set; } = string.Empty;
         public string journalEntryId { get; set; } = string.Empty; // partition key
         public string userId { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
