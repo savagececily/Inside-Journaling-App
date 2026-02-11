@@ -241,8 +241,7 @@ namespace MentalHealthJournal.Tests.Services
             _userServiceMock.Verify(x => x.CreateOrUpdateUserAsync(It.Is<User>(u =>
                 u.CurrentStreak == 1 &&
                 u.LongestStreak == 1 &&
-                u.LastStreakUpdateDate.HasValue &&
-                u.LastStreakUpdateDate.Value.Date == today
+                u.LastStreakUpdateDate == today
             )), Times.Once);
         }
 
@@ -301,32 +300,34 @@ namespace MentalHealthJournal.Tests.Services
             var utcNow = DateTime.UtcNow;
             var utcToday = utcNow.Date;
             
-            // PST is UTC-8 hours = -480 minutes
-            int pstOffset = -480;
+            // Use -480 minutes (UTC-8) as timezone offset
+            // Note: This represents standard time (PST). During daylight saving time, 
+            // the offset would be -420 minutes (PDT/UTC-7)
+            int timezoneOffset = -480;
             
-            // Calculate "today" in PST
-            var pstToday = utcToday.AddMinutes(pstOffset);
+            // Calculate "today" in the user's timezone
+            var userToday = utcToday.AddMinutes(timezoneOffset);
             
-            // Create entries for consecutive days in PST timezone
+            // Create entries for consecutive days in user's timezone
             var entries = new List<JournalEntry>
             {
-                // Entry for "today" in PST (stored as UTC)
+                // Entry for "today" in user's timezone (stored as UTC)
                 new JournalEntry 
                 { 
                     id = "1", 
                     userId = userId, 
-                    Text = "Today in PST", 
-                    // Convert PST date to UTC for storage
-                    Timestamp = pstToday.AddMinutes(-pstOffset)
+                    Text = "Today in user timezone", 
+                    // Convert user's local date to UTC for storage
+                    Timestamp = userToday.AddMinutes(-timezoneOffset)
                 },
-                // Entry for "yesterday" in PST (stored as UTC)
+                // Entry for "yesterday" in user's timezone (stored as UTC)
                 new JournalEntry 
                 { 
                     id = "2", 
                     userId = userId, 
-                    Text = "Yesterday in PST", 
-                    // Convert PST date to UTC for storage
-                    Timestamp = pstToday.AddDays(-1).AddMinutes(-pstOffset)
+                    Text = "Yesterday in user timezone", 
+                    // Convert user's local date to UTC for storage
+                    Timestamp = userToday.AddDays(-1).AddMinutes(-timezoneOffset)
                 }
             };
 
@@ -334,11 +335,11 @@ namespace MentalHealthJournal.Tests.Services
                 .Setup(x => x.GetEntriesForUserAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(entries);
 
-            // Act - Use PST timezone offset (-480 minutes = -8 hours)
-            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: pstOffset);
+            // Act - Use timezone offset
+            var result = await _streakService.CalculateStreaksAsync(userId, timezoneOffsetMinutes: timezoneOffset);
 
             // Assert
-            // The entries were created for consecutive days in PST, so streak should be 2
+            // The entries were created for consecutive days in the user's timezone, so streak should be 2
             // This test demonstrates that timezone conversion works correctly
             Assert.Equal(2, result.currentStreak);
             Assert.Equal(2, result.longestStreak);

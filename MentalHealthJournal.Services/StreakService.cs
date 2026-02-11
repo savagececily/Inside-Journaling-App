@@ -124,7 +124,7 @@ namespace MentalHealthJournal.Services
                 {
                     user.CurrentStreak = currentStreak;
                     user.LongestStreak = longestStreak;
-                    user.LastStreakUpdateDate = DateTime.UtcNow;
+                    user.LastStreakUpdateDate = DateTime.UtcNow.Date;
                     
                     await _userService.CreateOrUpdateUserAsync(user);
                     
