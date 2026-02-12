@@ -4,8 +4,9 @@ namespace MentalHealthJournal.Services;
 
 public interface IUserService
 {
-    Task<User?> GetUserByProviderIdAsync(string providerId, string provider);
-    Task<User?> GetUserByIdAsync(string userId);
-    Task<User> CreateOrUpdateUserAsync(User user);
-    Task<bool> IsUsernameAvailableAsync(string username, string? currentUserId = null);
+    public Task<User?> GetUserByProviderIdAsync(string providerId, string provider);
+    public Task<User?> GetUserByIdAsync(string userId);
+    public Task<User> CreateOrUpdateUserAsync(User user);
+    public Task<bool> IsUsernameAvailableAsync(string username, string? currentUserId = null);
+    public Task DeleteUserAsync(string userId, CancellationToken cancellationToken = default);
 }

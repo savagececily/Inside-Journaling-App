@@ -1,0 +1,121 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MentalHealthJournal.Models;
+using MentalHealthJournal.Services;
+using System.Security.Claims;
+
+namespace MentalHealthJournal.Server.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+[Authorize]
+public class UserDataController : ControllerBase
+{
+    private readonly IUserService _userService;
+    private readonly ICosmosDbService _cosmosDbService;
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly IAuditLogService _auditLogService;
+    private readonly IUserConsentService _userConsentService;
+    private readonly ILogger<UserDataController> _logger;
+
+    public UserDataController(
+        IUserService userService,
+        ICosmosDbService cosmosDbService,
+        IBlobStorageService blobStorageService,
+        IAuditLogService auditLogService,
+        IUserConsentService userConsentService,
+        ILogger<UserDataController> logger)
+    {
+        _userService = userService;
+        _cosmosDbService = cosmosDbService;
+        _blobStorageService = blobStorageService;
+        _auditLogService = auditLogService;
+        _userConsentService = userConsentService;
+        _logger = logger;
+    }
+
+    /// <summary>
+    /// Delete all user data including journal entries, audio files, and user profile
+    /// </summary>
+    [HttpDelete("delete-all")]
+    public async Task<IActionResult> DeleteAllUserData(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token");
+            }
+
+            _logger.LogInformation("Starting complete data deletion for user {UserId}", userId);
+            
+            // Get IP and User Agent for audit log
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+
+            // Delete journal entries
+            var entriesDeleted = await _cosmosDbService.DeleteAllUserEntriesAsync(userId, cancellationToken);
+            _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", entriesDeleted, userId);
+
+            // Delete audio files
+            var audioFilesDeleted = await _blobStorageService.DeleteAllUserAudioAsync(userId, cancellationToken);
+            _logger.LogInformation("Deleted {Count} audio files for user {UserId}", audioFilesDeleted, userId);
+
+            // Delete user profile
+            await _userService.DeleteUserAsync(userId, cancellationToken);
+            _logger.LogInformation("Deleted user profile for user {UserId}", userId);
+
+            // Final audit log for account deletion
+            await _auditLogService.LogActionAsync(
+                userId,
+                "Delete",
+                "Account",
+                userId,
+                successful: true,
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                additionalDetails: $"Complete account deletion: {entriesDeleted} entries, {audioFilesDeleted} audio files",
+                cancellationToken: cancellationToken);
+
+            return Ok(new
+            {
+                message = "All user data has been permanently deleted",
+                entriesDeleted,
+                audioFilesDeleted,
+                timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting all user data");
+            return StatusCode(500, new { error = "Failed to delete user data", details = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get audit logs for the current user
+    /// </summary>
+    [HttpGet("audit-logs")]
+    public async Task<IActionResult> GetAuditLogs([FromQuery] int? limit = 100, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token");
+            }
+
+            var auditLogs = await _auditLogService.GetUserAuditLogsAsync(userId, limit, cancellationToken);
+            return Ok(auditLogs);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving audit logs");
+            return StatusCode(500, new { error = "Failed to retrieve audit logs", details = ex.Message });
+        }
+    }
+}

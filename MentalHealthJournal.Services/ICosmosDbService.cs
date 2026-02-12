@@ -10,5 +10,6 @@ namespace MentalHealthJournal.Services
         public Task<JournalEntry> UpdateJournalEntryAsync(JournalEntry journalEntry, CancellationToken cancellationToken = default);
         public Task DeleteJournalEntryAsync(string entryId, string journalEntryId, CancellationToken cancellationToken = default);
         public Task<List<JournalEntry>> GetEntriesForUserByDateRangeAsync(string userId, DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+        public Task<int> DeleteAllUserEntriesAsync(string userId, CancellationToken cancellationToken = default);
     }
 }

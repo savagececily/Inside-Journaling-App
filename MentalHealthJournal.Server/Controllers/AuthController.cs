@@ -88,7 +88,9 @@ public class AuthController : ControllerBase
                     Provider = "google",
                     ProviderId = payload.Subject,
                     CreatedAt = DateTime.UtcNow,
-                    LastLoginAt = DateTime.UtcNow
+                    LastLoginAt = DateTime.UtcNow,
+                    DateOfBirth = request.DateOfBirth,
+                    AgeVerified = request.DateOfBirth.HasValue && CalculateAge(request.DateOfBirth.Value) >= 13
                 };
                 
                 // Use upsert to handle race conditions - if another request already created this user, it will update instead
@@ -98,13 +100,17 @@ public class AuthController : ControllerBase
                     deterministicId, payload.Subject);
             }
 
+            // Check if age verification is required
+            bool requiresAgeVerification = !user.AgeVerified;
+
             // Generate JWT token
             var jwtToken = GenerateJwtToken(user);
 
             return Ok(new AuthResponse
             {
                 Token = jwtToken,
-                User = user
+                User = user,
+                RequiresAgeVerification = requiresAgeVerification
             });
         }
         catch (InvalidJwtException ex)
@@ -265,7 +271,7 @@ public class AuthController : ControllerBase
             issuer: jwtIssuer,
             audience: jwtAudience,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddMinutes(30), // 30-minute session timeout for compliance
             signingCredentials: credentials
         );
 
@@ -302,5 +308,63 @@ public class AuthController : ControllerBase
         Array.Copy(hash, guidBytes, 16);
         
         return new Guid(guidBytes).ToString();
+    }
+
+    [HttpPost("verify-age")]
+    [Authorize]
+    public async Task<IActionResult> VerifyAge([FromBody] AgeVerificationRequest request)
+    {
+        try
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token");
+            }
+
+            // Calculate age
+            int age = CalculateAge(request.DateOfBirth);
+            
+            if (age < 13)
+            {
+                _logger.LogWarning("Age verification failed for user {UserId}: Age {Age} is below minimum", userId, age);
+                return BadRequest(new { error = "You must be at least 13 years old to use this service.", minimumAge = 13 });
+            }
+
+            // Update user with age verification
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            user.DateOfBirth = request.DateOfBirth;
+            user.AgeVerified = true;
+            await _userService.CreateOrUpdateUserAsync(user);
+
+            _logger.LogInformation("Age verified for user {UserId}: Age {Age}", userId, age);
+
+            return Ok(new { message = "Age verified successfully", age, ageVerified = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error verifying age");
+            return StatusCode(500, new { error = "Failed to verify age" });
+        }
+    }
+
+    private int CalculateAge(DateTime dateOfBirth)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - dateOfBirth.Year;
+        
+        // Adjust if birthday hasn't occurred this year
+        if (dateOfBirth.Date > today.AddYears(-age))
+        {
+            age--;
+        }
+        
+        return age;
     }
 }

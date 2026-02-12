@@ -11,13 +11,15 @@ namespace MentalHealthJournal.Services
         private readonly CosmosClient _cosmosClient;
         private readonly AppSettings _appSettings;
         private readonly Container _container;
+        private readonly IAuditLogService? _auditLogService;
 
-        public CosmosDbService(ILogger<CosmosDbService> logger, CosmosClient cosmosClient, IOptions<AppSettings> options)
+        public CosmosDbService(ILogger<CosmosDbService> logger, CosmosClient cosmosClient, IOptions<AppSettings> options, IAuditLogService? auditLogService = null)
         {
             _logger = logger;
             _cosmosClient = cosmosClient;
             _appSettings = options.Value;
             _container = _cosmosClient.GetContainer(_appSettings.CosmosDb.DatabaseName, _appSettings.CosmosDb.JournalEntryContainer);
+            _auditLogService = auditLogService;
         }
 
         public async Task SaveJournalEntryAsync(JournalEntry journalEntry, CancellationToken cancellationToken = default)
@@ -27,10 +29,36 @@ namespace MentalHealthJournal.Services
                 _logger.LogInformation("Saving journal entry for user {UserId}", journalEntry.userId);
                await _container.CreateItemAsync(journalEntry, new PartitionKey(journalEntry.journalEntryId), cancellationToken: cancellationToken);
                 _logger.LogInformation("Journal entry saved successfully for user {UserId}", journalEntry.userId);
+                
+                // Audit log
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        journalEntry.userId,
+                        "Create",
+                        "JournalEntry",
+                        journalEntry.id,
+                        successful: true,
+                        cancellationToken: cancellationToken);
+                }
             }
             catch (CosmosException ex)
             {
                 _logger.LogError(ex, "Cosmos DB error saving journal entry for user {UserId}. Status: {Status}", journalEntry.userId, ex.StatusCode);
+                
+                // Audit log failure
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        journalEntry.userId,
+                        "Create",
+                        "JournalEntry",
+                        journalEntry.id,
+                        successful: false,
+                        errorMessage: ex.Message,
+                        cancellationToken: cancellationToken);
+                }
+                
                 throw new InvalidOperationException($"Failed to save journal entry: {ex.Message}", ex);
             }
             catch (Exception ex)
@@ -59,6 +87,20 @@ namespace MentalHealthJournal.Services
                 }
 
                 _logger.LogInformation("Retrieved {Count} journal entries for user {UserId}", results.Count, userId);
+                
+                // Audit log
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        userId,
+                        "Read",
+                        "JournalEntry",
+                        "All",
+                        successful: true,
+                        additionalDetails: $"Retrieved {results.Count} entries",
+                        cancellationToken: cancellationToken);
+                }
+                
                 return results;
             }
             catch (CosmosException ex)
@@ -105,11 +147,38 @@ namespace MentalHealthJournal.Services
                 _logger.LogInformation("Updating journal entry {EntryId} for user {UserId}", journalEntry.id, journalEntry.userId);
                 var response = await _container.ReplaceItemAsync(journalEntry, journalEntry.id, new PartitionKey(journalEntry.journalEntryId), cancellationToken: cancellationToken);
                 _logger.LogInformation("Journal entry {EntryId} updated successfully for user {UserId}", journalEntry.id, journalEntry.userId);
+                
+                // Audit log
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        journalEntry.userId,
+                        "Update",
+                        "JournalEntry",
+                        journalEntry.id,
+                        successful: true,
+                        cancellationToken: cancellationToken);
+                }
+                
                 return response.Resource;
             }
             catch (CosmosException ex)
             {
                 _logger.LogError(ex, "Cosmos DB error updating journal entry {EntryId} for user {UserId}. Status: {Status}", journalEntry.id, journalEntry.userId, ex.StatusCode);
+                
+                // Audit log failure
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        journalEntry.userId,
+                        "Update",
+                        "JournalEntry",
+                        journalEntry.id,
+                        successful: false,
+                        errorMessage: ex.Message,
+                        cancellationToken: cancellationToken);
+                }
+                
                 throw new InvalidOperationException($"Failed to update journal entry: {ex.Message}", ex);
             }
             catch (Exception ex)
@@ -124,8 +193,25 @@ namespace MentalHealthJournal.Services
             try
             {
                 _logger.LogInformation("Deleting journal entry {EntryId} with partition key {JournalEntryId}", entryId, journalEntryId);
+                
+                // Get the entry first to extract userId for audit log
+                var entry = await _container.ReadItemAsync<JournalEntry>(entryId, new PartitionKey(journalEntryId), cancellationToken: cancellationToken);
+                var userId = entry.Resource.userId;
+                
                 await _container.DeleteItemAsync<JournalEntry>(entryId, new PartitionKey(journalEntryId), cancellationToken: cancellationToken);
                 _logger.LogInformation("Journal entry {EntryId} deleted successfully with partition key {JournalEntryId}", entryId, journalEntryId);
+                
+                // Audit log
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        userId,
+                        "Delete",
+                        "JournalEntry",
+                        entryId,
+                        successful: true,
+                        cancellationToken: cancellationToken);
+                }
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -181,6 +267,49 @@ namespace MentalHealthJournal.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving journal entries for user {UserId} by date range", userId);
+                throw;
+            }
+        }
+        
+        public async Task<int> DeleteAllUserEntriesAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                _logger.LogInformation("Deleting all journal entries for user {UserId}", userId);
+                
+                // Get all entries for the user
+                var entries = await GetEntriesForUserAsync(userId, cancellationToken);
+                int deletedCount = 0;
+                
+                foreach (var entry in entries)
+                {
+                    await _container.DeleteItemAsync<JournalEntry>(
+                        entry.id, 
+                        new PartitionKey(entry.journalEntryId), 
+                        cancellationToken: cancellationToken);
+                    deletedCount++;
+                }
+                
+                _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", deletedCount, userId);
+                
+                // Audit log
+                if (_auditLogService != null)
+                {
+                    await _auditLogService.LogActionAsync(
+                        userId,
+                        "Delete",
+                        "JournalEntry",
+                        "All",
+                        successful: true,
+                        additionalDetails: $"Deleted {deletedCount} entries during account deletion",
+                        cancellationToken: cancellationToken);
+                }
+                
+                return deletedCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting all journal entries for user {UserId}", userId);
                 throw;
             }
         }

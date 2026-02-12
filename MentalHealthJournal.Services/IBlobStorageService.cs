@@ -10,5 +10,6 @@ namespace MentalHealthJournal.Services
     public interface IBlobStorageService
     {
         public Task<string> UploadAudioAsync(IFormFile audioFile, string userId, CancellationToken cancellationToken = default);
+        public Task<int> DeleteAllUserAudioAsync(string userId, CancellationToken cancellationToken = default);
     }
 }

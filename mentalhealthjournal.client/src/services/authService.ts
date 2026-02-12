@@ -3,18 +3,41 @@ import type { AuthResponse } from '../types/auth';
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const authService = {
-    async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    async loginWithGoogle(idToken: string, dateOfBirth?: string): Promise<AuthResponse> {
+        const body: any = { idToken };
+        if (dateOfBirth) {
+            body.dateOfBirth = dateOfBirth;
+        }
+
         const response = await fetch(`${API_BASE_URL}/auth/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ idToken }),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
             const error = await response.text();
             throw new Error(`Authentication failed: ${error}`);
+        }
+
+        return response.json();
+    },
+
+    async verifyAge(token: string, dateOfBirth: string): Promise<{ message: string; age: number; ageVerified: boolean }> {
+        const response = await fetch(`${API_BASE_URL}/auth/verify-age`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ dateOfBirth }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Age verification failed');
         }
 
         return response.json();
