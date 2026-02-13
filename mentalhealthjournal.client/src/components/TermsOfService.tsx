@@ -5,6 +5,7 @@ export const TermsOfService: React.FC = () => {
     const [termsContent, setTermsContent] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>('');
+    const [lastUpdated, setLastUpdated] = useState<string>('');
 
     const loadTerms = () => {
         setLoading(true);
@@ -19,6 +20,13 @@ export const TermsOfService: React.FC = () => {
             })
             .then(text => {
                 setTermsContent(text);
+                
+                // Extract the "Last Updated" date from the markdown content
+                const dateMatch = text.match(/\*\*Last Updated:\*\*\s*(.+?)(?:\s*\n|\s*$)/);
+                if (dateMatch && dateMatch[1]) {
+                    setLastUpdated(dateMatch[1].trim());
+                }
+                
                 setLoading(false);
             })
             .catch(error => {
@@ -36,7 +44,7 @@ export const TermsOfService: React.FC = () => {
         <div className="legal-document">
             <div className="legal-document-header">
                 <h1>Terms of Service</h1>
-                <p className="document-meta">Last Updated: February 11, 2026</p>
+                {lastUpdated && <p className="document-meta">Last Updated: {lastUpdated}</p>}
             </div>
             <div className="legal-document-content">
                 {loading && (
