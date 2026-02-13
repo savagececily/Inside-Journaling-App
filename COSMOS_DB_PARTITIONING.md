@@ -129,6 +129,6 @@ SELECT * FROM c WHERE c.userId = @userId AND c.consentType = @consentType
 
 ## References
 
-- [Azure Cosmos DB Partitioning](https://docs.microsoft.com/en-us/azure/cosmos-db/partitioning-overview)
-- [Request Units in Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/request-units)
-- [Choosing a Partition Key](https://docs.microsoft.com/en-us/azure/cosmos-db/sql/how-to-choose-partition-key)
+- [Azure Cosmos DB Partitioning](https://learn.microsoft.com/en-us/azure/cosmos-db/partitioning-overview)
+- [Request Units in Azure Cosmos DB](https://learn.microsoft.com/en-us/azure/cosmos-db/request-units)
+- [Choosing a Partition Key](https://learn.microsoft.com/en-us/azure/cosmos-db/sql/how-to-choose-partition-key)
