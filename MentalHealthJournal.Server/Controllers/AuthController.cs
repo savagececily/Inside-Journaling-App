@@ -356,7 +356,7 @@ public class AuthController : ControllerBase
 
     private int CalculateAge(DateTime dateOfBirth)
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         var age = today.Year - dateOfBirth.Year;
         
         // Adjust if birthday hasn't occurred this year
