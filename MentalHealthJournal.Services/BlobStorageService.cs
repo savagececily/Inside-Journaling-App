@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using MentalHealthJournal.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -86,20 +88,100 @@ namespace MentalHealthJournal.Services
                 _logger.LogInformation("Deleting all audio files for user {UserId}", userId);
                 
                 BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_audioContainerName);
-                int deletedCount = 0;
                 
-                // List all blobs in the user's folder
+                // Collect all blob URIs to delete
+                var blobsToDelete = new List<BlobClient>();
                 await foreach (var blobItem in containerClient.GetBlobsAsync(prefix: $"{userId}/", cancellationToken: cancellationToken))
                 {
                     BlobClient blobClient = containerClient.GetBlobClient(blobItem.Name);
-                    await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
-                    deletedCount++;
-                    _logger.LogInformation("Deleted blob: {BlobName}", blobItem.Name);
+                    blobsToDelete.Add(blobClient);
                 }
                 
-                _logger.LogInformation("Deleted {Count} audio files for user {UserId}", deletedCount, userId);
+                int totalBlobs = blobsToDelete.Count;
+                _logger.LogInformation("Found {Count} audio files to delete for user {UserId}", totalBlobs, userId);
                 
-                // Audit log
+                if (totalBlobs == 0)
+                {
+                    _logger.LogInformation("No audio files found for user {UserId}", userId);
+                    return 0;
+                }
+                
+                // Use parallel deletion with controlled concurrency (max 10 concurrent deletions)
+                const int maxConcurrency = 10;
+                int deletedCount = 0;
+                int failedCount = 0;
+                var deletionLock = new object();
+                
+                var semaphore = new SemaphoreSlim(maxConcurrency, maxConcurrency);
+                var deletionTasks = blobsToDelete.Select(async blobClient =>
+                {
+                    await semaphore.WaitAsync(cancellationToken);
+                    try
+                    {
+                        var response = await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+                        
+                        lock (deletionLock)
+                        {
+                            if (response.Value)
+                            {
+                                deletedCount++;
+                            }
+                            else
+                            {
+                                // Blob didn't exist, but that's okay for a delete operation
+                                deletedCount++;
+                                _logger.LogDebug("Blob {BlobName} already deleted or not found", blobClient.Name);
+                            }
+                        }
+                    }
+                    catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+                    {
+                        // Blob already deleted - count as success
+                        lock (deletionLock)
+                        {
+                            deletedCount++;
+                        }
+                        _logger.LogDebug("Blob {BlobName} not found (already deleted)", blobClient.Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        lock (deletionLock)
+                        {
+                            failedCount++;
+                        }
+                        _logger.LogError(ex, "Failed to delete blob {BlobName} for user {UserId}", blobClient.Name, userId);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
+                
+                // Wait for all deletions to complete
+                await Task.WhenAll(deletionTasks);
+                
+                _logger.LogInformation("Deletion complete for user {UserId}: {DeletedCount} deleted, {FailedCount} failed out of {TotalCount} total", 
+                    userId, deletedCount, failedCount, totalBlobs);
+                
+                // If any deletions failed, log audit entry and throw exception
+                if (failedCount > 0)
+                {
+                    if (_auditLogService != null)
+                    {
+                        await _auditLogService.LogActionAsync(
+                            userId,
+                            "Delete",
+                            "AudioFile",
+                            "Partial",
+                            successful: false,
+                            additionalDetails: $"Deleted {deletedCount} of {totalBlobs} files, {failedCount} failed",
+                            cancellationToken: cancellationToken);
+                    }
+                    
+                    throw new InvalidOperationException($"Failed to delete all audio files. Successfully deleted {deletedCount} of {totalBlobs} files, {failedCount} failed.");
+                }
+                
+                // Audit log successful deletion
                 if (_auditLogService != null)
                 {
                     await _auditLogService.LogActionAsync(
@@ -108,13 +190,14 @@ namespace MentalHealthJournal.Services
                         "AudioFile",
                         "All",
                         successful: true,
-                        additionalDetails: $"Deleted {deletedCount} audio files during account deletion",
+                        additionalDetails: $"Deleted {deletedCount} audio files during account deletion using parallel operations",
                         cancellationToken: cancellationToken);
                 }
                 
+                _logger.LogInformation("Successfully deleted {Count} audio files for user {UserId}", deletedCount, userId);
                 return deletedCount;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not InvalidOperationException)
             {
                 _logger.LogError(ex, "Error deleting audio files for user {UserId}", userId);
                 throw;
