@@ -110,7 +110,7 @@ namespace MentalHealthJournal.Services
             int failedCount = 0;
             var deletionLock = new object();
             
-            var semaphore = new SemaphoreSlim(maxConcurrency, maxConcurrency);
+            using var semaphore = new SemaphoreSlim(maxConcurrency, maxConcurrency);
             var deletionTasks = blobsToDelete.Select(async blobClient =>
             {
                 await semaphore.WaitAsync(cancellationToken);
@@ -135,7 +135,7 @@ namespace MentalHealthJournal.Services
                 {
                     semaphore.Release();
                 }
-            });
+            }).ToArray();
             
             // Wait for all deletions to complete
             await Task.WhenAll(deletionTasks);
