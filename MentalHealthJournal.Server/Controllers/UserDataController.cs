@@ -125,7 +125,7 @@ public class UserDataController : ControllerBase
                 _logger.LogError(auditEx, "Failed to write audit log for deletion failure");
             }
             
-            return StatusCode(500, new { error = "Failed to delete user data", details = ex.Message });
+            return StatusCode(500, new { error = "Failed to delete user data. Please try again later or contact support if the issue persists." });
         }
     }
 
