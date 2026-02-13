@@ -108,7 +108,6 @@ namespace MentalHealthJournal.Services
             const int maxConcurrency = 10;
             int deletedCount = 0;
             int failedCount = 0;
-            var deletionLock = new object();
             
             using var semaphore = new SemaphoreSlim(maxConcurrency, maxConcurrency);
             var deletionTasks = blobsToDelete.Select(async blobClient =>
@@ -117,18 +116,11 @@ namespace MentalHealthJournal.Services
                 try
                 {
                     await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
-                    
-                    lock (deletionLock)
-                    {
-                        deletedCount++;
-                    }
+                    Interlocked.Increment(ref deletedCount);
                 }
                 catch (Exception ex)
                 {
-                    lock (deletionLock)
-                    {
-                        failedCount++;
-                    }
+                    Interlocked.Increment(ref failedCount);
                     _logger.LogError(ex, "Failed to delete blob {BlobName} for user {UserId}", blobClient.Name, userId);
                 }
                 finally
@@ -170,7 +162,7 @@ namespace MentalHealthJournal.Services
                     "AudioFile",
                     "All",
                     successful: true,
-                    additionalDetails: $"Deleted {deletedCount} audio files during account deletion using parallel operations",
+                    additionalDetails: $"Deleted {deletedCount} audio files using parallel operations",
                     cancellationToken: cancellationToken);
             }
             
