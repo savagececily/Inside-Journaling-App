@@ -65,6 +65,8 @@ export const consentService = {
 
     /**
      * Get consent status for all types
+     * @returns An object containing consent status for termsOfService, privacyPolicy, and aiProcessing,
+     * along with an allGranted flag indicating if all required consents have been granted
      */
     async getConsentStatus(token: string): Promise<ConsentStatusResponse> {
         const response = await fetch(`${API_BASE_URL}/Consent/status`, {
@@ -118,6 +120,7 @@ export const consentService = {
 
     /**
      * Get current consent versions
+     * @returns An object with version strings for termsOfService, privacyPolicy, and aiProcessing
      */
     async getConsentVersions(token: string): Promise<{ termsOfService: string; privacyPolicy: string; aiProcessing: string }> {
         const response = await fetch(`${API_BASE_URL}/Consent/versions`, {
