@@ -35,6 +35,16 @@ read -p "Enter your Cosmos DB account name: " ACCOUNT_NAME
 read -p "Enter your Cosmos DB database name [MentalHealthJournalDb]: " DATABASE_NAME
 DATABASE_NAME=${DATABASE_NAME:-MentalHealthJournalDb}
 
+# Validate required inputs
+if [ -z "$RESOURCE_GROUP" ]; then
+    echo "❌ Resource Group name is required. Please run the script again and provide a valid value."
+    exit 1
+fi
+
+if [ -z "$ACCOUNT_NAME" ]; then
+    echo "❌ Cosmos DB account name is required. Please run the script again and provide a valid value."
+    exit 1
+fi
 echo ""
 echo "Configuration:"
 echo "  Resource Group: $RESOURCE_GROUP"
