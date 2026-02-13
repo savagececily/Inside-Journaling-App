@@ -36,7 +36,7 @@ const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy, onViewTerms }) => {
 
             // Check if consents are required
             const consentStatus = await consentService.getConsentStatus(authResponse.token);
-            const hasAllConsents = consentStatus.every(c => c.hasConsent);
+            const hasAllConsents = consentStatus.allGranted;
 
             if (!hasAllConsents) {
                 setTempAuthResponse(authResponse);
@@ -66,7 +66,7 @@ const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy, onViewTerms }) => {
 
             // Now check consents
             const consentStatus = await consentService.getConsentStatus(tempAuthResponse.token);
-            const hasAllConsents = consentStatus.every(c => c.hasConsent);
+            const hasAllConsents = consentStatus.allGranted;
 
             if (!hasAllConsents) {
                 setShowConsentGate(true);
@@ -91,9 +91,9 @@ const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy, onViewTerms }) => {
             
             // Record all consents
             await Promise.all([
-                consentService.recordConsent(tempAuthResponse.token, 'TermsOfService', versions.TERMS_VERSION || '1.0', true),
-                consentService.recordConsent(tempAuthResponse.token, 'PrivacyPolicy', versions.PRIVACY_VERSION || '1.0', true),
-                consentService.recordConsent(tempAuthResponse.token, 'AIAnalysis', versions.AI_PROCESSING_VERSION || '1.0', true),
+                consentService.recordConsent(tempAuthResponse.token, 'TermsOfService', versions.termsOfService || '1.0', true),
+                consentService.recordConsent(tempAuthResponse.token, 'PrivacyPolicy', versions.privacyPolicy || '1.0', true),
+                consentService.recordConsent(tempAuthResponse.token, 'AIAnalysis', versions.aiProcessing || '1.0', true),
             ]);
 
             setShowConsentGate(false);
