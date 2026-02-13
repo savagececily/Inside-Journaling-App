@@ -31,6 +31,10 @@ export const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({ onVe
         }
 
         const birthDate = new Date(dateOfBirth);
+        if (isNaN(birthDate.getTime())) {
+            setError('Please enter a valid date');
+            return;
+        }
         const age = calculateAge(birthDate);
 
         if (age < 13) {
