@@ -74,7 +74,7 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType AND c.revokedDate = null ORDER BY c.consentDate DESC")
+                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType AND IS_NULL(c.revokedDate) ORDER BY c.consentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
