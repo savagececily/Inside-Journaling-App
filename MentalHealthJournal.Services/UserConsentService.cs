@@ -38,8 +38,7 @@ public class UserConsentService : IUserConsentService
         {
             var consent = new UserConsent
             {
-                userConsentId = Guid.NewGuid().ToString(), // Each consent gets unique partition key
-                UserId = userId,
+                UserId = userId, // Partition key - all consents for a user in same partition
                 ConsentType = consentType,
                 ConsentVersion = version,
                 Granted = granted,
@@ -50,7 +49,7 @@ public class UserConsentService : IUserConsentService
 
             await _container.CreateItemAsync(
                 consent,
-                new PartitionKey(consent.userConsentId),
+                new PartitionKey(consent.UserId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
@@ -74,11 +73,16 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType AND IS_NULL(c.revokedDate) ORDER BY c.consentDate DESC")
+                "SELECT TOP 1 * FROM c WHERE c.UserId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
-            var iterator = _container.GetItemQueryIterator<UserConsent>(query);
+            var queryRequestOptions = new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
+            };
+
+            var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
 
             if (iterator.HasMoreResults)
             {
@@ -121,11 +125,16 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE c.userId = @userId ORDER BY c.consentDate DESC")
+                "SELECT * FROM c WHERE c.UserId = @userId ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId);
 
+            var queryRequestOptions = new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
+            };
+
             var results = new List<UserConsent>();
-            var iterator = _container.GetItemQueryIterator<UserConsent>(query);
+            var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
 
             while (iterator.HasMoreResults)
             {
@@ -163,7 +172,7 @@ public class UserConsentService : IUserConsentService
             await _container.ReplaceItemAsync(
                 latestConsent,
                 latestConsent.id,
-                new PartitionKey(latestConsent.userConsentId),
+                new PartitionKey(latestConsent.UserId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Consent revoked: User {UserId}, Type {ConsentType}", userId, consentType);
