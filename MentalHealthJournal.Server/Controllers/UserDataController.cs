@@ -57,13 +57,13 @@ public class UserDataController : ControllerBase
         // This audit log will be retained for 7 years per Privacy Policy even after user deletion
         await _auditLogService.LogActionAsync(
             userId,
-            "Delete",
+            "DeleteInitiated",
             "Account",
             userId,
             successful: true,
             ipAddress: ipAddress,
             userAgent: userAgent,
-            additionalDetails: "Account deletion initiated",
+            additionalDetails: "Account deletion request received and initiated",
             cancellationToken: cancellationToken);
 
         try
@@ -104,18 +104,26 @@ public class UserDataController : ControllerBase
         {
             _logger.LogError(ex, "Error deleting all user data");
             
-            // Log the failure in audit log
-            await _auditLogService.LogActionAsync(
-                userId,
-                "Delete",
-                "Account",
-                userId,
-                successful: false,
-                errorMessage: ex.Message,
-                ipAddress: ipAddress,
-                userAgent: userAgent,
-                additionalDetails: "Account deletion failed",
-                cancellationToken: cancellationToken);
+            // Log the failure in audit log (wrap in try-catch to preserve original error)
+            try
+            {
+                await _auditLogService.LogActionAsync(
+                    userId,
+                    "Delete",
+                    "Account",
+                    userId,
+                    successful: false,
+                    errorMessage: ex.Message,
+                    ipAddress: ipAddress,
+                    userAgent: userAgent,
+                    additionalDetails: "Account deletion failed",
+                    cancellationToken: cancellationToken);
+            }
+            catch (Exception auditEx)
+            {
+                // Log audit failure but don't mask original error
+                _logger.LogError(auditEx, "Failed to write audit log for deletion failure");
+            }
             
             return StatusCode(500, new { error = "Failed to delete user data", details = ex.Message });
         }
