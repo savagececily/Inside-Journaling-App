@@ -80,7 +80,7 @@ public class AuditLogService : IAuditLogService
         try
         {
             var query = new QueryDefinition(
-                "SELECT TOP @limit * FROM c WHERE c.userId = @userId ORDER BY c.timestamp DESC")
+                "SELECT TOP @limit * FROM c WHERE c.UserId = @userId ORDER BY c.Timestamp DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@limit", limit ?? 100);
 
