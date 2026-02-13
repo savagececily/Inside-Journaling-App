@@ -356,11 +356,16 @@ public class AuthController : ControllerBase
 
     private int CalculateAge(DateTime dateOfBirth)
     {
-        var today = DateTime.Today;
-        var age = today.Year - dateOfBirth.Year;
+        // Use UTC for consistent age calculation regardless of server timezone
+        // Extract date components only (year, month, day) for comparison
+        var today = DateTime.UtcNow.Date;
+        var birthDate = dateOfBirth.Date;
+        
+        var age = today.Year - birthDate.Year;
         
         // Adjust if birthday hasn't occurred this year
-        if (dateOfBirth.Date > today.AddYears(-age))
+        if (birthDate.Month > today.Month || 
+            (birthDate.Month == today.Month && birthDate.Day > today.Day))
         {
             age--;
         }
