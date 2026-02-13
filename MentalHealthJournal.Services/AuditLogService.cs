@@ -41,8 +41,7 @@ public class AuditLogService : IAuditLogService
         {
             var auditLog = new AuditLog
             {
-                auditLogId = Guid.NewGuid().ToString(), // Each audit log gets unique partition key
-                UserId = userId,
+                UserId = userId, // Partition key - all audit logs for a user in same partition
                 Action = action,
                 ResourceType = resourceType,
                 ResourceId = resourceId,
@@ -56,7 +55,7 @@ public class AuditLogService : IAuditLogService
 
             await _container.CreateItemAsync(
                 auditLog,
-                new PartitionKey(auditLog.auditLogId),
+                new PartitionKey(auditLog.UserId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
@@ -84,8 +83,13 @@ public class AuditLogService : IAuditLogService
                 .WithParameter("@userId", userId)
                 .WithParameter("@limit", limit ?? 100);
 
+            var queryRequestOptions = new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
+            };
+
             var results = new List<AuditLog>();
-            var iterator = _container.GetItemQueryIterator<AuditLog>(query);
+            var iterator = _container.GetItemQueryIterator<AuditLog>(query, requestOptions: queryRequestOptions);
 
             while (iterator.HasMoreResults)
             {
