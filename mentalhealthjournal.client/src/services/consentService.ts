@@ -7,6 +7,25 @@ export interface ConsentStatus {
     grantedAt?: string;
 }
 
+export interface ConsentStatusResponse {
+    termsOfService: {
+        required: boolean;
+        version: string;
+        granted: boolean;
+    };
+    privacyPolicy: {
+        required: boolean;
+        version: string;
+        granted: boolean;
+    };
+    aiProcessing: {
+        required: boolean;
+        version: string;
+        granted: boolean;
+    };
+    allGranted: boolean;
+}
+
 export interface ConsentHistory {
     id: string;
     userId: string;
@@ -47,7 +66,7 @@ export const consentService = {
     /**
      * Get consent status for all types
      */
-    async getConsentStatus(token: string): Promise<ConsentStatus[]> {
+    async getConsentStatus(token: string): Promise<ConsentStatusResponse> {
         const response = await fetch(`${API_BASE_URL}/Consent/status`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -100,7 +119,7 @@ export const consentService = {
     /**
      * Get current consent versions
      */
-    async getConsentVersions(token: string): Promise<{ [key: string]: string }> {
+    async getConsentVersions(token: string): Promise<{ termsOfService: string; privacyPolicy: string; aiProcessing: string }> {
         const response = await fetch(`${API_BASE_URL}/Consent/versions`, {
             headers: {
                 'Authorization': `Bearer ${token}`,
