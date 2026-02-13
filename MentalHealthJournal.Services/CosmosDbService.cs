@@ -280,15 +280,37 @@ namespace MentalHealthJournal.Services
                 // Get all entries for the user
                 var entries = await GetEntriesForUserAsync(userId, cancellationToken);
                 int deletedCount = 0;
+
+                // Delete entries in parallel with controlled concurrency to improve performance
+                // while avoiding excessive RU consumption and preserving best-effort semantics.
+                var deleteTasks = new List<Task>();
+                var concurrencySemaphore = new System.Threading.SemaphoreSlim(5); // limit concurrent deletes
                 
                 foreach (var entry in entries)
                 {
-                    await _container.DeleteItemAsync<JournalEntry>(
-                        entry.id, 
-                        new PartitionKey(entry.journalEntryId), 
-                        cancellationToken: cancellationToken);
-                    deletedCount++;
+                    await concurrencySemaphore.WaitAsync(cancellationToken);
+
+                    var deleteTask = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _container.DeleteItemAsync<JournalEntry>(
+                                entry.id,
+                                new PartitionKey(entry.journalEntryId),
+                                cancellationToken: cancellationToken);
+                            
+                            System.Threading.Interlocked.Increment(ref deletedCount);
+                        }
+                        finally
+                        {
+                            concurrencySemaphore.Release();
+                        }
+                    }, cancellationToken);
+
+                    deleteTasks.Add(deleteTask);
                 }
+
+                await Task.WhenAll(deleteTasks);
                 
                 _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", deletedCount, userId);
                 
