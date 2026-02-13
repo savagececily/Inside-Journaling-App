@@ -424,6 +424,7 @@ function App() {
     if (!isAuthenticated) {
         if (showPrivacyPolicy) {
             return <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />;
+        }
 
         if (showTermsOfService) {
             return (
