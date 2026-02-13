@@ -40,21 +40,34 @@ public class UserDataController : ControllerBase
     [HttpDelete("delete-all")]
     public async Task<IActionResult> DeleteAllUserData(CancellationToken cancellationToken)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized("User ID not found in token");
+        }
+
+        _logger.LogInformation("Starting complete data deletion for user {UserId}", userId);
+        
+        // Get IP and User Agent for audit log
+        var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
+
+        // Create audit log BEFORE deletion to ensure traceability
+        // This audit log will be retained for 7 years per Privacy Policy even after user deletion
+        await _auditLogService.LogActionAsync(
+            userId,
+            "Delete",
+            "Account",
+            userId,
+            successful: true,
+            ipAddress: ipAddress,
+            userAgent: userAgent,
+            additionalDetails: "Account deletion initiated",
+            cancellationToken: cancellationToken);
+
         try
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("User ID not found in token");
-            }
-
-            _logger.LogInformation("Starting complete data deletion for user {UserId}", userId);
-            
-            // Get IP and User Agent for audit log
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
-
             // Delete journal entries
             var entriesDeleted = await _cosmosDbService.DeleteAllUserEntriesAsync(userId, cancellationToken);
             _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", entriesDeleted, userId);
@@ -67,7 +80,7 @@ public class UserDataController : ControllerBase
             await _userService.DeleteUserAsync(userId, cancellationToken);
             _logger.LogInformation("Deleted user profile for user {UserId}", userId);
 
-            // Final audit log for account deletion
+            // Log completion details
             await _auditLogService.LogActionAsync(
                 userId,
                 "Delete",
@@ -76,7 +89,7 @@ public class UserDataController : ControllerBase
                 successful: true,
                 ipAddress: ipAddress,
                 userAgent: userAgent,
-                additionalDetails: $"Complete account deletion: {entriesDeleted} entries, {audioFilesDeleted} audio files",
+                additionalDetails: $"Account deletion completed: {entriesDeleted} entries, {audioFilesDeleted} audio files",
                 cancellationToken: cancellationToken);
 
             return Ok(new
@@ -90,6 +103,20 @@ public class UserDataController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting all user data");
+            
+            // Log the failure in audit log
+            await _auditLogService.LogActionAsync(
+                userId,
+                "Delete",
+                "Account",
+                userId,
+                successful: false,
+                errorMessage: ex.Message,
+                ipAddress: ipAddress,
+                userAgent: userAgent,
+                additionalDetails: "Account deletion failed",
+                cancellationToken: cancellationToken);
+            
             return StatusCode(500, new { error = "Failed to delete user data", details = ex.Message });
         }
     }
