@@ -17,15 +17,18 @@ public class AuthController : ControllerBase
     private readonly IUserService _userService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<AuthController> _logger;
+    private readonly IAccountDeletionService _accountDeletionService;
 
     public AuthController(
         IUserService userService,
         IConfiguration configuration,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        IAccountDeletionService accountDeletionService)
     {
         _userService = userService;
         _configuration = configuration;
         _logger = logger;
+        _accountDeletionService = accountDeletionService;
     }
 
     [HttpPost("google")]
@@ -302,5 +305,80 @@ public class AuthController : ControllerBase
         Array.Copy(hash, guidBytes, 16);
         
         return new Guid(guidBytes).ToString();
+    }
+
+    [HttpPost("request-deletion")]
+    [Authorize]
+    public async Task<ActionResult<RequestAccountDeletionResponse>> RequestAccountDeletion()
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+
+            _logger.LogInformation("Account deletion requested for user {UserId}", userIdClaim);
+
+            // Create deletion token
+            var deletionToken = await _accountDeletionService.RequestAccountDeletionAsync(userIdClaim);
+
+            return Ok(new RequestAccountDeletionResponse
+            {
+                Message = "Account deletion requested. Please use the confirmation token to complete the deletion within 24 hours. This action is irreversible and will permanently delete all your journal entries, audio recordings, and account data.",
+                ExpiresAt = deletionToken.ExpiresAt,
+                ConfirmationToken = deletionToken.Token
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error requesting account deletion");
+            return StatusCode(500, "Failed to request account deletion");
+        }
+    }
+
+    [HttpPost("confirm-deletion")]
+    [Authorize]
+    public async Task<ActionResult> ConfirmAccountDeletion([FromBody] ConfirmAccountDeletionRequest request)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+
+            if (string.IsNullOrWhiteSpace(request.ConfirmationToken))
+            {
+                return BadRequest("Confirmation token is required");
+            }
+
+            _logger.LogInformation("Account deletion confirmation for user {UserId}", userIdClaim);
+
+            // Validate the confirmation token
+            var isValid = await _accountDeletionService.ValidateConfirmationTokenAsync(userIdClaim, request.ConfirmationToken);
+
+            if (!isValid)
+            {
+                _logger.LogWarning("Invalid or expired confirmation token for user {UserId}", userIdClaim);
+                return BadRequest("Invalid or expired confirmation token");
+            }
+
+            // Delete all user data
+            await _accountDeletionService.DeleteAllUserDataAsync(userIdClaim);
+
+            _logger.LogInformation("Account deletion completed for user {UserId}", userIdClaim);
+
+            return Ok(new { message = "Your account and all associated data have been permanently deleted." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error confirming account deletion");
+            return StatusCode(500, "Failed to complete account deletion");
+        }
     }
 }

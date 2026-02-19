@@ -64,5 +64,45 @@ namespace MentalHealthJournal.Services
             }
         }
 
+        public async Task DeleteAudioAsync(string blobUrl, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(blobUrl))
+                {
+                    throw new ArgumentException("Blob URL is null or empty");
+                }
+
+                _logger.LogInformation("Deleting audio file from blob storage: {BlobUrl}", blobUrl);
+
+                // Extract blob name from URL
+                var uri = new Uri(blobUrl);
+                var blobName = uri.AbsolutePath.TrimStart('/');
+                
+                // Remove container name from path if present
+                if (blobName.StartsWith(_audioContainerName + "/"))
+                {
+                    blobName = blobName.Substring(_audioContainerName.Length + 1);
+                }
+
+                BlobContainerClient containerClient = _blobServiceClient.GetBlobContainerClient(_audioContainerName);
+                BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+                await blobClient.DeleteIfExistsAsync(cancellationToken: cancellationToken);
+
+                _logger.LogInformation("Successfully deleted audio file from blob storage: {BlobUrl}", blobUrl);
+            }
+            catch (Azure.RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure Storage error deleting audio file {BlobUrl}. Status: {Status}", blobUrl, ex.Status);
+                throw new InvalidOperationException($"Failed to delete audio file: {ex.Message}", ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting audio file from blob storage: {BlobUrl}", blobUrl);
+                throw;
+            }
+        }
+
     }
 }
