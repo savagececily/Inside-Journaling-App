@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         return () => {
             if (warningTimer) clearTimeout(warningTimer);
-            if (logoutTimer) clearTimeout(logoutTimer);
+            clearTimeout(logoutTimer);
         };
     }, [token, logout]);
 
@@ -91,7 +91,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 // Token expired, clear storage
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('user');
-                localStorage.removeItem('loginTime');
             }
         }
         setIsLoading(false);
@@ -103,7 +102,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setShowSessionWarning(false);
         localStorage.setItem('authToken', authResponse.token);
         localStorage.setItem('user', JSON.stringify(authResponse.user));
-        localStorage.setItem('loginTime', Date.now().toString());
+    };
+
+    const logout = () => {
+        setToken(null);
+        setUser(null);
+        setShowSessionWarning(false);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
     };
 
     const updateUser = (updatedUser: User) => {
