@@ -121,13 +121,13 @@ public class AccountDeletionService : IAccountDeletionService
         {
             _logger.LogInformation("Starting complete data deletion for user {UserId}", userId);
 
-            // 1. Delete all journal entries
-            var journalDeleteCount = await DeleteAllJournalEntriesAsync(userId, cancellationToken);
-            _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", journalDeleteCount, userId);
+            // 1. Delete all journal entries and collect audio URLs in one pass
+            var audioUrls = await DeleteAllJournalEntriesAsync(userId, cancellationToken);
+            _logger.LogInformation("Deleted {Count} journal entries for user {UserId}", audioUrls.Count, userId);
 
             // 2. Delete all audio files from blob storage
-            await DeleteAllAudioFilesAsync(userId, cancellationToken);
-            _logger.LogInformation("Deleted all audio files for user {UserId}", userId);
+            await DeleteAllAudioFilesAsync(audioUrls, userId, cancellationToken);
+            _logger.LogInformation("Deleted audio files for user {UserId}", userId);
 
             // 3. Delete the user record
             await DeleteUserRecordAsync(userId, cancellationToken);
@@ -146,7 +146,7 @@ public class AccountDeletionService : IAccountDeletionService
         }
     }
 
-    private async Task<int> DeleteAllJournalEntriesAsync(string userId, CancellationToken cancellationToken)
+    private async Task<List<string>> DeleteAllJournalEntriesAsync(string userId, CancellationToken cancellationToken)
     {
         try
         {
@@ -154,7 +154,7 @@ public class AccountDeletionService : IAccountDeletionService
                 .WithParameter("@userId", userId);
 
             var iterator = _journalEntriesContainer.GetItemQueryIterator<JournalEntry>(query);
-            int count = 0;
+            var audioUrls = new List<string>();
 
             while (iterator.HasMoreResults)
             {
@@ -162,15 +162,20 @@ public class AccountDeletionService : IAccountDeletionService
 
                 foreach (var entry in response)
                 {
+                    // Collect audio URLs for deletion
+                    if (entry.IsVoiceEntry && !string.IsNullOrEmpty(entry.AudioBlobUrl))
+                    {
+                        audioUrls.Add(entry.AudioBlobUrl);
+                    }
+
                     await _journalEntriesContainer.DeleteItemAsync<JournalEntry>(
                         entry.id,
                         new PartitionKey(entry.journalEntryId),
                         cancellationToken: cancellationToken);
-                    count++;
                 }
             }
 
-            return count;
+            return audioUrls;
         }
         catch (Exception ex)
         {
@@ -179,34 +184,20 @@ public class AccountDeletionService : IAccountDeletionService
         }
     }
 
-    private async Task DeleteAllAudioFilesAsync(string userId, CancellationToken cancellationToken)
+    private async Task DeleteAllAudioFilesAsync(List<string> audioUrls, string userId, CancellationToken cancellationToken)
     {
         try
         {
-            // Get all journal entries with audio files
-            var query = new QueryDefinition("SELECT * FROM c WHERE c.userId = @userId AND c.IsVoiceEntry = true")
-                .WithParameter("@userId", userId);
-
-            var iterator = _journalEntriesContainer.GetItemQueryIterator<JournalEntry>(query);
-
-            while (iterator.HasMoreResults)
+            foreach (var audioUrl in audioUrls)
             {
-                var response = await iterator.ReadNextAsync(cancellationToken);
-
-                foreach (var entry in response)
+                try
                 {
-                    if (!string.IsNullOrEmpty(entry.AudioBlobUrl))
-                    {
-                        try
-                        {
-                            await _blobService.DeleteAudioAsync(entry.AudioBlobUrl, cancellationToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            // Log but don't fail the entire deletion if a single blob fails
-                            _logger.LogWarning(ex, "Failed to delete audio blob {BlobUrl} for user {UserId}", entry.AudioBlobUrl, userId);
-                        }
-                    }
+                    await _blobService.DeleteAudioAsync(audioUrl, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    // Log but don't fail the entire deletion if a single blob fails
+                    _logger.LogWarning(ex, "Failed to delete audio blob {BlobUrl} for user {UserId}", audioUrl, userId);
                 }
             }
         }

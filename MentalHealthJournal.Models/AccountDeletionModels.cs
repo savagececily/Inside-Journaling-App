@@ -1,10 +1,5 @@
 namespace MentalHealthJournal.Models;
 
-public class RequestAccountDeletionRequest
-{
-    public string Password { get; set; } = string.Empty;
-}
-
 public class ConfirmAccountDeletionRequest
 {
     public string ConfirmationToken { get; set; } = string.Empty;
