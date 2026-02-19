@@ -1,4 +1,4 @@
-import React, { useState, useEffect, type ReactNode } from 'react';
+import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { User, AuthResponse } from '../types/auth';
 import { AuthContext, type AuthContextType } from './AuthContextDefinition';
 
@@ -22,6 +22,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             return null;
         }
     };
+
+    const logout = useCallback(() => {
+        setToken(null);
+        setUser(null);
+        setShowSessionWarning(false);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginTime');
+    }, []);
 
     // Check token expiration and auto-logout
     useEffect(() => {
@@ -65,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (warningTimer) clearTimeout(warningTimer);
             clearTimeout(logoutTimer);
         };
-    }, [token]);
+    }, [token, logout]);
 
     useEffect(() => {
         // Load token and user from localStorage on mount
