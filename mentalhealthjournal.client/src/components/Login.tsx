@@ -192,8 +192,6 @@ const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy, onViewTerms }) => {
                 <ConsentGate
                     onAcceptAll={handleAcceptConsents}
                     onDecline={handleDeclineConsents}
-                    onViewTerms={() => onViewTerms && onViewTerms()}
-                    onViewPrivacy={() => onViewPrivacyPolicy && onViewPrivacyPolicy()}
                 />
             )}
         </>

@@ -4,17 +4,13 @@ import './ConsentGate.css';
 interface ConsentGateProps {
     onAcceptAll: () => Promise<void>;
     onDecline: () => void;
-    onViewTerms: () => void;
-    onViewPrivacy: () => void;
 }
 
 type ViewMode = 'consent' | 'terms' | 'privacy';
 
 export const ConsentGate: React.FC<ConsentGateProps> = ({ 
     onAcceptAll, 
-    onDecline,
-    onViewTerms,
-    onViewPrivacy 
+    onDecline
 }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [acceptedTerms, setAcceptedTerms] = useState(false);

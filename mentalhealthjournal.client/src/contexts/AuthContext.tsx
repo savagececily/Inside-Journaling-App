@@ -104,14 +104,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(authResponse.user));
     };
 
-    const logout = () => {
-        setToken(null);
-        setUser(null);
-        setShowSessionWarning(false);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-    };
-
     const updateUser = (updatedUser: User) => {
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
