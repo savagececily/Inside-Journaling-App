@@ -23,6 +23,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    const logout = useCallback(() => {
+        setToken(null);
+        setUser(null);
+        setShowSessionWarning(false);
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        localStorage.removeItem('loginTime');
+    }, []);
+
     // Check token expiration and auto-logout
     useEffect(() => {
         if (!token) return;
@@ -86,15 +95,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             }
         }
         setIsLoading(false);
-    }, []);
-
-    const logout = useCallback(() => {
-        setToken(null);
-        setUser(null);
-        setShowSessionWarning(false);
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('loginTime');
     }, []);
 
     const login = (authResponse: AuthResponse) => {
