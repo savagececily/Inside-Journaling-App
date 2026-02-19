@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MentalHealthJournal.Models;
 using MentalHealthJournal.Services;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace MentalHealthJournal.Server.Controllers;
@@ -45,6 +46,25 @@ public class ConsentController : ControllerBase
                 return Unauthorized("User ID not found in token");
             }
 
+            // Validate model state (includes data annotations)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Additional validation for ConsentType
+            var validConsentTypes = new[] { "TermsOfService", "PrivacyPolicy", "AIAnalysis" };
+            if (!validConsentTypes.Contains(request.ConsentType))
+            {
+                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", validConsentTypes)}" });
+            }
+
+            // Validate version format (semantic versioning: major.minor or major.minor.patch)
+            if (!IsValidVersion(request.Version))
+            {
+                return BadRequest(new { error = "Invalid Version format. Must follow semantic versioning (e.g., '1.0' or '1.0.0')" });
+            }
+
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
@@ -76,6 +96,15 @@ public class ConsentController : ControllerBase
             _logger.LogError(ex, "Error recording consent");
             return StatusCode(500, new { error = "Failed to record consent", details = ex.Message });
         }
+    }
+
+    private static bool IsValidVersion(string version)
+    {
+        if (string.IsNullOrWhiteSpace(version))
+            return false;
+
+        // Use System.Version to validate semantic versioning
+        return Version.TryParse(version, out _);
     }
 
     /// <summary>
@@ -152,6 +181,19 @@ public class ConsentController : ControllerBase
                 return Unauthorized("User ID not found in token");
             }
 
+            // Validate model state
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Validate ConsentType
+            var validConsentTypes = new[] { "TermsOfService", "PrivacyPolicy", "AIAnalysis" };
+            if (!validConsentTypes.Contains(request.ConsentType))
+            {
+                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", validConsentTypes)}" });
+            }
+
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             var userAgent = HttpContext.Request.Headers["User-Agent"].ToString();
 
@@ -195,12 +237,17 @@ public class ConsentController : ControllerBase
 
 public class RecordConsentRequest
 {
+    [Required(ErrorMessage = "ConsentType is required")]
     public string ConsentType { get; set; } = string.Empty; // TermsOfService, PrivacyPolicy, AIAnalysis
+    
+    [Required(ErrorMessage = "Version is required")]
     public string Version { get; set; } = string.Empty;
+    
     public bool Granted { get; set; }
 }
 
 public class RevokeConsentRequest
 {
+    [Required(ErrorMessage = "ConsentType is required")]
     public string ConsentType { get; set; } = string.Empty;
 }
