@@ -21,6 +21,9 @@ public class ConsentController : ControllerBase
     private const string PRIVACY_VERSION = "1.0";
     private const string AI_PROCESSING_VERSION = "1.0";
 
+    // Valid consent types
+    private static readonly string[] ValidConsentTypes = { "TermsOfService", "PrivacyPolicy", "AIAnalysis" };
+
     public ConsentController(
         IUserConsentService consentService,
         IAuditLogService auditLogService,
@@ -53,16 +56,15 @@ public class ConsentController : ControllerBase
             }
 
             // Additional validation for ConsentType
-            var validConsentTypes = new[] { "TermsOfService", "PrivacyPolicy", "AIAnalysis" };
-            if (!validConsentTypes.Contains(request.ConsentType))
+            if (!ValidConsentTypes.Contains(request.ConsentType))
             {
-                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", validConsentTypes)}" });
+                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", ValidConsentTypes)}" });
             }
 
-            // Validate version format (semantic versioning: major.minor or major.minor.patch)
+            // Validate version format (System.Version supports formats like 1.0, 1.0.0, 1.0.0.0)
             if (!IsValidVersion(request.Version))
             {
-                return BadRequest(new { error = "Invalid Version format. Must follow semantic versioning (e.g., '1.0' or '1.0.0')" });
+                return BadRequest(new { error = "Invalid Version format. Must be a valid version string (e.g., '1.0', '1.0.0', or '1.0.0.0')" });
             }
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -103,7 +105,7 @@ public class ConsentController : ControllerBase
         if (string.IsNullOrWhiteSpace(version))
             return false;
 
-        // Use System.Version to validate semantic versioning
+        // Validate version format using System.Version (supports formats like 1.0, 1.0.0, 1.0.0.0)
         return Version.TryParse(version, out _);
     }
 
@@ -188,10 +190,9 @@ public class ConsentController : ControllerBase
             }
 
             // Validate ConsentType
-            var validConsentTypes = new[] { "TermsOfService", "PrivacyPolicy", "AIAnalysis" };
-            if (!validConsentTypes.Contains(request.ConsentType))
+            if (!ValidConsentTypes.Contains(request.ConsentType))
             {
-                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", validConsentTypes)}" });
+                return BadRequest(new { error = $"Invalid ConsentType. Must be one of: {string.Join(", ", ValidConsentTypes)}" });
             }
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
