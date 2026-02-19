@@ -114,8 +114,20 @@ public class UserConsentService : IUserConsentService
             return false;
         }
 
-        // Check if version matches or is newer
-        return string.Compare(consent.ConsentVersion, requiredVersion, StringComparison.Ordinal) >= 0;
+        // Check if version matches or is newer using proper semantic versioning
+        try
+        {
+            var consentVer = Version.Parse(consent.ConsentVersion);
+            var requiredVer = Version.Parse(requiredVersion);
+            return consentVer >= requiredVer;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to parse version strings. ConsentVersion: {ConsentVersion}, RequiredVersion: {RequiredVersion}",
+                consent.ConsentVersion, requiredVersion);
+            return false;
+        }
     }
 
     public async Task<List<UserConsent>> GetAllUserConsentsAsync(
