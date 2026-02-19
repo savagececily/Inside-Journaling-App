@@ -44,7 +44,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Show warning 2 minutes before expiration
         const warningTime = timeUntilExpiration - (2 * 60 * 1000);
         let warningTimer: number | undefined;
-        let logoutTimer: number | undefined;
 
         if (warningTime > 0) {
             warningTimer = window.setTimeout(() => {
@@ -56,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         // Auto-logout at expiration
-        logoutTimer = window.setTimeout(() => {
+        const logoutTimer = window.setTimeout(() => {
             console.log('Token expired, logging out');
             logout();
             alert('Your session has expired. Please sign in again.');
@@ -64,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         return () => {
             if (warningTimer) clearTimeout(warningTimer);
-            if (logoutTimer) clearTimeout(logoutTimer);
+            clearTimeout(logoutTimer);
         };
     }, [token]);
 
@@ -72,7 +71,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Load token and user from localStorage on mount
         const storedToken = localStorage.getItem('authToken');
         const storedUser = localStorage.getItem('user');
-        const storedLoginTime = localStorage.getItem('loginTime');
 
         if (storedToken && storedUser) {
             // Check if token is still valid
@@ -84,7 +82,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 // Token expired, clear storage
                 localStorage.removeItem('authToken');
                 localStorage.removeItem('user');
-                localStorage.removeItem('loginTime');
             }
         }
         setIsLoading(false);
@@ -96,7 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setShowSessionWarning(false);
         localStorage.setItem('authToken', authResponse.token);
         localStorage.setItem('user', JSON.stringify(authResponse.user));
-        localStorage.setItem('loginTime', Date.now().toString());
     };
 
     const logout = () => {
@@ -105,7 +101,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setShowSessionWarning(false);
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
-        localStorage.removeItem('loginTime');
     };
 
     const updateUser = (updatedUser: User) => {
