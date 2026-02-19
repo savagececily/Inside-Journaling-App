@@ -105,6 +105,8 @@ namespace MentalHealthJournal.Server
             .ValidateOnStart();
 
             // Add services to the container.
+            builder.Services.AddSingleton<IAuditLogService, AuditLogService>();
+            builder.Services.AddSingleton<IUserConsentService, UserConsentService>();
             builder.Services.AddScoped<IJournalAnalysisService, JournalAnalysisService>();
             builder.Services.AddSingleton<ISpeechToTextService, SpeechToTextService>();
             builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();

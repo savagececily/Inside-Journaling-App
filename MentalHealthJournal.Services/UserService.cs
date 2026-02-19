@@ -10,13 +10,15 @@ public class UserService : IUserService
 {
     private readonly Container _usersContainer;
     private readonly ILogger<UserService> _logger;
+    private readonly IAuditLogService? _auditLogService;
 
-    public UserService(CosmosClient cosmosClient, ILogger<UserService> logger, IOptions<AppSettings> options)
+    public UserService(CosmosClient cosmosClient, ILogger<UserService> logger, IOptions<AppSettings> options, IAuditLogService? auditLogService = null)
     {
         var appSettings = options.Value;
         var database = cosmosClient.GetDatabase(appSettings.CosmosDb.DatabaseName);
         _usersContainer = database.GetContainer(appSettings.CosmosDb.UserContainer);
         _logger = logger;
+        _auditLogService = auditLogService;
     }
 
     public async Task<User?> GetUserByProviderIdAsync(string providerId, string provider)
@@ -66,6 +68,18 @@ public class UserService : IUserService
         try
         {
             var response = await _usersContainer.ReadItemAsync<User>(userId, new PartitionKey(userId));
+            
+            // Audit log
+            if (_auditLogService != null && response.Resource != null)
+            {
+                await _auditLogService.LogActionAsync(
+                    userId,
+                    "Read",
+                    "User",
+                    userId,
+                    successful: true);
+            }
+            
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -101,6 +115,18 @@ public class UserService : IUserService
             
             _logger.LogInformation("User upserted successfully: id={Id}", response.Resource.id);
             
+            // Audit log
+            if (_auditLogService != null)
+            {
+                await _auditLogService.LogActionAsync(
+                    user.userId,
+                    "Update",
+                    "User",
+                    user.userId,
+                    successful: true,
+                    additionalDetails: "User login/profile update");
+            }
+            
             return response.Resource;
         }
         catch (Exception ex)
@@ -135,6 +161,44 @@ public class UserService : IUserService
         {
             _logger.LogError(ex, "Error checking username availability");
             return false;
+        }
+    }
+    
+    public async Task DeleteUserAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogInformation("Deleting user {UserId}", userId);
+            
+            await _usersContainer.DeleteItemAsync<User>(
+                userId, 
+                new PartitionKey(userId), 
+                cancellationToken: cancellationToken);
+            
+            _logger.LogInformation("User {UserId} deleted successfully", userId);
+            
+            // Audit log
+            if (_auditLogService != null)
+            {
+                await _auditLogService.LogActionAsync(
+                    userId,
+                    "Delete",
+                    "User",
+                    userId,
+                    successful: true,
+                    additionalDetails: "Account deletion",
+                    cancellationToken: cancellationToken);
+            }
+        }
+        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            _logger.LogWarning("User {UserId} not found for deletion", userId);
+            throw new InvalidOperationException("User not found");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting user {UserId}", userId);
+            throw;
         }
     }
 }
