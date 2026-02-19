@@ -8,4 +8,5 @@ public interface IUserService
     Task<User?> GetUserByIdAsync(string userId);
     Task<User> CreateOrUpdateUserAsync(User user);
     Task<bool> IsUsernameAvailableAsync(string username, string? currentUserId = null);
+    Task DeleteUserAsync(string userId, CancellationToken cancellationToken = default);
 }

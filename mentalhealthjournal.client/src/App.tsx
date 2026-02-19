@@ -5,6 +5,7 @@ import Login from './components/Login';
 import UsernameSetup from './components/UsernameSetup';
 import About from './About';
 import PrivacyPolicy from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
 import { VoiceRecorder } from './components/VoiceRecorder';
 import { EditEntryModal } from './components/EditEntryModal';
 import CrisisAlert from './components/CrisisAlert';
@@ -79,6 +80,7 @@ function App() {
     const [showCrisisAlert, setShowCrisisAlert] = useState(false);
     const [crisisData, setCrisisData] = useState<{ reason?: string; resources: CrisisResource[] }>({ resources: [] });
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+    const [showTermsOfService, setShowTermsOfService] = useState(false);
 
     // Clean up blob URL when audioBlob changes or component unmounts
     useEffect(() => {
@@ -423,10 +425,25 @@ function App() {
         if (showPrivacyPolicy) {
             return <PrivacyPolicy onBack={() => setShowPrivacyPolicy(false)} />;
         }
+
+        if (showTermsOfService) {
+            return (
+                <div>
+                    <button 
+                        onClick={() => setShowTermsOfService(false)}
+                        style={{ margin: '20px', padding: '10px 20px', cursor: 'pointer' }}
+                    >
+                        ← Back to Login
+                    </button>
+                    <TermsOfService />
+                </div>
+            );
+        }
         
         return (
             <Login 
                 onViewPrivacyPolicy={() => setShowPrivacyPolicy(true)}
+                onViewTerms={() => setShowTermsOfService(true)}
             />
         );
     }
