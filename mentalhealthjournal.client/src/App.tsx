@@ -8,6 +8,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { VoiceRecorder } from './components/VoiceRecorder';
 import { EditEntryModal } from './components/EditEntryModal';
 import CrisisAlert from './components/CrisisAlert';
+import { AccountSettings } from './components/AccountSettings';
 import { journalService } from './services/journalService';
 import './App.css';
 import './Tabs.css';
@@ -67,7 +68,7 @@ function App() {
     const [loadingError, setLoadingError] = useState<string | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
-    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'insights' | 'calendar' | 'export'>('new');
+    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'insights' | 'calendar' | 'export' | 'settings'>('new');
     const [trends, setTrends] = useState<TrendData | null>(null);
     const [latestEntry, setLatestEntry] = useState<JournalEntry | null>(null);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -525,6 +526,15 @@ function App() {
                     >
                         📦 Export Data
                     </button>
+                    <button 
+                        className={`tab ${activeTab === 'settings' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('settings')}
+                        role="tab"
+                        aria-selected={activeTab === 'settings'}
+                        aria-controls="settings-panel"
+                    >
+                        ⚙️ Settings
+                    </button>
                 </div>
             </div>
 
@@ -862,6 +872,16 @@ function App() {
                         <Suspense fallback={<div className="loading-placeholder">Loading export...</div>}>
                             <DataExport token={token} />
                         </Suspense>
+                    </div>
+                )}
+
+                {activeTab === 'settings' && token && (
+                    <div className="settings-tab" role="tabpanel" id="settings-panel" aria-labelledby="settings-tab">
+                        <AccountSettings 
+                            token={token} 
+                            onLogout={logout}
+                            userName={user?.name || user?.email}
+                        />
                     </div>
                 )}
             </div>

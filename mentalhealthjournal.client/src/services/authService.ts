@@ -65,5 +65,39 @@ export const authService = {
 
         const data = await response.json();
         return data.available;
+    },
+
+    async requestAccountDeletion(token: string) {
+        const response = await fetch(`${API_BASE_URL}/auth/request-deletion`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to request account deletion');
+        }
+
+        return response.json();
+    },
+
+    async confirmAccountDeletion(token: string, confirmationToken: string) {
+        const response = await fetch(`${API_BASE_URL}/auth/confirm-deletion`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ confirmationToken }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(error || 'Failed to confirm account deletion');
+        }
+
+        return response.json();
     }
 };
