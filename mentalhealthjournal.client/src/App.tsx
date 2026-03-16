@@ -8,6 +8,8 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
 import { VoiceRecorder } from './components/VoiceRecorder';
 import { EditEntryModal } from './components/EditEntryModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import CrisisAlert from './components/CrisisAlert';
 import { journalService } from './services/journalService';
 import './App.css';
@@ -450,6 +452,8 @@ function App() {
 
     return (
         <div className="app-container">
+            <OfflineIndicator />
+            <PWAInstallPrompt />
             <header className="app-header">
                 <div className="header-content">
                     <div>

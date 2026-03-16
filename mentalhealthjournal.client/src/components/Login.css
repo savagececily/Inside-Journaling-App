@@ -1,26 +1,33 @@
+/* ==========================================================================
+   LOGIN - MOBILE FIRST STYLES
+   ========================================================================== */
+
 .login-container {
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 20px;
+    padding: 1rem;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
 .login-card {
     background: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     max-width: 450px;
     width: 100%;
-    padding: 40px;
+    padding: 1.75rem 1.25rem;
     animation: slideUp 0.5s ease-out;
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(20px);
     }
     to {
         opacity: 1;
@@ -30,22 +37,25 @@
 
 .login-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 2rem;
 }
 
 .login-header h1 {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 10px;
+    margin-bottom: 0.5rem;
+    /* Prevent iOS text size adjustment */
+    -webkit-text-size-adjust: 100%;
 }
 
 .login-header p {
     color: #666;
-    font-size: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
 }
 
 .login-content {
@@ -53,45 +63,106 @@
 }
 
 .login-content h2 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 0.5rem;
 }
 
 .login-subtitle {
     color: #666;
-    margin-bottom: 30px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    margin-bottom: 1.75rem;
 }
 
 .google-login-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 30px;
+    margin-bottom: 1.75rem;
+    /* Ensure button has good touch target */
+    min-height: 44px;
+}
+
+/* Target Google Sign-In button to ensure mobile optimization */
+.google-login-wrapper > div {
+    -webkit-tap-highlight-color: transparent;
 }
 
 .login-footer {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
     border-top: 1px solid #eee;
 }
 
 .login-footer p {
     color: #999;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1.5;
 }
 
-@media (max-width: 500px) {
+/* ==========================================================================
+   TABLET AND DESKTOP ENHANCEMENTS (768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    .login-container {
+        padding: 1.5rem;
+    }
+
     .login-card {
-        padding: 30px 20px;
+        padding: 2.5rem 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-header {
+        margin-bottom: 2.5rem;
     }
 
     .login-header h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
+        margin-bottom: 0.625rem;
+    }
+
+    .login-header p {
+        font-size: 1rem;
     }
 
     .login-content h2 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        margin-bottom: 0.625rem;
+    }
+
+    .login-subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .google-login-wrapper {
+        margin-bottom: 2rem;
+    }
+
+    .login-footer {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+    }
+
+    .login-footer p {
+        font-size: 0.85rem;
+    }
+}
+
+/* ==========================================================================
+   LARGE SCREENS (1024px+)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+    .login-card {
+        padding: 2.5rem;
+    }
+
+    .login-header {
+        margin-bottom: 2.5rem;
     }
 }

@@ -1,0 +1,155 @@
+/* ==========================================================================
+   OFFLINE INDICATOR - MOBILE FIRST
+   ========================================================================== */
+
+.offline-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    padding: 0.75rem 1rem;
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.offline-indicator.offline {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    animation: slideDown 0.3s ease;
+}
+
+.offline-indicator.online {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    animation: slideDown 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%);
+    }
+}
+
+.indicator-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 100%;
+}
+
+.indicator-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.indicator-text {
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   TABLET STYLES (768px+)
+   ========================================================================== */
+
+@media (min-width: 768px) {
+    .offline-indicator {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 0 0 12px 12px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        min-width: 400px;
+        max-width: 600px;
+    }
+
+    .offline-indicator.offline {
+        animation: slideDownCenter 0.3s ease;
+    }
+
+    .offline-indicator.online {
+        animation: slideDownCenter 0.3s ease, fadeOut 0.5s ease 4.5s forwards;
+    }
+
+    @keyframes slideDownCenter {
+        from {
+            transform: translateX(-50%) translateY(-100%);
+        }
+        to {
+            transform: translateX(-50%) translateY(0);
+        }
+    }
+
+    .indicator-icon {
+        font-size: 1.5rem;
+    }
+
+    .indicator-content {
+        gap: 0.75rem;
+    }
+}
+
+/* ==========================================================================
+   DESKTOP STYLES (1024px+)
+   ========================================================================== */
+
+@media (min-width: 1024px) {
+    .offline-indicator {
+        top: 1rem;
+        left: auto;
+        right: 1rem;
+        transform: none;
+        border-radius: 12px;
+        min-width: 350px;
+        max-width: 500px;
+        padding: 1rem 1.5rem;
+    }
+
+    .offline-indicator.offline {
+        animation: slideInRight 0.3s ease;
+    }
+
+    .offline-indicator.online {
+        animation: slideInRight 0.3s ease, fadeOutRight 0.5s ease 4.5s forwards;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(120%);
+        }
+        to {
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes fadeOutRight {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(120%);
+        }
+    }
+}
