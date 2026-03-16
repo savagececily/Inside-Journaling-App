@@ -41,7 +41,7 @@ public class AuditLogService : IAuditLogService
         {
             var auditLog = new AuditLog
             {
-                UserId = userId, // Partition key - all audit logs for a user in same partition
+                userId = userId, // Partition key - all audit logs for a user in same partition
                 Action = action,
                 ResourceType = resourceType,
                 ResourceId = resourceId,
@@ -55,7 +55,7 @@ public class AuditLogService : IAuditLogService
 
             await _container.CreateItemAsync(
                 auditLog,
-                new PartitionKey(auditLog.UserId),
+                new PartitionKey(auditLog.userId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
@@ -79,7 +79,7 @@ public class AuditLogService : IAuditLogService
         try
         {
             var query = new QueryDefinition(
-                "SELECT TOP @limit * FROM c WHERE c.UserId = @userId ORDER BY c.Timestamp DESC")
+                "SELECT TOP @limit * FROM c WHERE c.userId = @userId ORDER BY c.Timestamp DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@limit", limit ?? 100);
 

@@ -38,7 +38,7 @@ public class UserConsentService : IUserConsentService
         {
             var consent = new UserConsent
             {
-                UserId = userId, // Partition key - all consents for a user in same partition
+                userId = userId, // Partition key - all consents for a user in same partition
                 ConsentType = consentType,
                 ConsentVersion = version,
                 Granted = granted,
@@ -49,7 +49,7 @@ public class UserConsentService : IUserConsentService
 
             await _container.CreateItemAsync(
                 consent,
-                new PartitionKey(consent.UserId),
+                new PartitionKey(consent.userId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
@@ -73,7 +73,7 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT TOP 1 * FROM c WHERE c.UserId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
+                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
@@ -137,7 +137,7 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE c.UserId = @userId ORDER BY c.ConsentDate DESC")
+                "SELECT * FROM c WHERE c.userId = @userId ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId);
 
             var queryRequestOptions = new QueryRequestOptions
@@ -184,7 +184,7 @@ public class UserConsentService : IUserConsentService
             await _container.ReplaceItemAsync(
                 latestConsent,
                 latestConsent.id,
-                new PartitionKey(latestConsent.UserId),
+                new PartitionKey(latestConsent.userId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Consent revoked: User {UserId}, Type {ConsentType}", userId, consentType);

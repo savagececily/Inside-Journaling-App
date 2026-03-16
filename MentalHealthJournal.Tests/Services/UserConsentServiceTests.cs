@@ -40,7 +40,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "2.0",
                 Granted = true,
@@ -67,7 +67,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "1.0",
                 Granted = true,
@@ -94,7 +94,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "1.0",
                 Granted = true,
@@ -123,7 +123,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "1.10",
                 Granted = true,
@@ -152,7 +152,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "10.0",
                 Granted = true,
@@ -179,7 +179,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "1.9",
                 Granted = true,
@@ -206,7 +206,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "invalid-version",
                 Granted = true,
@@ -233,7 +233,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "2.0",
                 Granted = true,
@@ -260,7 +260,7 @@ namespace MentalHealthJournal.Tests.Services
 
             var consent = new UserConsent
             {
-                UserId = userId,
+                userId = userId,
                 ConsentType = consentType,
                 ConsentVersion = "2.0",
                 Granted = false,

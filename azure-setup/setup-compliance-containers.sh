@@ -69,7 +69,7 @@ az cosmosdb sql container create \
   --account-name "$ACCOUNT_NAME" \
   --database-name "$DATABASE_NAME" \
   --name AuditLogs \
-  --partition-key-path "/UserId" \
+  --partition-key-path "/userId" \
   --throughput 400
 
 if [ $? -eq 0 ]; then
@@ -88,7 +88,7 @@ az cosmosdb sql container create \
   --account-name "$ACCOUNT_NAME" \
   --database-name "$DATABASE_NAME" \
   --name UserConsents \
-  --partition-key-path "/UserId" \
+  --partition-key-path "/userId" \
   --throughput 400
 
 if [ $? -eq 0 ]; then
@@ -104,10 +104,10 @@ echo "✅ Setup Complete!"
 echo "=========================================="
 echo ""
 echo "The following containers have been created:"
-echo "  1. AuditLogs (partition key: /UserId)"
-echo "  2. UserConsents (partition key: /UserId)"
+echo "  1. AuditLogs (partition key: /userId)"
+echo "  2. UserConsents (partition key: /userId)"
 echo ""
-echo "Note: Using /UserId as the partition key enables efficient single-partition"
+echo "Note: Using /userId as the partition key enables efficient single-partition"
 echo "queries when retrieving all audit logs or consents for a specific user."
 echo "This design significantly reduces RU costs and improves query performance."
 echo ""

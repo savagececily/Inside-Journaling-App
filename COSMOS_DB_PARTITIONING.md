@@ -7,11 +7,11 @@ This document explains the optimized partition key strategy for the Mental Healt
 ## Partition Key Design
 
 ### UserConsents Container
-- **Partition Key**: `/UserId`
+- **Partition Key**: `/userId`
 - **Rationale**: All consent records for a single user are stored in the same logical partition
 
 ### AuditLogs Container
-- **Partition Key**: `/UserId`
+- **Partition Key**: `/userId`
 - **Rationale**: All audit log entries for a single user are stored in the same logical partition
 
 ## Why This Design?
@@ -29,7 +29,7 @@ The original implementation used unique GUIDs as partition keys:
 
 ### Optimized Design Benefits
 
-By using `/UserId` as the partition key:
+By using `/userId` as the partition key:
 
 1. **Single-partition queries**: All queries for a user's data stay within a single partition
 2. **Lower RU costs**: Single-partition queries are significantly cheaper in terms of RU consumption
@@ -62,14 +62,14 @@ The application's access patterns align perfectly with this partition strategy:
 - ✅ Revoke a consent for a user
 - ✅ Check if user has valid consent
 
-All these operations are scoped to a single user, making `/UserId` the optimal partition key.
+All these operations are scoped to a single user, making `/userId` the optimal partition key.
 
 ### AuditLogs
 - ✅ Get all audit logs for a user
 - ✅ Get recent audit logs for a user (with limit)
 - ✅ Create audit log entry for user action
 
-All audit log operations are user-specific, making `/UserId` the optimal partition key.
+All audit log operations are user-specific, making `/userId` the optimal partition key.
 
 ## Migration Guide
 
@@ -90,8 +90,8 @@ cd azure-setup
 ```
 
 The script will create:
-- `AuditLogs` container with partition key `/UserId`
-- `UserConsents` container with partition key `/UserId`
+- `AuditLogs` container with partition key `/userId`
+- `UserConsents` container with partition key `/userId`
 
 ## Performance Considerations
 
@@ -117,15 +117,17 @@ The script will create:
 
 ## SQL Query Updates
 
-All SQL queries now use correct property names (PascalCase matching the C# model):
+All SQL queries now use correct property names (camelCase matching the Cosmos DB serialization policy):
 
 ```sql
--- Correct: Uses PascalCase property names
-SELECT * FROM c WHERE c.UserId = @userId AND c.ConsentType = @consentType
-
--- Incorrect (old): Used camelCase
+-- Correct: Uses camelCase property names to match serialization
 SELECT * FROM c WHERE c.userId = @userId AND c.consentType = @consentType
+
+-- Incorrect: PascalCase doesn't match the camelCase serialization policy
+SELECT * FROM c WHERE c.UserId = @userId AND c.ConsentType = @consentType
 ```
+
+**Important**: The Cosmos DB client is configured with `CosmosPropertyNamingPolicy.CamelCase`, which converts all C# property names to camelCase in JSON documents.
 
 ## References
 
