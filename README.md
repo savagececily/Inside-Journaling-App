@@ -36,6 +36,30 @@ Mental Health Journal is a full-stack web application that helps users track the
 - Azure Blob Storage for audio files
 - Reliable and secure data persistence
 
+## 📱 Mobile Application (Phase 2)
+
+**Status:** 67% Complete (Sprint 4 of 6)
+
+A native iOS and Android mobile app built with **React Native (Expo)** is currently in development.
+
+### 🎉 Completed Features (Sprint 1-4)
+- ✅ **Journal Management**: Create, edit, delete entries with voice recording
+- ✅ **Offline-First**: Full offline support with background sync
+- ✅ **Data Visualization**: Sentiment charts, streak counter, calendar, word clouds
+- ✅ **Crisis Support**: Hotlines, breathing exercises, grounding techniques
+- ✅ **Push Notifications**: Daily reminders, streak alerts, achievement notifications
+- ✅ **Biometric Auth**: Face ID/Touch ID/Fingerprint with PIN fallback
+- ✅ **Dark Mode**: Automatic theme switching based on system preference
+- ✅ **Haptic Feedback**: Tactile responses for interactions and achievements
+- ✅ **Deep Linking**: URL schemes for navigation (`mentalhealthjournal://`)
+
+### 🔜 Coming Soon (Sprint 5-6)
+- ⏳ App icon, splash screen, and branding
+- ⏳ Performance optimization and testing
+- ⏳ App Store and Google Play deployment
+
+**[View Mobile Progress →](MOBILE_PROGRESS.md)** | **[View Development Plan →](PHASE_2_PLAN.md)**
+
 ## 🏗️ Architecture
 
 ### Frontend
@@ -122,7 +146,7 @@ See [appsettings.Example.json](MentalHealthJournal.Server/appsettings.Example.js
 
 ```
 MentalHealthJournal/
-├── mentalhealthjournal.client/     # React frontend
+├── mentalhealthjournal.client/     # React frontend (Web)
 │   ├── src/
 │   │   ├── components/             # React components
 │   │   ├── services/               # API and utility services
@@ -130,6 +154,15 @@ MentalHealthJournal/
 │   │   ├── hooks/                  # Custom React hooks
 │   │   └── types/                  # TypeScript type definitions
 │   └── public/                     # Static assets
+├── MentalHealthJournal.Mobile/     # React Native app (iOS/Android) 📱
+│   ├── src/
+│   │   ├── components/             # UI components
+│   │   ├── screens/                # App screens
+│   │   ├── services/               # Services (sync, notifications, etc.)
+│   │   ├── contexts/               # State management
+│   │   ├── hooks/                  # Custom hooks
+│   │   └── navigation/             # React Navigation setup
+│   └── app.json                    # Expo configuration
 ├── MentalHealthJournal.Server/     # .NET Web API
 │   ├── Controllers/                # API controllers
 │   └── Properties/                 # Server configuration
@@ -175,16 +208,26 @@ dotnet publish -c Release
 
 ## 📚 Documentation
 
-### Core Documentation
-- [Azure Deployment Guide](AZURE_DEPLOYMENT.md) - Comprehensive deployment instructions for Azure
+**[📖 Complete Documentation Index →](DOCS_INDEX.md)** - Quick navigation to all project documentation
+
+### Getting Started
+- [README.md](README.md) - This file, project overview and quick start
+- [Azure Deployment Guide](AZURE_DEPLOYMENT.md) - Comprehensive Azure deployment instructions
 - [Testing Guide](TESTING_GUIDE.md) - How to test the application end-to-end
-- [Unit Test Summary](UNIT_TEST_SUMMARY.md) - Current unit test coverage and results
-- [Performance Optimizations](PERFORMANCE_OPTIMIZATIONS.md) - Caching, retry policies, and lazy loading
 
 ### Feature Documentation
-- [Crisis Support Feature](CRISIS_SUPPORT_FEATURE.md) - AI-powered crisis detection and resources
-- [Data Visualization Feature](DATA_VISUALIZATION_FEATURE.md) - Sentiment timeline, word cloud, and patterns
-- [Voice Recording Feature](VOICE_RECORDING_FEATURE.md) - Speech-to-text implementation details
+- **[Web Features](WEB_FEATURES.md)** - Complete web app feature reference (voice, AI analysis, visualizations, crisis support)
+- **[Mobile Features](MOBILE_FEATURES.md)** - Complete mobile app feature reference (offline sync, notifications, biometrics, dark mode)
+- [Mobile Progress Summary](MOBILE_PROGRESS.md) - Sprint progress, statistics, and achievements
+- [Phase 2 Development Plan](PHASE_2_PLAN.md) - 6-sprint mobile development roadmap
+
+### Technical Documentation
+- [Performance Optimizations](PERFORMANCE_OPTIMIZATIONS.md) - Caching, retry policies, and optimization strategies
+- [Unit Test Summary](UNIT_TEST_SUMMARY.md) - Current test coverage and results
+
+### Legal
+- [Privacy Policy](PRIVACY_POLICY.md) - Data collection, usage, and user rights
+- [Terms of Service](TERMS_OF_SERVICE.md) - User agreement and service terms
 
 ## 🔒 Security
 
@@ -197,11 +240,19 @@ dotnet publish -c Release
 
 ## 🛠️ Technology Stack
 
-**Frontend**
+**Web Frontend**
 - React 19
 - TypeScript
 - Vite
 - Microsoft Application Insights
+
+**Mobile App (React Native)**
+- Expo ~55.0.7
+- React Native 0.83.2
+- TypeScript 5.9.2
+- React Navigation 7.x
+- React Query (TanStack) 5.x
+- Expo Notifications, Local Authentication, Haptics
 
 **Backend**
 - .NET 8

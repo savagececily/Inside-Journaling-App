@@ -1,0 +1,90 @@
+{
+  "expo": {
+    "name": "Mental Health Journal",
+    "slug": "mental-health-journal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "scheme": "mentalhealthjournal",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "infoPlist": {
+        "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit."
+      },
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mentalhealthjournal.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "We use Face ID to keep your journal entries secure and private.",
+        "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit."
+      },
+      "associatedDomains": [
+        "applinks:mentalhealthjournal.app"
+      ]
+    },
+    "android": {
+      "package": "com.mentalhealthjournal.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "VIBRATE",
+        "NOTIFICATIONS"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "mentalhealthjournal.app"
+            },
+            {
+              "scheme": "mentalhealthjournal"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#6366f1",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Mental Health Journal to use Face ID for secure authentication."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
+  }
+}
