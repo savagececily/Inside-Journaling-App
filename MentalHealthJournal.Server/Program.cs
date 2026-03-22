@@ -197,8 +197,8 @@ namespace MentalHealthJournal.Server
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            // Only use HTTPS redirection in production
-            if (!app.Environment.IsDevelopment())
+            // Only use HTTPS redirection in development
+            if (app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
             }
