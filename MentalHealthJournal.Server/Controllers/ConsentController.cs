@@ -49,6 +49,9 @@ public class ConsentController : ControllerBase
                 return Unauthorized("User ID not found in token");
             }
 
+            _logger.LogInformation("📝 Recording consent: UserId={UserId}, Type={ConsentType}, Version={Version}, Granted={Granted}",
+                userId, request.ConsentType, request.Version, request.Granted);
+
             // Validate model state (includes data annotations)
             if (!ModelState.IsValid)
             {
@@ -149,9 +152,14 @@ public class ConsentController : ControllerBase
                 return Unauthorized("User ID not found in token");
             }
 
+            _logger.LogInformation("🔍 Checking consent status for UserId: {UserId}", userId);
+
             var hasTerms = await _consentService.HasValidConsentAsync(userId, "TermsOfService", TERMS_VERSION, cancellationToken);
             var hasPrivacy = await _consentService.HasValidConsentAsync(userId, "PrivacyPolicy", PRIVACY_VERSION, cancellationToken);
             var hasAiProcessing = await _consentService.HasValidConsentAsync(userId, "AIAnalysis", AI_PROCESSING_VERSION, cancellationToken);
+
+            _logger.LogInformation("📊 Consent status: UserId={UserId}, Terms={HasTerms}, Privacy={HasPrivacy}, AI={HasAI}, AllGranted={AllGranted}",
+                userId, hasTerms, hasPrivacy, hasAiProcessing, hasTerms && hasPrivacy && hasAiProcessing);
 
             return Ok(new
             {

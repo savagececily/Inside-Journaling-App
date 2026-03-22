@@ -36,30 +36,36 @@ public class UserConsentService : IUserConsentService
     {
         try
         {
+            // Use deterministic ID to prevent duplicates: one consent record per user per type
+            var deterministicId = $"{userId}_{consentType}";
+            
             var consent = new UserConsent
             {
+                id = deterministicId, // Deterministic ID prevents duplicates
                 userId = userId, // Partition key - all consents for a user in same partition
                 ConsentType = consentType,
                 ConsentVersion = version,
                 Granted = granted,
                 ConsentDate = DateTime.UtcNow,
+                RevokedDate = granted ? null : DateTime.UtcNow, // If revoking, set revoked date
                 IpAddress = ipAddress,
                 UserAgent = userAgent
             };
 
-            await _container.CreateItemAsync(
+            // Use UpsertItemAsync to replace existing consent if it exists
+            await _container.UpsertItemAsync(
                 consent,
                 new PartitionKey(consent.userId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
-                "Consent recorded: User {UserId}, Type {ConsentType}, Version {Version}, Granted {Granted}",
-                userId, consentType, version, granted);
+                "✅ Consent SAVED: UserId={UserId}, Type={ConsentType}, Version={Version}, Granted={Granted}, Id={Id}",
+                userId, consentType, version, granted, deterministicId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "Failed to record consent for User {UserId}, Type {ConsentType}",
+                "❌ Failed to record consent for UserId={UserId}, Type={ConsentType}",
                 userId, consentType);
             throw;
         }
@@ -72,6 +78,8 @@ public class UserConsentService : IUserConsentService
     {
         try
         {
+            _logger.LogInformation("🔍 Searching for consent: UserId={UserId}, Type={ConsentType}", userId, consentType);
+            
             var query = new QueryDefinition(
                 "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId)
@@ -87,15 +95,28 @@ public class UserConsentService : IUserConsentService
             if (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync(cancellationToken);
-                return response.FirstOrDefault();
+                var result = response.FirstOrDefault();
+                
+                if (result != null)
+                {
+                    _logger.LogInformation("✅ Found consent: UserId={UserId}, Type={ConsentType}, Granted={Granted}, Date={Date}",
+                        result.userId, result.ConsentType, result.Granted, result.ConsentDate);
+                }
+                else
+                {
+                    _logger.LogWarning("⚠️ No consent found: UserId={UserId}, Type={ConsentType}", userId, consentType);
+                }
+                
+                return result;
             }
 
+            _logger.LogWarning("⚠️ No consent records found: UserId={UserId}, Type={ConsentType}", userId, consentType);
             return null;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "Failed to retrieve latest consent for User {UserId}, Type {ConsentType}",
+                "❌ Failed to retrieve latest consent for UserId={UserId}, Type={ConsentType}",
                 userId, consentType);
             throw;
         }
