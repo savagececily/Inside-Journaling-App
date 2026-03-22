@@ -90,6 +90,23 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EEDDAEFD6DF14EECA26F7D75E82BEDDC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7B20162A54CB4C47AA639857637A3117 }}
 
+      # Disable Oryx build in Azure since we already built the app in GitHub Actions
+      - name: Configure Azure App Settings
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: 'MentalHealthJournal-WebApp'
+          app-settings-json: |
+            [
+              {
+                "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                "value": "false"
+              },
+              {
+                "name": "ENABLE_ORYX_BUILD",
+                "value": "false"
+              }
+            ]
+
       - name: Deploy to Azure Web App
         id: deploy
         uses: azure/webapps-deploy@v3
