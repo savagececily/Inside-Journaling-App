@@ -108,12 +108,13 @@ public class UserService : IUserService
                 user.id = user.userId;
             }
             
-            _logger.LogInformation("Upserting user: id={Id}, userId={UserId}, provider={Provider}, providerId={ProviderId}", 
-                user.id, user.userId, user.Provider, user.ProviderId);
+            _logger.LogInformation("💾 Upserting user: id={Id}, userId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}", 
+                user.id, user.userId, user.DateOfBirth, user.AgeVerified);
             
             var response = await _usersContainer.UpsertItemAsync(user, new PartitionKey(user.userId));
             
-            _logger.LogInformation("User upserted successfully: id={Id}", response.Resource.id);
+            _logger.LogInformation("✅ User upserted successfully: id={Id}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}", 
+                response.Resource.id, response.Resource.DateOfBirth, response.Resource.AgeVerified);
             
             // Audit log
             if (_auditLogService != null)

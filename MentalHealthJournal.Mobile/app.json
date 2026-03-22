@@ -14,14 +14,11 @@
     },
     "ios": {
       "infoPlist": {
+        "NSFaceIDUsageDescription": "We use Face ID to keep your journal entries secure and private.",
         "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit."
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.mentalhealthjournal.app",
-      "infoPlist": {
-        "NSFaceIDUsageDescription": "We use Face ID to keep your journal entries secure and private.",
-        "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit."
-      },
       "associatedDomains": [
         "applinks:mentalhealthjournal.app"
       ]
@@ -79,7 +76,8 @@
         {
           "faceIDPermission": "Allow Mental Health Journal to use Face ID for secure authentication."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "extra": {
       "eas": {

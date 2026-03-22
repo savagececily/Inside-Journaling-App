@@ -355,6 +355,9 @@ _logger.LogInformation("📤 Login response: UserId={UserId}, AgeVerified={AgeVe
                 return Unauthorized("User ID not found in token");
             }
 
+            _logger.LogInformation("🎂 Received age verification request: UserId={UserId}, DateOfBirth={DateOfBirth}",
+                userId, request.DateOfBirth);
+
             // Calculate age
             int age = CalculateAge(request.DateOfBirth);
             
@@ -371,9 +374,19 @@ _logger.LogInformation("📤 Login response: UserId={UserId}, AgeVerified={AgeVe
                 return NotFound("User not found");
             }
 
+            _logger.LogInformation("👤 User BEFORE update: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                user.userId, user.DateOfBirth, user.AgeVerified);
+
             user.DateOfBirth = request.DateOfBirth;
             user.AgeVerified = true;
-            await _userService.CreateOrUpdateUserAsync(user);
+            
+            _logger.LogInformation("👤 User AFTER setting values: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                user.userId, user.DateOfBirth, user.AgeVerified);
+            
+            var updatedUser = await _userService.CreateOrUpdateUserAsync(user);
+            
+            _logger.LogInformation("✅ User AFTER save: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                updatedUser.userId, updatedUser.DateOfBirth, updatedUser.AgeVerified);
 
             _logger.LogInformation("Age verified for user {UserId}: Age {Age}", userId, age);
 

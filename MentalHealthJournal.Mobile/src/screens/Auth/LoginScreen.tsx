@@ -12,12 +12,20 @@ import { AuthStackScreenProps } from '../../types/navigation';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 import { useGoogleAuth } from '../../hooks/useGoogleAuth';
 import { useAuth } from '../../contexts/AuthContext';
-import { googleLogin } from '../../services/api/auth';
+import { googleLogin, verifyAge } from '../../services/api/auth';
+import { getConsentStatus, recordConsent } from '../../services/api/consent';
+import { AgeVerificationModal } from '../../components/common/AgeVerificationModal';
+import { ConsentGateModal } from '../../components/common/ConsentGateModal';
+import type { AuthResponse } from '../../types/api';
 
 type Props = AuthStackScreenProps<'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [showAgeVerification, setShowAgeVerification] = useState(false);
+  const [showConsentGate, setShowConsentGate] = useState(false);
+  const [tempAuthResponse, setTempAuthResponse] = useState<AuthResponse | null>(null);
+  
   const { signIn, isLoading: isOAuthLoading, idToken, error: oauthError } = useGoogleAuth();
   const { login } = useAuth();
 
@@ -44,50 +52,98 @@ export default function LoginScreen({ navigation }: Props) {
     
     try {
       console.log('🔐 Authenticating with backend...');
-      console.log('📍 API URL:', 'https://mentalhealthjournal-webapp.azurewebsites.net/api/auth/google');
-      console.log('🎫 ID Token length:', idToken.length);
-      console.log('🎫 ID Token preview:', idToken.substring(0, 50) + '...');
       
       // Send ID token to backend for validation
       const authResponse = await googleLogin({ idToken });
       
       console.log('✅ Authentication successful!');
       
-      // Save auth data and update context
-      await login(authResponse);
+      // Store temp auth response
+      setTempAuthResponse(authResponse);
       
-      // Show age verification alert if needed
+      // Check if age verification is needed
       if (authResponse.requiresAgeVerification) {
-        Alert.alert(
-          'Age Verification Required',
-          'For compliance, please verify your age in the Profile settings.',
-          [{ text: 'OK' }]
-        );
+        setShowAgeVerification(true);
+        return;
       }
       
-      // Navigation is handled automatically by AuthContext
+      // Check consent status
+      const consentStatus = await getConsentStatus();
+      
+      if (!consentStatus.allGranted) {
+        setShowConsentGate(true);
+        return;
+      }
+      
+      // If everything is verified and consented, complete login
+      await login(authResponse);
     } catch (error: any) {
       console.error('❌ Backend authentication error:', error);
-      console.error('Error details:', JSON.stringify(error, null, 2));
-      
-      let errorMessage = 'Failed to authenticate with server. Please try again.';
-      
-      if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
-        errorMessage = `Server error (${error.response.status}): ${error.response.data?.message || error.response.data?.error || 'Unknown error'}`;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
       
       Alert.alert(
         'Sign In Failed',
-        errorMessage,
+        error.message || 'Failed to authenticate with server. Please try again.',
         [{ text: 'OK' }]
       );
     } finally {
       setIsAuthenticating(false);
     }
+  };
+
+  const handleAgeVerify = async (dateOfBirth: Date) => {
+    if (!tempAuthResponse) return;
+
+    try {
+      await verifyAge(dateOfBirth);
+      
+      setShowAgeVerification(false);
+      
+      // Now check consents
+      const consentStatus = await getConsentStatus();
+      
+      if (!consentStatus.allGranted) {
+        setShowConsentGate(true);
+      } else {
+        await login(tempAuthResponse);
+        setTempAuthResponse(null);
+      }
+    } catch (error: any) {
+      throw error; // Let the modal handle the error
+    }
+  };
+
+  const handleCancelAgeVerification = () => {
+    setShowAgeVerification(false);
+    setTempAuthResponse(null);
+  };
+
+  const handleAcceptConsents = async () => {
+    if (!tempAuthResponse) return;
+
+    try {
+      // Record all consents (use default version 1.0 for now)
+      await Promise.all([
+        recordConsent('TermsOfService', '1.0', true),
+        recordConsent('PrivacyPolicy', '1.0', true),
+        recordConsent('AIAnalysis', '1.0', true),
+      ]);
+
+      setShowConsentGate(false);
+      await login(tempAuthResponse);
+      setTempAuthResponse(null);
+    } catch (error: any) {
+      throw error; // Let the modal handle the error
+    }
+  };
+
+  const handleDeclineConsents = () => {
+    setShowConsentGate(false);
+    setTempAuthResponse(null);
+    Alert.alert(
+      'Consent Required',
+      'You must accept all terms to use this application.',
+      [{ text: 'OK' }]
+    );
   };
 
   const handleGoogleLogin = async () => {
@@ -158,6 +214,20 @@ export default function LoginScreen({ navigation }: Props) {
           Your journal entries are private and secure
         </Text>
       </View>
+
+      {/* Age Verification Modal */}
+      <AgeVerificationModal
+        visible={showAgeVerification}
+        onVerify={handleAgeVerify}
+        onCancel={handleCancelAgeVerification}
+      />
+
+      {/* Consent Gate Modal */}
+      <ConsentGateModal
+        visible={showConsentGate}
+        onAcceptAll={handleAcceptConsents}
+        onDecline={handleDeclineConsents}
+      />
     </View>
   );
 }
