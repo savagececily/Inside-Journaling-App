@@ -167,13 +167,7 @@ namespace MentalHealthJournal.Server
                 });
             });
 
-            builder.Services.AddControllers()
-                .AddJsonOptions(options =>
-                {
-                    // Use camelCase for JSON serialization to match mobile app convention
-                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-                    options.JsonSerializerOptions.DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-                });
+            builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
