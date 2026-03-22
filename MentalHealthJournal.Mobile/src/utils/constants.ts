@@ -2,9 +2,17 @@
 
 // API Configuration
 // TODO: Replace with your actual backend URL
-export const API_BASE_URL = __DEV__
-  ? 'http://localhost:5079' // Local development (adjust port if needed)
-  : 'https://your-production-api.azurewebsites.net'; // Production URL
+// export const API_BASE_URL = __DEV__
+//   ? 'http://localhost:5079/api' // Local development (adjust port if needed)
+//   : 'https://mentalhealthjournal-webapp.azurewebsites.net/api'; // Production URL
+
+  export const API_BASE_URL = 'https://mentalhealthjournal-webapp.azurewebsites.net/api';
+
+// Legal document URLs - using API endpoints that don't require authentication
+export const LEGAL_URLS = {
+  TERMS_OF_SERVICE: 'https://mentalhealthjournal-webapp.azurewebsites.net/api/legal/terms',
+  PRIVACY_POLICY: 'https://mentalhealthjournal-webapp.azurewebsites.net/api/legal/privacy',
+} as const;
 
 // Google OAuth Configuration
 // IMPORTANT: Replace these with your actual Google OAuth client IDs
@@ -30,7 +38,7 @@ export const API_BASE_URL = __DEV__
 //
 export const GOOGLE_CLIENT_ID_IOS = 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com';
 export const GOOGLE_CLIENT_ID_ANDROID = 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com';
-export const GOOGLE_CLIENT_ID_WEB = 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID_WEB = '765765451806-8552it3usqnh6qa7n457r32mcfv8g9u8.apps.googleusercontent.com';
 
 // Storage keys
 export const STORAGE_KEYS = {

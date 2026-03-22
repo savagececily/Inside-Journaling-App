@@ -15,7 +15,7 @@ export async function createJournalEntry(
 ): Promise<JournalEntry> {
   try {
     const response = await apiClient.post<JournalEntry>(
-      '/api/journal',
+      '/journal',
       data
     );
     return response.data;
@@ -34,7 +34,7 @@ export async function getJournalEntries(
 ): Promise<JournalEntry[]> {
   try {
     const response = await apiClient.get<JournalEntry[]>(
-      `/api/journal?page=${page}&pageSize=${pageSize}`
+      `/journal?page=${page}&pageSize=${pageSize}`
     );
     return response.data;
   } catch (error) {
@@ -51,7 +51,7 @@ export async function getJournalEntryById(
 ): Promise<JournalEntry> {
   try {
     const response = await apiClient.get<JournalEntry>(
-      `/api/journal/${id}`
+      `/journal/${id}`
     );
     return response.data;
   } catch (error) {
@@ -69,7 +69,7 @@ export async function updateJournalEntry(
 ): Promise<JournalEntry> {
   try {
     const response = await apiClient.put<JournalEntry>(
-      `/api/journal/${id}`,
+      `/journal/${id}`,
       data
     );
     return response.data;
@@ -84,7 +84,7 @@ export async function updateJournalEntry(
  */
 export async function deleteJournalEntry(id: string): Promise<void> {
   try {
-    await apiClient.delete(`/api/journal/${id}`);
+    await apiClient.delete(`/journal/${id}`);
   } catch (error) {
     console.error('Error deleting journal entry:', error);
     throw error;
@@ -108,7 +108,7 @@ export async function uploadAudioFile(
     } as any);
 
     const response = await apiClient.post<{ audioUrl: string }>(
-      '/api/journal/upload-audio',
+      '/journal/upload-audio',
       formData,
       {
         headers: {

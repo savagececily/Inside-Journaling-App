@@ -43,8 +43,15 @@ export default function LoginScreen({ navigation }: Props) {
     setIsAuthenticating(true);
     
     try {
+      console.log('🔐 Authenticating with backend...');
+      console.log('📍 API URL:', 'https://mentalhealthjournal-webapp.azurewebsites.net/api/auth/google');
+      console.log('🎫 ID Token length:', idToken.length);
+      console.log('🎫 ID Token preview:', idToken.substring(0, 50) + '...');
+      
       // Send ID token to backend for validation
       const authResponse = await googleLogin({ idToken });
+      
+      console.log('✅ Authentication successful!');
       
       // Save auth data and update context
       await login(authResponse);
@@ -59,11 +66,23 @@ export default function LoginScreen({ navigation }: Props) {
       }
       
       // Navigation is handled automatically by AuthContext
-    } catch (error) {
-      console.error('Backend authentication error:', error);
+    } catch (error: any) {
+      console.error('❌ Backend authentication error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      
+      let errorMessage = 'Failed to authenticate with server. Please try again.';
+      
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        errorMessage = `Server error (${error.response.status}): ${error.response.data?.message || error.response.data?.error || 'Unknown error'}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       Alert.alert(
         'Sign In Failed',
-        error instanceof Error ? error.message : 'Failed to authenticate with server. Please try again.',
+        errorMessage,
         [{ text: 'OK' }]
       );
     } finally {
@@ -73,6 +92,14 @@ export default function LoginScreen({ navigation }: Props) {
 
   const handleGoogleLogin = async () => {
     await signIn();
+  };
+
+  const handleOpenTerms = () => {
+    navigation.navigate('TermsOfService');
+  };
+
+  const handleOpenPrivacy = () => {
+    navigation.navigate('PrivacyPolicy');
   };
 
   const isLoading = isOAuthLoading || isAuthenticating;
@@ -114,8 +141,13 @@ export default function LoginScreen({ navigation }: Props) {
         <View style={styles.legalContainer}>
           <Text style={styles.legalText}>
             By signing in, you agree to our{' '}
-            <Text style={styles.legalLink}>Terms of Service</Text> and{' '}
-            <Text style={styles.legalLink}>Privacy Policy</Text>
+            <Text style={styles.legalLink} onPress={handleOpenTerms}>
+              Terms of Service
+            </Text>
+            {' '}and{' '}
+            <Text style={styles.legalLink} onPress={handleOpenPrivacy}>
+              Privacy Policy
+            </Text>
           </Text>
         </View>
       </View>

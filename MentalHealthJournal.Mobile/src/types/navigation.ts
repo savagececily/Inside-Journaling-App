@@ -13,6 +13,8 @@ export type RootStackParamList = {
 export type AuthStackParamList = {
   Login: undefined;
   Onboarding: undefined;
+  TermsOfService: undefined;
+  PrivacyPolicy: undefined;
 };
 
 // Main Tab Navigator

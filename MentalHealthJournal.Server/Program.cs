@@ -148,7 +148,8 @@ namespace MentalHealthJournal.Server
 
             builder.Services.AddAuthorization();
 
-            // Add CORS policy
+            // Add CORS policy for web frontend only
+            // Note: Mobile apps don't need CORS - CORS is browser-only security
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
@@ -166,7 +167,13 @@ namespace MentalHealthJournal.Server
                 });
             });
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    // Use camelCase for JSON serialization to match mobile app convention
+                    options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

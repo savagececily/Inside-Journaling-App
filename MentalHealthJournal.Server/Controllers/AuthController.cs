@@ -34,7 +34,31 @@ public class AuthController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Google login attempt");
+            // Log request details for debugging
+            _logger.LogInformation("========== Google Login Request Received ==========");
+            _logger.LogInformation("Request is null: {IsNull}", request == null);
+            _logger.LogInformation("IdToken length: {TokenLength}", request?.IdToken?.Length ?? 0);
+            _logger.LogInformation("IdToken is null or empty: {IsNullOrEmpty}", string.IsNullOrEmpty(request?.IdToken));
+            _logger.LogInformation("DateOfBirth provided: {HasDateOfBirth}", request?.DateOfBirth.HasValue ?? false);
+            
+            // Log first 50 chars of token for debugging (not sensitive)
+            if (request?.IdToken != null && request.IdToken.Length > 0)
+            {
+                var tokenPreview = request.IdToken.Length > 50 ? request.IdToken.Substring(0, 50) + "..." : request.IdToken;
+                _logger.LogInformation("IdToken preview: {TokenPreview}", tokenPreview);
+            }
+            
+            if (request == null || string.IsNullOrEmpty(request.IdToken))
+            {
+                _logger.LogWarning("❌ Google login request is null or IdToken is empty - returning BadRequest");
+                return BadRequest(new { 
+                    error = "IdToken is required", 
+                    detail = "The request must include a valid Google ID token",
+                    requestWasNull = request == null,
+                    tokenWasEmpty = request == null || string.IsNullOrEmpty(request.IdToken)
+                });
+            }
+            
             // Get Google Client ID from configuration
             var googleClientId = _configuration["Google:ClientId"];
             if (string.IsNullOrEmpty(googleClientId))
@@ -43,6 +67,8 @@ public class AuthController : ControllerBase
                 return StatusCode(500, "Google authentication not configured");
             }
 
+            _logger.LogInformation("Validating token with Google Client ID: {ClientId}", googleClientId);
+            
             // Validate the Google ID token
             var payload = await GoogleJsonWebSignature.ValidateAsync(request.IdToken, new GoogleJsonWebSignature.ValidationSettings
             {
@@ -115,13 +141,13 @@ public class AuthController : ControllerBase
         }
         catch (InvalidJwtException ex)
         {
-            _logger.LogWarning(ex, "Invalid Google token");
-            return Unauthorized("Invalid Google token");
+            _logger.LogWarning(ex, "Invalid Google token - this usually means Client ID mismatch. Token audience doesn't match backend's Google:ClientId");
+            return Unauthorized(new { error = "Invalid Google token", detail = "Token validation failed - Client ID mismatch?" });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during Google authentication");
-            return StatusCode(500, "Authentication failed");
+            _logger.LogError(ex, "Error during Google authentication: {Message}", ex.Message);
+            return StatusCode(500, new { error = "Authentication failed", detail = ex.Message });
         }
     }
 
