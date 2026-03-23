@@ -87,6 +87,9 @@ public class AuthController : ControllerBase
             User user;
             if (existingUser != null)
             {
+                _logger.LogInformation("🔍 Existing user RETRIEVED: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                    existingUser.userId, existingUser.DateOfBirth, existingUser.AgeVerified);
+                
                 // Update last login
                 user = existingUser;
                 user.LastLoginAt = DateTime.UtcNow;
@@ -96,10 +99,13 @@ public class AuthController : ControllerBase
                 user.Name = payload.Name;
                 user.ProfilePictureUrl = payload.Picture;
                 
+                _logger.LogInformation("👤 Before CreateOrUpdateUserAsync: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                    user.userId, user.DateOfBirth, user.AgeVerified);
+                
                 user = await _userService.CreateOrUpdateUserAsync(user);
                 
-                _logger.LogInformation("Existing user logged in - UserId: {UserId}, AgeVerified: {AgeVerified}, ProviderId: {ProviderId}", 
-                    user.userId, user.AgeVerified, payload.Subject);
+                _logger.LogInformation("✅ After CreateOrUpdateUserAsync: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                    user.userId, user.DateOfBirth, user.AgeVerified);
             }
             else
             {
@@ -129,11 +135,11 @@ public class AuthController : ControllerBase
                     deterministicId, payload.Subject);
             }
 
-            // Check if age verification is required
-        bool requiresAgeVerification = !user.DateOfBirth.HasValue;
+            // Check if age verification is required - user must have both DateOfBirth AND AgeVerified flag
+            bool requiresAgeVerification = !user.AgeVerified || !user.DateOfBirth.HasValue;
             
-_logger.LogInformation("📤 Login response: UserId={UserId}, AgeVerified={AgeVerified}, RequiresAgeVerification={RequiresAgeVerification}",
-                user.userId, user.AgeVerified, requiresAgeVerification);
+            _logger.LogInformation("📤 Login response: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}, RequiresAgeVerification={RequiresAgeVerification}",
+                user.userId, user.DateOfBirth, user.AgeVerified, requiresAgeVerification);
 
             // Generate JWT token
             var jwtToken = GenerateJwtToken(user);

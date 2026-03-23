@@ -36,12 +36,9 @@ public class UserConsentService : IUserConsentService
     {
         try
         {
-            // Use deterministic ID to prevent duplicates: one consent record per user per type
-            var deterministicId = $"{userId}_{consentType}";
-            
             var consent = new UserConsent
             {
-                id = deterministicId, // Deterministic ID prevents duplicates
+                id = Guid.NewGuid().ToString(), // Generate unique ID for each consent record
                 userId = userId, // Partition key - all consents for a user in same partition
                 ConsentType = consentType,
                 ConsentVersion = version,
@@ -52,15 +49,14 @@ public class UserConsentService : IUserConsentService
                 UserAgent = userAgent
             };
 
-            // Use UpsertItemAsync to replace existing consent if it exists
-            await _container.UpsertItemAsync(
+            var response = await _container.CreateItemAsync(
                 consent,
                 new PartitionKey(consent.userId),
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation(
                 "✅ Consent SAVED: UserId={UserId}, Type={ConsentType}, Version={Version}, Granted={Granted}, Id={Id}",
-                userId, consentType, version, granted, deterministicId);
+                userId, consentType, version, granted, response.Resource.id);
         }
         catch (Exception ex)
         {
@@ -80,38 +76,44 @@ public class UserConsentService : IUserConsentService
         {
             _logger.LogInformation("🔍 Searching for consent: UserId={UserId}, Type={ConsentType}", userId, consentType);
             
+            // Query for the latest non-revoked consent
             var query = new QueryDefinition(
                 "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
-            // var queryRequestOptions = new QueryRequestOptions
-            // {
-            //     PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
-            // };
+            var queryRequestOptions = new QueryRequestOptions
+            {
+                PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
+            };
 
-            // var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
-            var iterator = _container.GetItemQueryIterator<UserConsent>(query);
+            _logger.LogInformation("🔍 Executing query with PartitionKey={PartitionKey}", userId);
+
+            var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
 
             if (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync(cancellationToken);
+                _logger.LogInformation("📦 Query returned {Count} results", response.Count);
+                
                 var result = response.FirstOrDefault();
                 
                 if (result != null)
                 {
-                    _logger.LogInformation("✅ Found consent: UserId={UserId}, Type={ConsentType}, Granted={Granted}, Date={Date}",
-                        result.userId, result.ConsentType, result.Granted, result.ConsentDate);
+                    _logger.LogInformation("✅ Found consent: UserId={UserId}, Type={ConsentType}, Granted={Granted}, ConsentDate={Date}, RevokedDate={RevokedDate}, Id={Id}",
+                        result.userId, result.ConsentType, result.Granted, result.ConsentDate, result.RevokedDate, result.id);
+                    return result;
                 }
                 else
                 {
-                    _logger.LogWarning("⚠️ No consent found: UserId={UserId}, Type={ConsentType}", userId, consentType);
+                    _logger.LogWarning("⚠️ Query executed but returned no results: UserId={UserId}, Type={ConsentType}", userId, consentType);
                 }
-                
-                return result;
+            }
+            else
+            {
+                _logger.LogWarning("⚠️ Query has no more results: UserId={UserId}, Type={ConsentType}", userId, consentType);
             }
 
-            _logger.LogWarning("⚠️ No consent records found: UserId={UserId}, Type={ConsentType}", userId, consentType);
             return null;
         }
         catch (Exception ex)
