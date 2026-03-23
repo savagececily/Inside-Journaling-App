@@ -85,12 +85,13 @@ public class UserConsentService : IUserConsentService
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
-            var queryRequestOptions = new QueryRequestOptions
-            {
-                PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
-            };
+            // var queryRequestOptions = new QueryRequestOptions
+            // {
+            //     PartitionKey = new PartitionKey(userId) // Single-partition query for efficiency
+            // };
 
-            var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
+            // var iterator = _container.GetItemQueryIterator<UserConsent>(query, requestOptions: queryRequestOptions);
+            var iterator = _container.GetItemQueryIterator<UserConsent>(query);
 
             if (iterator.HasMoreResults)
             {

@@ -8,6 +8,9 @@ export const authService = {
         if (dateOfBirth) {
             body.dateOfBirth = dateOfBirth;
         }
+        else{
+            console.log('⚠️ No date of birth provided for age verification');
+        }
 
         const response = await fetch(`${API_BASE_URL}/auth/google`, {
             method: 'POST',

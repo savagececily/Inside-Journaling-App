@@ -130,7 +130,7 @@ public class AuthController : ControllerBase
             }
 
             // Check if age verification is required
-            bool requiresAgeVerification = !user.AgeVerified;
+        bool requiresAgeVerification = !user.DateOfBirth.HasValue;
             
 _logger.LogInformation("📤 Login response: UserId={UserId}, AgeVerified={AgeVerified}, RequiresAgeVerification={RequiresAgeVerification}",
                 user.userId, user.AgeVerified, requiresAgeVerification);
