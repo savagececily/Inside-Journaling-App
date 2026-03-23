@@ -25,6 +25,7 @@ namespace MentalHealthJournal.Server
             // Configure logging
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
 
             var defaultCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
             {
@@ -53,6 +54,10 @@ namespace MentalHealthJournal.Server
                     configureTelemetryConfiguration: (config) => config.ConnectionString = appInsightsConnectionString,
                     configureApplicationInsightsLoggerOptions: (options) => { }
                 );
+                
+                // Set Application Insights to capture Information level logs
+                builder.Logging.AddFilter<Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider>
+                    ("", LogLevel.Information);
             }
             else
             {

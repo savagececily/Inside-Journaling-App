@@ -78,7 +78,9 @@ public class UserConsentService : IUserConsentService
             
             // Query for the latest non-revoked consent (using camelCase property names as stored in Cosmos DB)
             var query = new QueryDefinition(
-                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType AND IS_NULL(c.revokedDate) ORDER BY c.consentDate DESC")
+                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType " +
+                "AND (IS_NULL(c.revokedDate) OR NOT IS_DEFINED(c.revokedDate)) " +
+                "ORDER BY c.consentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
@@ -131,7 +133,7 @@ public class UserConsentService : IUserConsentService
         string requiredVersion,
         CancellationToken cancellationToken = default)
     {
-        var consent = await GetLatestConsentAsync(userId, consentType, cancellationToken);
+        UserConsent? consent = await GetLatestConsentAsync(userId, consentType, cancellationToken);
         
         if (consent == null || !consent.Granted || consent.RevokedDate != null)
         {
