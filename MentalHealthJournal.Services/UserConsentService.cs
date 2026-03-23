@@ -76,9 +76,9 @@ public class UserConsentService : IUserConsentService
         {
             _logger.LogInformation("🔍 Searching for consent: UserId={UserId}, Type={ConsentType}", userId, consentType);
             
-            // Query for the latest non-revoked consent
+            // Query for the latest non-revoked consent (using camelCase property names as stored in Cosmos DB)
             var query = new QueryDefinition(
-                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.ConsentType = @consentType AND IS_NULL(c.RevokedDate) ORDER BY c.ConsentDate DESC")
+                "SELECT TOP 1 * FROM c WHERE c.userId = @userId AND c.consentType = @consentType AND IS_NULL(c.revokedDate) ORDER BY c.consentDate DESC")
                 .WithParameter("@userId", userId)
                 .WithParameter("@consentType", consentType);
 
@@ -161,7 +161,7 @@ public class UserConsentService : IUserConsentService
         try
         {
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE c.userId = @userId ORDER BY c.ConsentDate DESC")
+                "SELECT * FROM c WHERE c.userId = @userId ORDER BY c.consentDate DESC")
                 .WithParameter("@userId", userId);
 
             var queryRequestOptions = new QueryRequestOptions

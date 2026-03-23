@@ -28,7 +28,7 @@ public class UserService : IUserService
             _logger.LogInformation("Looking up user by providerId={ProviderId}, provider={Provider}", providerId, provider);
             
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE c.ProviderId = @providerId AND c.Provider = @provider")
+                "SELECT * FROM c WHERE c.providerId = @providerId AND c.provider = @provider")
                 .WithParameter("@providerId", providerId)
                 .WithParameter("@provider", provider);
 
@@ -42,7 +42,8 @@ public class UserService : IUserService
                 
                 if (user != null)
                 {
-                    _logger.LogInformation("Found existing user: id={Id}, userId={UserId}, email={Email}", user.id, user.userId, user.Email);
+                    _logger.LogInformation("✅ Found existing user: id={Id}, userId={UserId}, email={Email}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}", 
+                        user.id, user.userId, user.Email, user.DateOfBirth, user.AgeVerified);
                     return user;
                 }
             }
@@ -67,7 +68,22 @@ public class UserService : IUserService
     {
         try
         {
+            _logger.LogInformation("🔍 GetUserByIdAsync: Looking up userId={UserId}", userId);
+            
             var response = await _usersContainer.ReadItemAsync<User>(userId, new PartitionKey(userId));
+            
+            _logger.LogInformation("📦 RAW Cosmos Response: StatusCode={StatusCode}, ActivityId={ActivityId}", 
+                response.StatusCode, response.ActivityId);
+            
+            if (response.Resource != null)
+            {
+                _logger.LogInformation("✅ User retrieved: id={Id}, userId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}, Email={Email}",
+                    response.Resource.id, response.Resource.userId, response.Resource.DateOfBirth, response.Resource.AgeVerified, response.Resource.Email);
+            }
+            else
+            {
+                _logger.LogWarning("⚠️ Response.Resource is null for userId={UserId}", userId);
+            }
             
             // Audit log
             if (_auditLogService != null && response.Resource != null)
@@ -84,11 +100,12 @@ public class UserService : IUserService
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
+            _logger.LogWarning("⚠️ User not found: userId={UserId}", userId);
             return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting user by ID");
+            _logger.LogError(ex, "Error getting user by ID: userId={UserId}", userId);
             return null;
         }
     }
@@ -147,7 +164,7 @@ public class UserService : IUserService
             // 2. Using Azure Cognitive Search for username lookups
             // 3. Caching username availability results
             var query = new QueryDefinition(
-                "SELECT * FROM c WHERE LOWER(c.Username) = LOWER(@username)")
+                "SELECT * FROM c WHERE LOWER(c.username) = LOWER(@username)")
                 .WithParameter("@username", username);
 
             var iterator = _usersContainer.GetItemQueryIterator<User>(query);
