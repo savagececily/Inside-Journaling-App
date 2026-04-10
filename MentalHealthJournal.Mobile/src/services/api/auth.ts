@@ -15,10 +15,16 @@ export interface RefreshUserResponse {
  * Authenticate with Google ID token
  */
 export async function googleLogin(request: GoogleLoginRequest): Promise<AuthResponse> {
-  const response = await apiClient.post<AuthResponse>('/auth/google', {
-    idToken: request.idToken,
-    dateOfBirth: request.dateOfBirth,
-  });
+  // Build request body - only include DateOfBirth if provided
+  const body: any = {
+    IdToken: request.idToken,
+  };
+  
+  if (request.dateOfBirth) {
+    body.DateOfBirth = request.dateOfBirth;
+  }
+  
+  const response = await apiClient.post<AuthResponse>('/auth/google', body);
   
   return response.data;
 }
@@ -44,7 +50,7 @@ export async function refreshUser(): Promise<User> {
  */
 export async function verifyAge(dateOfBirth: Date): Promise<User> {
   const response = await apiClient.post<User>('/auth/verify-age', {
-    dateOfBirth,
+    DateOfBirth: dateOfBirth,
   });
   return response.data;
 }

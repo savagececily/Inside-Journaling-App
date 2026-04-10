@@ -36,7 +36,7 @@ export const LEGAL_URLS = {
 // The backend needs ONE of these client IDs configured in appsettings.json:
 //   "Google": { "ClientId": "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com" }
 //
-export const GOOGLE_CLIENT_ID_IOS = 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com';
+export const GOOGLE_CLIENT_ID_IOS = '765765451806-5htslbhkn876bcnadgluollhh0miku5s.apps.googleusercontent.com';
 export const GOOGLE_CLIENT_ID_ANDROID = 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com';
 export const GOOGLE_CLIENT_ID_WEB = '765765451806-8552it3usqnh6qa7n457r32mcfv8g9u8.apps.googleusercontent.com';
 

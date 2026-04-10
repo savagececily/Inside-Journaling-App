@@ -22,6 +22,12 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Log request details for debugging
+    console.log(`📤 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    if (config.data) {
+      console.log('Request data:', JSON.stringify(config.data, null, 2));
+    }
+    
     return config;
   },
   (error) => {
@@ -34,7 +40,15 @@ apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
-  async (error: AxiosError<ApiError>) => {
+  async (error: AxiosError<any>) => {
+    // Log full error details for debugging
+    console.error('API Error Details:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message,
+    });
+
     // Handle 401 Unauthorized - token expired
     if (error.response?.status === 401) {
       // Clear auth and redirect to login
@@ -44,7 +58,7 @@ apiClient.interceptors.response.use(
     
     // Format error for consistency
     const apiError: ApiError = {
-      message: error.response?.data?.message || error.message || 'An error occurred',
+      message: error.response?.data?.error || error.response?.data?.message || error.message || 'An error occurred',
       statusCode: error.response?.status,
       errors: error.response?.data?.errors,
     };

@@ -47,9 +47,9 @@ export async function recordConsent(
   granted: boolean
 ): Promise<void> {
   await apiClient.post('/Consent/record', {
-    consentType,
-    version,
-    granted,
+    ConsentType: consentType,
+    Version: version,
+    Granted: granted,
   });
 }
 
@@ -83,5 +83,5 @@ export async function getConsentVersions(): Promise<ConsentVersions> {
  * Revoke a specific consent type
  */
 export async function revokeConsent(consentType: string): Promise<void> {
-  await apiClient.post('/Consent/revoke', { consentType });
+  await apiClient.post('/Consent/revoke', { ConsentType: consentType });
 }

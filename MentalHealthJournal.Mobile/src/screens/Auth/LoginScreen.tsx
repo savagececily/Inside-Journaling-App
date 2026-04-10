@@ -79,10 +79,15 @@ export default function LoginScreen({ navigation }: Props) {
       await login(authResponse);
     } catch (error: any) {
       console.error('❌ Backend authentication error:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      
+      // Show detailed error message
+      const errorMessage = error.message || 'Failed to authenticate with server. Please try again.';
+      const errorDetails = error.statusCode ? ` (Status: ${error.statusCode})` : '';
       
       Alert.alert(
         'Sign In Failed',
-        error.message || 'Failed to authenticate with server. Please try again.',
+        `${errorMessage}${errorDetails}`,
         [{ text: 'OK' }]
       );
     } finally {

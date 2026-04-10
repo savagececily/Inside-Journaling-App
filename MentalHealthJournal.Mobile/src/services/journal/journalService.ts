@@ -15,8 +15,13 @@ export async function createJournalEntry(
 ): Promise<JournalEntry> {
   try {
     const response = await apiClient.post<JournalEntry>(
-      '/journal',
-      data
+      '/journal/analyze',
+      {
+        Text: data.content,
+        AudioBlobUrl: data.audioUrl,
+        IsVoiceEntry: !!data.audioUrl,
+        Timestamp: new Date(),
+      }
     );
     return response.data;
   } catch (error) {
@@ -70,7 +75,9 @@ export async function updateJournalEntry(
   try {
     const response = await apiClient.put<JournalEntry>(
       `/journal/${id}`,
-      data
+      {
+        Text: data.content,
+      }
     );
     return response.data;
   } catch (error) {
