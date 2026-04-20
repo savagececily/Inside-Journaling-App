@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Mental Health Journal",
-    "slug": "@savagececily/mental-health-journal",
+    "slug": "mental-health-journal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,11 +15,13 @@
     "ios": {
       "infoPlist": {
         "NSFaceIDUsageDescription": "We use Face ID to keep your journal entries secure and private.",
-        "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit."
+        "NSUserNotificationsUsageDescription": "We send you daily reminders to help maintain your journaling habit.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "supportsTablet": true,
       "bundleIdentifier": "com.mentalhealthjournal.app",
       "associatedDomains": [
+        "applinks:mentalhealthjournal.app",
         "applinks:mentalhealthjournal.app"
       ]
     },
@@ -36,7 +38,9 @@
         "USE_BIOMETRIC",
         "USE_FINGERPRINT",
         "VIBRATE",
-        "NOTIFICATIONS"
+        "NOTIFICATIONS",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ],
       "intentFilters": [
         {
@@ -81,7 +85,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "ea887694-6a2e-4cdf-a59b-226cddb5d64f"
       }
     }
   }
