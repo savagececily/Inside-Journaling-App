@@ -7,6 +7,8 @@ using System.Security.Claims;
 using System.Text;
 using MentalHealthJournal.Models;
 using MentalHealthJournal.Services;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace MentalHealthJournal.Server.Controllers;
 
@@ -161,6 +163,183 @@ public class AuthController : ControllerBase
             _logger.LogError(ex, "Error during Google authentication: {Message}", ex.Message);
             return StatusCode(500, new { error = "Authentication failed", detail = ex.Message });
         }
+    }
+
+    [HttpPost("microsoft")]
+    [AllowAnonymous]
+    public async Task<ActionResult<AuthResponse>> MicrosoftLogin([FromBody] MicrosoftTokenRequest request)
+    {
+        try
+        {
+            _logger.LogInformation("========== Microsoft Login Request Received ==========");
+            _logger.LogInformation("Request is null: {IsNull}", request == null);
+            _logger.LogInformation("IdToken length: {TokenLength}", request?.IdToken?.Length ?? 0);
+            _logger.LogInformation("DateOfBirth provided: {HasDateOfBirth}", request?.DateOfBirth.HasValue ?? false);
+
+            if (request == null || string.IsNullOrEmpty(request.IdToken))
+            {
+                _logger.LogWarning("❌ Microsoft login request is null or IdToken is empty");
+                return BadRequest(new
+                {
+                    error = "IdToken is required",
+                    detail = "The request must include a valid Microsoft ID token"
+                });
+            }
+
+            // Get Microsoft configuration
+            string microsoftTenantId = _configuration["Microsoft:TenantId"] ?? "common";
+            string microsoftClientId = _configuration["Microsoft:ClientId"];
+
+            if (string.IsNullOrEmpty(microsoftClientId))
+            {
+                _logger.LogError("Microsoft Client ID not configured");
+                return StatusCode(500, "Microsoft authentication not configured");
+            }
+
+            _logger.LogInformation("Validating Microsoft token with Client ID: {ClientId}, Tenant: {TenantId}", 
+                microsoftClientId, microsoftTenantId);
+
+            // Validate the Microsoft ID token
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadJwtToken(request.IdToken);
+
+            // Get Microsoft's public keys for token validation
+            string microsoftKeysUrl = $"https://login.microsoftonline.com/{microsoftTenantId}/discovery/v2.0/keys";
+            using var httpClient = new HttpClient();
+            string keysJson = await httpClient.GetStringAsync(microsoftKeysUrl);
+            var keys = JsonSerializer.Deserialize<JsonElement>(keysJson);
+            
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuers = new[]
+                {
+                    $"https://login.microsoftonline.com/{microsoftTenantId}/v2.0",
+                    $"https://sts.windows.net/{microsoftTenantId}/"
+                },
+                ValidateAudience = true,
+                ValidAudiences = new[] { microsoftClientId },
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = GetMicrosoftSigningKeys(keys)
+            };
+
+            ClaimsPrincipal claimsPrincipal;
+            try
+            {
+                claimsPrincipal = handler.ValidateToken(request.IdToken, validationParameters, out _);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Invalid Microsoft token");
+                return Unauthorized(new { error = "Invalid Microsoft token", detail = ex.Message });
+            }
+
+            // Extract claims from the validated token
+            var claims = claimsPrincipal.Claims.ToDictionary(c => c.Type, c => c.Value);
+            var subject = claims.GetValueOrDefault("sub") ?? claims.GetValueOrDefault("oid") ?? string.Empty;
+            var email = claims.GetValueOrDefault("email") ?? claims.GetValueOrDefault("preferred_username") ?? string.Empty;
+            var name = claims.GetValueOrDefault("name") ?? email;
+
+            if (string.IsNullOrEmpty(subject))
+            {
+                _logger.LogWarning("No subject/oid found in Microsoft token");
+                return Unauthorized("Invalid token: missing subject");
+            }
+
+            // Check if user exists
+            var existingUser = await _userService.GetUserByProviderIdAsync(subject, "microsoft");
+
+            User user;
+            if (existingUser != null)
+            {
+                _logger.LogInformation("🔍 Existing user RETRIEVED: UserId={UserId}, DateOfBirth={DateOfBirth}, AgeVerified={AgeVerified}",
+                    existingUser.userId, existingUser.DateOfBirth, existingUser.AgeVerified);
+
+                // Update last login
+                user = existingUser;
+                user.LastLoginAt = DateTime.UtcNow;
+
+                // Ensure email and name are up to date from provider
+                user.Email = email;
+                user.Name = name;
+
+                _logger.LogInformation("👤 Before CreateOrUpdateUserAsync: UserId={UserId}", user.userId);
+
+                user = await _userService.CreateOrUpdateUserAsync(user);
+
+                _logger.LogInformation("✅ After CreateOrUpdateUserAsync: UserId={UserId}", user.userId);
+            }
+            else
+            {
+                // Create new user with deterministic ID
+                var deterministicId = GenerateDeterministicUserId("microsoft", subject);
+
+                user = new User
+                {
+                    id = deterministicId,
+                    userId = deterministicId,
+                    Email = email,
+                    Name = name,
+                    Provider = "microsoft",
+                    ProviderId = subject,
+                    CreatedAt = DateTime.UtcNow,
+                    LastLoginAt = DateTime.UtcNow,
+                    DateOfBirth = request.DateOfBirth,
+                    AgeVerified = request.DateOfBirth.HasValue && CalculateAge(request.DateOfBirth.Value) >= 13
+                };
+
+                user = await _userService.CreateOrUpdateUserAsync(user);
+
+                _logger.LogInformation("Created new user with deterministic ID: {UserId} for ProviderId: {ProviderId}",
+                    deterministicId, subject);
+            }
+
+            // Check if age verification is required
+            bool requiresAgeVerification = !user.AgeVerified || !user.DateOfBirth.HasValue;
+
+            _logger.LogInformation("📤 Login response: UserId={UserId}, RequiresAgeVerification={RequiresAgeVerification}",
+                user.userId, requiresAgeVerification);
+
+            // Generate JWT token
+            var jwtTokenString = GenerateJwtToken(user);
+
+            return Ok(new AuthResponse
+            {
+                Token = jwtTokenString,
+                User = user,
+                RequiresAgeVerification = requiresAgeVerification
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Microsoft authentication: {Message}", ex.Message);
+            return StatusCode(500, new { error = "Authentication failed", detail = ex.Message });
+        }
+    }
+
+    private IEnumerable<SecurityKey> GetMicrosoftSigningKeys(JsonElement keysJson)
+    {
+        var keys = new List<SecurityKey>();
+        
+        if (keysJson.TryGetProperty("keys", out var keysArray))
+        {
+            foreach (var key in keysArray.EnumerateArray())
+            {
+                if (key.TryGetProperty("x5c", out var x5cArray) && x5cArray.GetArrayLength() > 0)
+                {
+                    var x5c = x5cArray[0].GetString();
+                    if (!string.IsNullOrEmpty(x5c))
+                    {
+                        var cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(
+                            Convert.FromBase64String(x5c));
+                        keys.Add(new X509SecurityKey(cert));
+                    }
+                }
+            }
+        }
+        
+        return keys;
     }
 
     [HttpGet("me")]

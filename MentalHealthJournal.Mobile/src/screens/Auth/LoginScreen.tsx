@@ -11,11 +11,13 @@ import {
 import { AuthStackScreenProps } from '../../types/navigation';
 import { colors, spacing, typography, borderRadius } from '../../theme';
 import { useGoogleAuth } from '../../hooks/useGoogleAuth';
+import { useMicrosoftAuth } from '../../hooks/useMicrosoftAuth';
 import { useAuth } from '../../contexts/AuthContext';
-import { googleLogin, verifyAge } from '../../services/api/auth';
+import { googleLogin, microsoftLogin, verifyAge } from '../../services/api/auth';
 import { getConsentStatus, recordConsent } from '../../services/api/consent';
 import { AgeVerificationModal } from '../../components/common/AgeVerificationModal';
 import { ConsentGateModal } from '../../components/common/ConsentGateModal';
+import { hasAnyAuthProvider } from '../../utils/authConfig';
 import type { AuthResponse } from '../../types/api';
 
 type Props = AuthStackScreenProps<'Login'>;
@@ -26,35 +28,73 @@ export default function LoginScreen({ navigation }: Props) {
   const [showConsentGate, setShowConsentGate] = useState(false);
   const [tempAuthResponse, setTempAuthResponse] = useState<AuthResponse | null>(null);
   
-  const { signIn, isLoading: isOAuthLoading, idToken, error: oauthError } = useGoogleAuth();
+  const { 
+    signIn: googleSignIn, 
+    isLoading: isGoogleLoading, 
+    idToken: googleIdToken, 
+    error: googleError,
+    isAvailable: isGoogleAvailable 
+  } = useGoogleAuth();
+  
+  const { 
+    signIn: microsoftSignIn, 
+    isLoading: isMicrosoftLoading, 
+    idToken: microsoftIdToken, 
+    error: microsoftError,
+    isAvailable: isMicrosoftAvailable 
+  } = useMicrosoftAuth();
+  
   const { login } = useAuth();
+  
+  // Check if at least one auth provider is available
+  const hasAuthProvider = hasAnyAuthProvider();
 
   // Handle Google OAuth response
   useEffect(() => {
-    if (idToken && !isAuthenticating) {
-      authenticateWithBackend(idToken);
+    if (googleIdToken && !isAuthenticating) {
+      authenticateWithBackend(googleIdToken, 'google');
     }
-  }, [idToken]);
+  }, [googleIdToken]);
 
-  // Handle OAuth errors
+  // Handle Microsoft OAuth response
   useEffect(() => {
-    if (oauthError && oauthError !== 'Authentication cancelled') {
+    if (microsoftIdToken && !isAuthenticating) {
+      authenticateWithBackend(microsoftIdToken, 'microsoft');
+    }
+  }, [microsoftIdToken]);
+
+  // Handle Google OAuth errors
+  useEffect(() => {
+    if (googleError && googleError !== 'Authentication cancelled') {
       Alert.alert(
         'Authentication Error',
-        oauthError,
+        googleError,
         [{ text: 'OK' }]
       );
     }
-  }, [oauthError]);
+  }, [googleError]);
 
-  const authenticateWithBackend = async (idToken: string) => {
+  // Handle Microsoft OAuth errors
+  useEffect(() => {
+    if (microsoftError && microsoftError !== 'Authentication cancelled') {
+      Alert.alert(
+        'Authentication Error',
+        microsoftError,
+        [{ text: 'OK' }]
+      );
+    }
+  }, [microsoftError]);
+
+  const authenticateWithBackend = async (idToken: string, provider: 'google' | 'microsoft') => {
     setIsAuthenticating(true);
     
     try {
-      console.log('🔐 Authenticating with backend...');
+      console.log(`🔐 Authenticating with backend using ${provider}...`);
       
       // Send ID token to backend for validation
-      const authResponse = await googleLogin({ idToken });
+      const authResponse = provider === 'google' 
+        ? await googleLogin({ idToken })
+        : await microsoftLogin({ idToken });
       
       console.log('✅ Authentication successful!');
       
@@ -152,7 +192,11 @@ export default function LoginScreen({ navigation }: Props) {
   };
 
   const handleGoogleLogin = async () => {
-    await signIn();
+    await googleSignIn();
+  };
+
+  const handleMicrosoftLogin = async () => {
+    await microsoftSignIn();
   };
 
   const handleOpenTerms = () => {
@@ -163,7 +207,7 @@ export default function LoginScreen({ navigation }: Props) {
     navigation.navigate('PrivacyPolicy');
   };
 
-  const isLoading = isOAuthLoading || isAuthenticating;
+  const isLoading = isGoogleLoading || isMicrosoftLoading || isAuthenticating;
 
   return (
     <View style={styles.container}>
@@ -179,24 +223,67 @@ export default function LoginScreen({ navigation }: Props) {
           </Text>
         </View>
 
+        {/* No auth providers configured warning */}
+        {!hasAuthProvider && (
+          <View style={styles.warningContainer}>
+            <Text style={styles.warningIcon}>⚠️</Text>
+            <Text style={styles.warningText}>
+              No authentication providers are configured.{'\n'}
+              Please contact support.
+            </Text>
+          </View>
+        )}
+
         {/* Google Sign-In Button */}
-        <TouchableOpacity
-          style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
-          onPress={handleGoogleLogin}
-          disabled={isLoading}
-          activeOpacity={0.8}
-        >
-          {isLoading ? (
-            <ActivityIndicator color={colors.text} />
-          ) : (
-            <>
-              <View style={styles.googleIcon}>
-                <Text style={styles.googleIconText}>G</Text>
-              </View>
-              <Text style={styles.googleButtonText}>Sign in with Google</Text>
-            </>
-          )}
-        </TouchableOpacity>
+        {isGoogleAvailable && (
+          <TouchableOpacity
+            style={[styles.googleButton, isLoading && styles.googleButtonDisabled]}
+            onPress={handleGoogleLogin}
+            disabled={isLoading}
+            activeOpacity={0.8}
+          >
+            {isGoogleLoading ? (
+              <ActivityIndicator color={colors.text} />
+            ) : (
+              <>
+                <View style={styles.googleIcon}>
+                  <Text style={styles.googleIconText}>G</Text>
+                </View>
+                <Text style={styles.googleButtonText}>Sign in with Google</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
+
+        {/* Divider - only show if both providers are available */}
+        {isGoogleAvailable && isMicrosoftAvailable && (
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or</Text>
+            <View style={styles.dividerLine} />
+          </View>
+        )}
+
+        {/* Microsoft Sign-In Button */}
+        {isMicrosoftAvailable && (
+          <TouchableOpacity
+            style={[styles.microsoftButton, isLoading && styles.microsoftButtonDisabled]}
+            onPress={handleMicrosoftLogin}
+            disabled={isLoading}
+            activeOpacity={0.8}
+          >
+            {isMicrosoftLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <>
+                <View style={styles.microsoftIcon}>
+                  <Text style={styles.microsoftIconText}>M</Text>
+                </View>
+                <Text style={styles.microsoftButtonText}>Sign in with Microsoft</Text>
+              </>
+            )}
+          </TouchableOpacity>
+        )}
 
         {/* Privacy & Terms */}
         <View style={styles.legalContainer}>
@@ -275,6 +362,25 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: spacing.sm,
   },
+  warningContainer: {
+    backgroundColor: '#FFF3CD',
+    borderWidth: 1,
+    borderColor: '#FFC107',
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    alignItems: 'center',
+  },
+  warningIcon: {
+    fontSize: 32,
+    marginBottom: spacing.sm,
+  },
+  warningText: {
+    fontSize: typography.fontSize.sm,
+    color: '#856404',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
   googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -308,6 +414,53 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.base,
     fontWeight: typography.fontWeight.semiBold,
     color: colors.text,
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.lg,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: colors.border,
+  },
+  dividerText: {
+    marginHorizontal: spacing.md,
+    fontSize: typography.fontSize.sm,
+    color: colors.textSecondary,
+  },
+  microsoftButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#2f2f2f',
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    minHeight: 48,
+  },
+  microsoftButtonDisabled: {
+    opacity: 0.6,
+  },
+  microsoftIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  microsoftIconText: {
+    color: '#2f2f2f',
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.bold,
+  },
+  microsoftButtonText: {
+    fontSize: typography.fontSize.base,
+    fontWeight: typography.fontWeight.semiBold,
+    color: '#fff',
   },
   legalContainer: {
     marginTop: spacing.xl,

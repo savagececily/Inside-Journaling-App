@@ -40,6 +40,33 @@ export const GOOGLE_CLIENT_ID_IOS = '765765451806-5htslbhkn876bcnadgluollhh0miku
 export const GOOGLE_CLIENT_ID_ANDROID = 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com';
 export const GOOGLE_CLIENT_ID_WEB = '765765451806-8552it3usqnh6qa7n457r32mcfv8g9u8.apps.googleusercontent.com';
 
+// Microsoft OAuth Configuration
+// IMPORTANT: Replace these with your actual Microsoft Entra ID app registration details
+//
+// Setup instructions:
+// 1. Go to https://portal.azure.com/
+// 2. Navigate to "Microsoft Entra ID" → "App registrations" → "New registration"
+// 3. Register your application:
+//    - Name: Mental Health Journal Mobile
+//    - Supported account types: "Accounts in any organizational directory and personal Microsoft accounts"
+//    - Redirect URI: Add a custom redirect URI for mobile (e.g., msauth.com.mentalhealthjournal://auth)
+// 4. After creation, note the "Application (client) ID" - this is your MICROSOFT_CLIENT_ID
+// 5. Note the "Directory (tenant) ID" - or use "common" for multi-tenant
+// 6. Configure platform settings:
+//    - Add "Mobile and desktop applications" platform
+//    - Add redirect URI: msauth.com.mentalhealthjournal://auth
+// 7. Under "API permissions", ensure these are added:
+//    - Microsoft Graph: openid, profile, email (User.Read)
+//
+// The backend needs these configured in appsettings.json:
+//   "Microsoft": { 
+//     "TenantId": "common",
+//     "ClientId": "YOUR_CLIENT_ID"
+//   }
+//
+export const MICROSOFT_CLIENT_ID = 'YOUR_MICROSOFT_CLIENT_ID';
+export const MICROSOFT_TENANT_ID = 'common'; // Use 'common' for multi-tenant, or your specific tenant ID
+
 // Storage keys
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'auth_token',

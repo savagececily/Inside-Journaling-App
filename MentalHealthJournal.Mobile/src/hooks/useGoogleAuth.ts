@@ -8,15 +8,18 @@ import {
   GOOGLE_CLIENT_ID_ANDROID,
   GOOGLE_CLIENT_ID_WEB,
 } from '../utils/constants';
+import { isGoogleConfigured } from '../utils/authConfig';
 
 export interface GoogleAuthResponse {
   idToken: string | null;
   accessToken: string | null;
   error: string | null;
+  isAvailable: boolean;
 }
 
 export function useGoogleAuth() {
   const [isLoading, setIsLoading] = useState(false);
+  const configStatus = isGoogleConfigured();
 
   // For Expo Go, we need to use auth.expo.io proxy
   // The response comes back through Expo's linking system
@@ -52,6 +55,7 @@ export function useGoogleAuth() {
     idToken: null,
     accessToken: null,
     error: null,
+    isAvailable: configStatus.isConfigured,
   });
 
   // Handle OAuth response
@@ -76,6 +80,7 @@ export function useGoogleAuth() {
           idToken: authentication.idToken || null,
           accessToken: authentication.accessToken,
           error: null,
+          isAvailable: true,
         });
       } else {
         console.error('❌ No authentication object in success response');
@@ -83,6 +88,7 @@ export function useGoogleAuth() {
           idToken: null,
           accessToken: null,
           error: 'No authentication data received',
+          isAvailable: true,
         });
       }
       setIsLoading(false);
@@ -94,6 +100,7 @@ export function useGoogleAuth() {
         idToken: null,
         accessToken: null,
         error: response.error?.message || 'Authentication failed',
+        isAvailable: true,
       });
       setIsLoading(false);
     } else if (response?.type === 'dismiss' || response?.type === 'cancel') {
@@ -103,6 +110,7 @@ export function useGoogleAuth() {
         idToken: null,
         accessToken: null,
         error: 'Authentication cancelled',
+        isAvailable: true,
       });
       setIsLoading(false);
     } else if (response) {
@@ -113,11 +121,24 @@ export function useGoogleAuth() {
 
   // Trigger Google login
   const signIn = async () => {
+    // Check if Google auth is configured
+    if (!configStatus.isConfigured) {
+      console.warn('⚠️ Google auth not configured:', configStatus.reason);
+      setAuthResult({
+        idToken: null,
+        accessToken: null,
+        error: configStatus.reason || 'Google Sign-In is not configured',
+        isAvailable: false,
+      });
+      return;
+    }
+
     setIsLoading(true);
     setAuthResult({
       idToken: null,
       accessToken: null,
       error: null,
+      isAvailable: true,
     });
 
     try {
@@ -128,6 +149,7 @@ export function useGoogleAuth() {
         idToken: null,
         accessToken: null,
         error: error instanceof Error ? error.message : 'Failed to start authentication',
+        isAvailable: true,
       });
       setIsLoading(false);
     }
@@ -139,6 +161,7 @@ export function useGoogleAuth() {
       idToken: null,
       accessToken: null,
       error: null,
+      isAvailable: configStatus.isConfigured,
     });
   };
 
@@ -150,5 +173,6 @@ export function useGoogleAuth() {
     idToken: authResult.idToken,
     accessToken: authResult.accessToken,
     error: authResult.error,
+    isAvailable: authResult.isAvailable,
   };
 }

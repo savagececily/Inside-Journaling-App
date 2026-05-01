@@ -7,6 +7,11 @@ export interface GoogleLoginRequest {
   dateOfBirth?: Date;
 }
 
+export interface MicrosoftLoginRequest {
+  idToken: string;
+  dateOfBirth?: Date;
+}
+
 export interface RefreshUserResponse {
   user: User;
 }
@@ -25,6 +30,24 @@ export async function googleLogin(request: GoogleLoginRequest): Promise<AuthResp
   }
   
   const response = await apiClient.post<AuthResponse>('/auth/google', body);
+  
+  return response.data;
+}
+
+/**
+ * Authenticate with Microsoft ID token
+ */
+export async function microsoftLogin(request: MicrosoftLoginRequest): Promise<AuthResponse> {
+  // Build request body - only include DateOfBirth if provided
+  const body: any = {
+    IdToken: request.idToken,
+  };
+  
+  if (request.dateOfBirth) {
+    body.DateOfBirth = request.dateOfBirth;
+  }
+  
+  const response = await apiClient.post<AuthResponse>('/auth/microsoft', body);
   
   return response.data;
 }

@@ -88,6 +88,64 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+.login-divider {
+    position: relative;
+    text-align: center;
+    margin: 1.5rem 0;
+}
+
+.login-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e0e0e0;
+}
+
+.login-divider span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.microsoft-login-button {
+    width: 100%;
+    max-width: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.625rem 1.5rem;
+    background-color: #2f2f2f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0 auto;
+}
+
+.microsoft-login-button:hover:not(:disabled) {
+    background-color: #1f1f1f;
+}
+
+.microsoft-login-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.microsoft-login-button svg {
+    flex-shrink: 0;
+}
+
 .login-footer {
     text-align: center;
     margin-top: 1.75rem;

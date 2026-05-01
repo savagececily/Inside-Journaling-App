@@ -28,6 +28,28 @@ export const authService = {
         return response.json();
     },
 
+    async loginWithMicrosoft(idToken: string, dateOfBirth?: string): Promise<AuthResponse> {
+        const body: any = { idToken };
+        if (dateOfBirth) {
+            body.dateOfBirth = dateOfBirth;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/auth/microsoft`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Microsoft authentication failed: ${error}`);
+        }
+
+        return response.json();
+    },
+
     async verifyAge(token: string, dateOfBirth: string): Promise<{ message: string; age: number; ageVerified: boolean }> {
         const response = await fetch(`${API_BASE_URL}/auth/verify-age`, {
             method: 'POST',
