@@ -128,6 +128,10 @@ namespace MentalHealthJournal.Server
             });
             builder.Services.AddSingleton<AnalysisCacheService>();
 
+            // === Stripe Payment Services ===
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            builder.Services.AddSingleton<IStripeService, StripeService>();
+
             // === JWT Authentication ===
             var jwtKey = config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
             var jwtIssuer = config["Jwt:Issuer"] ?? "MentalHealthJournal";

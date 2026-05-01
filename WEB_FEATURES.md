@@ -469,7 +469,7 @@ When concerning content detected:
 - Rollback capabilities
 
 **Key Files:**
-- `AZURE_DEPLOYMENT.md` - Complete deployment guide
+- `OPERATIONS.md` - Complete deployment and operations guide
 - `.github/workflows/` - CI/CD pipelines
 
 ---
@@ -520,4 +520,4 @@ When concerning content detected:
 ✅ **Testing:** Comprehensive test coverage  
 ✅ **Documentation:** Complete guides and references  
 
-**[View Deployment Guide →](AZURE_DEPLOYMENT.md)** | **[View Testing Guide →](TESTING_GUIDE.md)**
+**[View Operations Guide →](OPERATIONS.md)** | **[View Testing Guide →](TESTING_GUIDE.md)**

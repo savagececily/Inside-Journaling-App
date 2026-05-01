@@ -110,6 +110,40 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<User?> GetUserByStripeSubscriptionIdAsync(string stripeSubscriptionId)
+    {
+        try
+        {
+            _logger.LogInformation("Looking up user by StripeSubscriptionId={SubscriptionId}", stripeSubscriptionId);
+            
+            var query = new QueryDefinition(
+                "SELECT * FROM c WHERE c.StripeSubscriptionId = @subscriptionId")
+                .WithParameter("@subscriptionId", stripeSubscriptionId);
+
+            var iterator = _usersContainer.GetItemQueryIterator<User>(query);
+            
+            while (iterator.HasMoreResults)
+            {
+                var results = await iterator.ReadNextAsync();
+                var user = results.FirstOrDefault();
+                
+                if (user != null)
+                {
+                    _logger.LogInformation("Found user with StripeSubscriptionId: userId={UserId}", user.userId);
+                    return user;
+                }
+            }
+            
+            _logger.LogWarning("No user found with StripeSubscriptionId={SubscriptionId}", stripeSubscriptionId);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting user by Stripe subscription ID: {SubscriptionId}", stripeSubscriptionId);
+            throw;
+        }
+    }
+
     public async Task<User> CreateOrUpdateUserAsync(User user)
     {
         try

@@ -17,4 +17,8 @@ public class User
     public int CurrentStreak { get; set; } = 0; // Number of consecutive days with entries
     public int LongestStreak { get; set; } = 0; // Best streak ever achieved
     public DateTime? LastStreakUpdateDate { get; set; } // Date of last streak calculation (UTC date only)
+    
+    // Stripe payment fields
+    public string? StripeCustomerId { get; set; } // Stripe customer ID for billing portal access
+    public string? StripeSubscriptionId { get; set; } // Stripe subscription ID for status tracking
 }

@@ -97,7 +97,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 2. **Configure Azure Services**
    - Create an Azure account and resource group
-   - Set up required Azure services (see [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md))
+   - Set up required Azure services (see [OPERATIONS.md](OPERATIONS.md))
    - Configure `appsettings.json` with your Azure service connections
 
 3. **Backend Setup**
@@ -189,7 +189,7 @@ The application can be deployed to Azure using multiple approaches:
 2. **Azure Static Web Apps + Functions**
 3. **Azure Container Apps**
 
-For detailed deployment instructions, see [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md).
+For detailed deployment instructions, see [OPERATIONS.md](OPERATIONS.md).
 
 ### Quick Deploy to Azure App Service
 ```bash
@@ -198,7 +198,7 @@ az login
 
 # Deploy (from project root)
 dotnet publish -c Release
-# Follow deployment steps in AZURE_DEPLOYMENT.md
+# Follow deployment steps in OPERATIONS.md
 ```
 
 ## 📚 Documentation
@@ -207,7 +207,7 @@ dotnet publish -c Release
 
 ### Getting Started
 - [README.md](README.md) - This file, project overview and quick start
-- [Azure Deployment Guide](AZURE_DEPLOYMENT.md) - Comprehensive Azure deployment instructions
+- [Operations Guide](OPERATIONS.md) - Complete deployment, operations, cost optimization, and monitoring
 - [Testing Guide](TESTING_GUIDE.md) - How to test the application end-to-end
 
 ### Feature Documentation

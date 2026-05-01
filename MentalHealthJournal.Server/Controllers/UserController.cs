@@ -14,11 +14,13 @@ namespace MentalHealthJournal.Server.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IQuotaService _quotaService;
+        private readonly IStripeService _stripeService;
 
-        public UserController(ILogger<UserController> logger, IQuotaService quotaService)
+        public UserController(ILogger<UserController> logger, IQuotaService quotaService, IStripeService stripeService)
         {
             _logger = logger;
             _quotaService = quotaService;
+            _stripeService = stripeService;
         }
 
         /// <summary>
@@ -127,10 +129,39 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         /// <summary>
-        /// Upgrade to premium (placeholder - integrate with payment system)
+        /// Upgrade to premium via Stripe Checkout
         /// </summary>
         [HttpPost("upgrade")]
-        public async Task<ActionResult> UpgradeToPremium([FromBody] UpgradeRequest? request, CancellationToken cancellationToken = default)
+        public async Task<ActionResult> UpgradeToPremium(CancellationToken cancellationToken = default)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                _logger.LogInformation("User {UserId} requested premium upgrade", userId);
+                
+                var checkoutUrl = await _stripeService.CreateCheckoutSessionAsync(userId, email, cancellationToken);
+                
+                return Ok(new { checkoutUrl });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating checkout session for user {UserId}", userId);
+                return StatusCode(500, "Unable to create checkout session. Please try again later.");
+            }
+        }
+
+        /// <summary>
+        /// Get Stripe Customer Portal URL for managing billing
+        /// </summary>
+        [HttpPost("portal")]
+        public async Task<ActionResult> GetCustomerPortal(CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
@@ -140,30 +171,18 @@ namespace MentalHealthJournal.Server.Controllers
 
             try
             {
-                // TODO: Integrate with payment provider (Stripe, etc.)
-                // For now, this is a placeholder that grants premium access
-                
-                _logger.LogInformation("User {UserId} requested premium upgrade", userId);
-                
-                // Set premium expiration to 1 month from now (for monthly subscription)
-                var expiresAt = DateTime.UtcNow.AddMonths(1);
-                
-                await _quotaService.UpgradeToPremiumAsync(userId, expiresAt, cancellationToken);
-                
-                _logger.LogInformation("User {UserId} upgraded to premium (expires: {Expires})", userId, expiresAt);
-                
-                return Ok(new
-                {
-                    success = true,
-                    message = "Successfully upgraded to Premium!",
-                    tier = "premium",
-                    expiresAt = expiresAt
-                });
+                var portalUrl = await _stripeService.CreateCustomerPortalSessionAsync(userId, cancellationToken);
+                return Ok(new { portalUrl });
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "User {UserId} attempted to access portal without Stripe customer ID", userId);
+                return BadRequest(new { error = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error upgrading user {UserId} to premium", userId);
-                return StatusCode(500, "An error occurred while processing your upgrade.");
+                _logger.LogError(ex, "Error creating portal session for user {UserId}", userId);
+                return StatusCode(500, "Unable to access billing portal. Please try again later.");
             }
         }
 
