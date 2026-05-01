@@ -18,7 +18,8 @@ Mental Health Journal is a full-stack web application that helps users track the
 - **Sentiment Analysis**: Automatically detects emotional tone (Positive, Negative, Neutral, Mixed)
 - **Key Phrase Extraction**: Identifies important topics and themes in your entries
 - **AI-Generated Summaries**: Contextual summaries with confidence scores
-- **GPT-4 Affirmations**: Personalized encouraging messages tailored to your entry
+- **GPT-4o-mini Affirmations**: Personalized encouraging messages tailored to your entry
+- **Crisis Detection**: Intelligent screening with GPT-4o for safety support
 
 ### 📊 **Trend Visualization**
 - Visual charts showing sentiment trends over time
@@ -30,35 +31,29 @@ Mental Health Journal is a full-stack web application that helps users track the
 - Google OAuth integration
 - JWT-based authentication
 - Secure user data management
-
-### 💾 **Cloud Storage**
-- Azure Cosmos DB for scalable NoSQL data storage
+ & Performance**
+- Azure Cosmos DB for scalable NoSQL data storage with partition optimization
 - Azure Blob Storage for audio files
+- In-memory response caching (15-25% cost reduction)
+- Retry policies with exponential backoff for resilience
+- Rate limiting for abuse prevention
 - Reliable and secure data persistence
 
-## 📱 Mobile Application (Phase 2)
+## 📱 Mobile Application
 
-**Status:** 67% Complete (Sprint 4 of 6)
+A native iOS and Android mobile app built with **React Native (Expo)** with complete feature parity to the web application.
 
-A native iOS and Android mobile app built with **React Native (Expo)** is currently in development.
+### ✅ Features
+- **Full Journal Management**: Create, edit, delete entries with voice recording and speech-to-text
+- **Offline-First Architecture**: Complete offline support with automatic background sync
+- **Data Visualizations**: Sentiment charts, streak counter, calendar view, word clouds, time patterns
+- **Crisis Support**: Emergency hotlines, breathing exercises, grounding techniques
+- **Push Notifications**: Customizable daily reminders, streak alerts, achievement notifications
+- **Biometric Security**: Face ID/Touch ID/Fingerprint authentication with PIN fallback
+- **Native Features**: Dark mode, haptic feedback, deep linking
+- **Google OAuth**: Secure authentication with token management
 
-### 🎉 Completed Features (Sprint 1-4)
-- ✅ **Journal Management**: Create, edit, delete entries with voice recording
-- ✅ **Offline-First**: Full offline support with background sync
-- ✅ **Data Visualization**: Sentiment charts, streak counter, calendar, word clouds
-- ✅ **Crisis Support**: Hotlines, breathing exercises, grounding techniques
-- ✅ **Push Notifications**: Daily reminders, streak alerts, achievement notifications
-- ✅ **Biometric Auth**: Face ID/Touch ID/Fingerprint with PIN fallback
-- ✅ **Dark Mode**: Automatic theme switching based on system preference
-- ✅ **Haptic Feedback**: Tactile responses for interactions and achievements
-- ✅ **Deep Linking**: URL schemes for navigation (`mentalhealthjournal://`)
-
-### 🔜 Coming Soon (Sprint 5-6)
-- ⏳ App icon, splash screen, and branding
-- ⏳ Performance optimization and testing
-- ⏳ App Store and Google Play deployment
-
-**[View Mobile Progress →](MOBILE_PROGRESS.md)** | **[View Development Plan →](PHASE_2_PLAN.md)**
+**[View Mobile Features Documentation →](MOBILE_FEATURES.md)**
 
 ## 🏗️ Architecture
 
@@ -74,12 +69,12 @@ A native iOS and Android mobile app built with **React Native (Expo)** is curren
 - Service-oriented design pattern
 - Comprehensive error handling and logging
 
-### Azure Services
-- **Azure App Configuration**: Centralized configuration management
-- **Azure Cosmos DB**: NoSQL database for journal entries
+### Azure Serviceswith user quota and token tracking
 - **Azure Blob Storage**: Audio file storage
 - **Azure Cognitive Services**: Text Analytics for sentiment and key phrases
-- **Azure OpenAI**: GPT-4 for personalized affirmations
+- **Azure OpenAI**: Dual deployments (GPT-4o-mini, GPT-4o) for cost optimization
+- **Azure Speech Services**: Speech-to-text transcription
+- **Application Insights**: Comprehensive m personalized affirmations
 - **Azure Speech Services**: Speech-to-text transcription
 - **Application Insights**: Monitoring and telemetry
 

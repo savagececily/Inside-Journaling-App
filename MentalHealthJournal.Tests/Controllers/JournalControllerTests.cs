@@ -4,6 +4,7 @@ using MentalHealthJournal.Services;
 using MentalHealthJournal.Tests.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
@@ -20,6 +21,8 @@ namespace MentalHealthJournal.Tests.Controllers
         private readonly Mock<ICosmosDbService> _cosmosServiceMock;
         private readonly Mock<IDataExportService> _exportServiceMock;
         private readonly Mock<IStreakService> _streakServiceMock;
+        private readonly Mock<IQuotaService> _quotaServiceMock;
+        private readonly AnalysisCacheService _cacheService;
         private readonly JournalController _controller;
         private const string TestUserId = "test-user-123";
 
@@ -32,6 +35,18 @@ namespace MentalHealthJournal.Tests.Controllers
             _cosmosServiceMock = new Mock<ICosmosDbService>();
             _exportServiceMock = new Mock<IDataExportService>();
             _streakServiceMock = new Mock<IStreakService>();
+            _quotaServiceMock = new Mock<IQuotaService>();
+            
+            // Setup quota service to allow creation by default
+            _quotaServiceMock.Setup(q => q.CanCreateAIEntryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, (string?)null));
+            _quotaServiceMock.Setup(q => q.CanCreateVoiceEntryAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, (string?)null));
+            
+            // Setup cache service
+            var memoryCache = new MemoryCache(new MemoryCacheOptions());
+            var cacheLogger = new Mock<ILogger<AnalysisCacheService>>();
+            _cacheService = new AnalysisCacheService(memoryCache, cacheLogger.Object);
 
             _controller = new JournalController(
                 _loggerMock.Object,
@@ -40,7 +55,9 @@ namespace MentalHealthJournal.Tests.Controllers
                 _blobServiceMock.Object,
                 _cosmosServiceMock.Object,
                 _exportServiceMock.Object,
-                _streakServiceMock.Object);
+                _streakServiceMock.Object,
+                _quotaServiceMock.Object,
+                _cacheService);
 
             // Setup authenticated user
             SetupAuthenticatedUser(TestUserId);

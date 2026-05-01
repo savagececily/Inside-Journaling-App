@@ -23,6 +23,10 @@ namespace MentalHealthJournal.Models
         public string Endpoint { get; set; } = string.Empty;
         public string Key { get; set; } = string.Empty;
         public string DeploymentName { get; set; } = string.Empty;
+        
+        // Cost optimization: Use cheaper GPT-4o-mini for affirmations, GPT-4/GPT-4o for crisis detection
+        public string AffirmationDeploymentName { get; set; } = string.Empty;
+        public string CrisisDeploymentName { get; set; } = string.Empty;
     }
 
     public class AzureBlobStorageSettings

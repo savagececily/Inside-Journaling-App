@@ -14,24 +14,65 @@ namespace MentalHealthJournal.Services
 {
     public class JournalAnalysisService : IJournalAnalysisService
     {
+        // Crisis keywords for pre-screening (cost optimization)
+        private static readonly HashSet<string> CrisisKeywords = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "suicide", "suicidal", "kill myself", "end it all", "end my life",
+            "no reason to live", "better off dead", "want to die",
+            "self-harm", "self harm", "hurt myself", "cut myself",
+            "don't want to exist", "wish I was dead", "plan to die",
+            "overdose", "jump off", "hang myself"
+        };
+
         private readonly ILogger<JournalAnalysisService> _logger;
         private readonly TextAnalyticsClient _textClient;
         private readonly AzureOpenAIClient _openAIClient;
+        private readonly IQuotaService? _quotaService;
         private readonly string _openAIDeployment;
+        private readonly string _affirmationDeployment;
+        private readonly string _crisisDeployment;
         private readonly ResiliencePipeline _cognitiveServicesRetryPipeline;
         private readonly ResiliencePipeline _openAIRetryPipeline;
+        private string? _currentUserId;
+        private string? _currentEntryId;
 
         public JournalAnalysisService(ILogger<JournalAnalysisService> logger,
             TextAnalyticsClient textClient,
             AzureOpenAIClient openAIClient,
-            IOptions<AppSettings> configuration)
+            IOptions<AppSettings> configuration,
+            IQuotaService? quotaService = null)
         {
             _logger = logger;
             _textClient = textClient;
             _openAIClient = openAIClient;
-            _openAIDeployment = configuration.Value.AzureOpenAI.DeploymentName ?? throw new ArgumentNullException("AzureOpenAI:DeploymentName");
+            _quotaService = quotaService;
+            
+            // Support both old single deployment and new cost-optimized dual deployment approach
+            var config = configuration.Value.AzureOpenAI;
+            _openAIDeployment = config.DeploymentName ?? throw new ArgumentNullException("AzureOpenAI:DeploymentName");
+            
+            // Use dedicated deployments if configured, otherwise fall back to main deployment
+            _affirmationDeployment = !string.IsNullOrEmpty(config.AffirmationDeploymentName) 
+                ? config.AffirmationDeploymentName 
+                : _openAIDeployment;
+            _crisisDeployment = !string.IsNullOrEmpty(config.CrisisDeploymentName) 
+                ? config.CrisisDeploymentName 
+                : _openAIDeployment;
+            
+            _logger.LogInformation("OpenAI deployments - Affirmation: {Affirmation}, Crisis: {Crisis}", 
+                _affirmationDeployment, _crisisDeployment);
+            
             _cognitiveServicesRetryPipeline = ResiliencePolicies.CreateCognitiveServicesRetryPipeline(_logger);
             _openAIRetryPipeline = ResiliencePolicies.CreateOpenAIRetryPipeline(_logger);
+        }
+        
+        /// <summary>
+        /// Set context for token tracking (call before AnalyzeAsync)
+        /// </summary>
+        public void SetTrackingContext(string userId, string entryId)
+        {
+            _currentUserId = userId;
+            _currentEntryId = entryId;
         }
 
         public async Task<JournalAnalysisResult> AnalyzeAsync(string text, CancellationToken cancellationToken = default)
@@ -113,9 +154,9 @@ Journal entry: ""{journalText}""";
                     TopP = 1.0f,
                 };
 
-                ChatClient chatClient = _openAIClient.GetChatClient(_openAIDeployment);
+                ChatClient chatClient = _openAIClient.GetChatClient(_affirmationDeployment);
 
-                _logger.LogInformation("Generating affirmation for journal entry");
+                _logger.LogInformation("Generating affirmation for journal entry using deployment: {Deployment}", _affirmationDeployment);
 
                 ClientResult<ChatCompletion> completions = await _openAIRetryPipeline.ExecuteAsync(
                     async token => await chatClient.CompleteChatAsync(chatMessages, requestOptions, cancellationToken: token),
@@ -124,6 +165,9 @@ Journal entry: ""{journalText}""";
 
                 string affirmation = completions.Value.Content[0].Text.Trim();
                 _logger.LogInformation("Generated affirmation successfully");
+                
+                // Record token usage for monitoring
+                await RecordTokenUsageAsync(completions.Value, _affirmationDeployment, "affirmation", cancellationToken);
                 
                 return affirmation;
             }
@@ -139,6 +183,18 @@ Journal entry: ""{journalText}""";
         {
             try
             {
+                // COST OPTIMIZATION: Pre-screen for crisis keywords before calling expensive GPT-4 API
+                bool hasCrisisKeywords = CrisisKeywords.Any(keyword => 
+                    journalText.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+                
+                if (!hasCrisisKeywords)
+                {
+                    _logger.LogInformation("No crisis keywords detected - skipping GPT-4 crisis analysis (cost optimization)");
+                    return (false, null);
+                }
+                
+                _logger.LogWarning("Crisis keywords detected - performing detailed GPT-4 analysis");
+                
                 string prompt = $@"Analyze this journal entry for signs of immediate crisis or serious mental health concerns.
 Specifically look for indicators of:
 - Suicidal ideation or self-harm intentions
@@ -171,9 +227,9 @@ Journal entry: ""{journalText}""";
                     ResponseFormat = ChatResponseFormat.CreateJsonObjectFormat()
                 };
 
-                ChatClient chatClient = _openAIClient.GetChatClient(_openAIDeployment);
+                ChatClient chatClient = _openAIClient.GetChatClient(_crisisDeployment);
 
-                _logger.LogInformation("Performing crisis detection on journal entry");
+                _logger.LogInformation("Performing crisis detection on journal entry using deployment: {Deployment}", _crisisDeployment);
 
                 ClientResult<ChatCompletion> completions = await _openAIRetryPipeline.ExecuteAsync(
                     async token => await chatClient.CompleteChatAsync(chatMessages, requestOptions, cancellationToken: token),
@@ -181,6 +237,9 @@ Journal entry: ""{journalText}""";
                 );
 
                 string response = completions.Value.Content[0].Text.Trim();
+                
+                // Record token usage for monitoring
+                await RecordTokenUsageAsync(completions.Value, _crisisDeployment, "crisis-detection", cancellationToken);
                 
                 // Parse the JSON response
                 using var jsonDoc = System.Text.Json.JsonDocument.Parse(response);
@@ -227,6 +286,53 @@ Journal entry: ""{journalText}""";
             };
 
             return summary;
+        }
+        
+        /// <summary>
+        /// Record token usage for monitoring and billing
+        /// </summary>
+        private async Task RecordTokenUsageAsync(ChatCompletion completion, string model, string operation, CancellationToken cancellationToken = default)
+        {
+            if (_quotaService == null || string.IsNullOrEmpty(_currentUserId))
+            {
+                return; // Quota service not available or no user context
+            }
+            
+            try
+            {
+                var usage = completion.Usage;
+                
+                // Approximate costs per 1M tokens (as of April 2026)
+                var (inputCost, outputCost) = model.ToLower() switch
+                {
+                    "gpt-4o-mini" => (0.15m, 0.60m),
+                    "gpt-4o" => (5.00m, 15.00m),
+                    "gpt-4" => (30.00m, 60.00m),
+                    "gpt-4-turbo" => (10.00m, 30.00m),
+                    _ => (5.00m, 15.00m) // Default to GPT-4o pricing
+                };
+                
+                var estimatedCost = (usage.InputTokenCount * inputCost / 1_000_000m) + 
+                                   (usage.OutputTokenCount * outputCost / 1_000_000m);
+                
+                var tokenUsage = new TokenUsage
+                {
+                    UserId = _currentUserId,
+                    Model = model,
+                    InputTokens = usage.InputTokenCount,
+                    OutputTokens = usage.OutputTokenCount,
+                    EstimatedCost = estimatedCost,
+                    Operation = operation,
+                    JournalEntryId = _currentEntryId ?? string.Empty
+                };
+                
+                await _quotaService.RecordTokenUsageAsync(tokenUsage, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to record token usage for operation {Operation}", operation);
+                // Don't throw - this is monitoring only
+            }
         }
     }
 }

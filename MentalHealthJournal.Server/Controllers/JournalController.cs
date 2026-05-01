@@ -3,6 +3,7 @@ using MentalHealthJournal.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 
@@ -20,6 +21,8 @@ namespace MentalHealthJournal.Server.Controllers
         private readonly ICosmosDbService _cosmosService;
         private readonly IDataExportService _exportService;
         private readonly IStreakService _streakService;
+        private readonly IQuotaService _quotaService;
+        private readonly AnalysisCacheService _cacheService;
 
         public JournalController(ILogger<JournalController> logger, 
             IJournalAnalysisService analysisService, 
@@ -27,7 +30,9 @@ namespace MentalHealthJournal.Server.Controllers
             IBlobStorageService blobService,
             ICosmosDbService cosmosService,
             IDataExportService exportService,
-            IStreakService streakService)
+            IStreakService streakService,
+            IQuotaService quotaService,
+            AnalysisCacheService cacheService)
         {
             _logger = logger;
             _analysisService = analysisService;
@@ -36,6 +41,8 @@ namespace MentalHealthJournal.Server.Controllers
             _cosmosService = cosmosService;
             _exportService = exportService;
             _streakService = streakService;
+            _quotaService = quotaService;
+            _cacheService = cacheService;
             
             _logger.LogInformation("JournalController initialized");
         }
@@ -49,6 +56,7 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         [HttpGet]
+        [EnableRateLimiting("journal-reads")]
         public async Task<ActionResult<List<JournalEntry>>> GetEntries(CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -81,6 +89,7 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         [HttpPost("analyze")]
+        [EnableRateLimiting("journal-entries")] // Cost protection: limit AI analysis calls
         public async Task<ActionResult<JournalEntry>> AnalyzeEntry([FromBody] JournalEntryRequest request, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -101,6 +110,19 @@ namespace MentalHealthJournal.Server.Controllers
                 
                 _logger.LogInformation("Processing journal entry for user {UserId}", userId);
 
+                // Check quota before processing (freemium model)
+                var (canCreate, quotaReason) = await _quotaService.CanCreateAIEntryAsync(userId, cancellationToken);
+                if (!canCreate)
+                {
+                    _logger.LogWarning("User {UserId} exceeded quota: {Reason}", userId, quotaReason);
+                    return StatusCode(429, new 
+                    { 
+                        error = "Quota exceeded", 
+                        message = quotaReason,
+                        upgradeUrl = "/api/user/upgrade" // Frontend can link to upgrade page
+                    });
+                }
+
                 string entryText = request.Text ?? "";
                 string? blobUrl = request.AudioBlobUrl;
                 bool isVoice = request.IsVoiceEntry;
@@ -118,9 +140,32 @@ namespace MentalHealthJournal.Server.Controllers
                     return BadRequest("Text exceeds maximum length of 10,000 characters.");
                 }
 
-                _logger.LogInformation("Starting AI analysis for user {UserId}, text length: {Length}", userId, entryText.Length);
-                JournalAnalysisResult analysis = await _analysisService.AnalyzeAsync(entryText, cancellationToken);
-                _logger.LogInformation("AI analysis completed for user {UserId}, sentiment: {Sentiment}", userId, analysis.Sentiment);
+                // Try to get cached analysis result (cost optimization)
+                JournalAnalysisResult analysis;
+                if (_cacheService.TryGetCached(entryText, out var cachedAnalysis) && cachedAnalysis != null)
+                {
+                    _logger.LogInformation("Using cached analysis for user {UserId}", userId);
+                    analysis = cachedAnalysis;
+                }
+                else
+                {
+                    _logger.LogInformation("Starting AI analysis for user {UserId}, text length: {Length}", userId, entryText.Length);
+                    
+                    // Create entry ID early so token tracking can reference it
+                    var entryId = Guid.NewGuid().ToString();
+                    
+                    // Set tracking context for token usage monitoring
+                    if (_analysisService is JournalAnalysisService concreteService)
+                    {
+                        concreteService.SetTrackingContext(userId, entryId);
+                    }
+                    
+                    analysis = await _analysisService.AnalyzeAsync(entryText, cancellationToken);
+                    _logger.LogInformation("AI analysis completed for user {UserId}, sentiment: {Sentiment}", userId, analysis.Sentiment);
+                    
+                    // Cache the result for future similar entries
+                    _cacheService.CacheResult(entryText, analysis);
+                }
 
                 JournalEntry journal = new();
                 journal.userId = userId;
@@ -136,6 +181,9 @@ namespace MentalHealthJournal.Server.Controllers
 
                 // Save to Cosmos DB
                 await _cosmosService.SaveJournalEntryAsync(journal, cancellationToken);
+                
+                // Increment quota usage (after successful save)
+                await _quotaService.IncrementEntryCountAsync(userId, isVoice, cancellationToken);
                 
                 // Update streak asynchronously (don't await to avoid blocking the response)
                 _ = Task.Run(async () =>
@@ -171,6 +219,7 @@ namespace MentalHealthJournal.Server.Controllers
         }
 
         [HttpPost("voice")]
+        [EnableRateLimiting("voice-transcription")] // Cost protection: limit expensive speech-to-text calls
         public async Task<ActionResult<object>> ProcessVoiceEntry([FromForm] IFormFile audioFile, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -183,18 +232,31 @@ namespace MentalHealthJournal.Server.Controllers
             
             try
             {
+                // Check quota before processing (freemium model)
+                var (canCreate, quotaReason) = await _quotaService.CanCreateVoiceEntryAsync(userId, cancellationToken);
+                if (!canCreate)
+                {
+                    _logger.LogWarning("User {UserId} exceeded voice quota: {Reason}", userId, quotaReason);
+                    return StatusCode(429, new 
+                    { 
+                        error = "Quota exceeded", 
+                        message = quotaReason,
+                        upgradeUrl = "/api/user/upgrade"
+                    });
+                }
+                
                 if (audioFile == null || audioFile.Length == 0)
                 {
                     _logger.LogWarning("No audio file provided");
                     return BadRequest("Audio file is required.");
                 }
 
-                // Validate file size (max 10MB)
-                const long maxFileSize = 10 * 1024 * 1024; // 10MB
+                // Validate file size (max 5MB for cost control - approximately 5-7 minutes of audio)
+                const long maxFileSize = 5 * 1024 * 1024; // 5MB
                 if (audioFile.Length > maxFileSize)
                 {
                     _logger.LogWarning("Audio file too large: {Size} bytes", audioFile.Length);
-                    return BadRequest($"Audio file exceeds maximum size of {maxFileSize / (1024 * 1024)}MB.");
+                    return BadRequest($"Audio file exceeds maximum size of {maxFileSize / (1024 * 1024)}MB. This helps keep the service affordable for everyone. Please record shorter entries or reduce audio quality.");
                 }
 
                 // Validate file type

@@ -119,6 +119,14 @@ namespace MentalHealthJournal.Server
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IDataExportService, DataExportService>();
             builder.Services.AddSingleton<IStreakService, StreakService>();
+            
+            // === Freemium Model Services ===
+            builder.Services.AddSingleton<IQuotaService, QuotaService>();
+            builder.Services.AddMemoryCache(options =>
+            {
+                options.SizeLimit = 1000; // Limit to 1000 cached analysis results
+            });
+            builder.Services.AddSingleton<AnalysisCacheService>();
 
             // === JWT Authentication ===
             var jwtKey = config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
@@ -152,6 +160,9 @@ namespace MentalHealthJournal.Server
             });
 
             builder.Services.AddAuthorization();
+
+            // === Rate Limiting (Cost Protection) ===
+            builder.Services.AddRateLimiting();
 
             // Add CORS policy for web frontend only
             // Note: Mobile apps don't need CORS - CORS is browser-only security
@@ -212,7 +223,7 @@ namespace MentalHealthJournal.Server
 
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseRateLimiter(); // Cost protection
 
             app.MapControllers();
 

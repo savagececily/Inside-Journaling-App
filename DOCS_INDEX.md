@@ -9,18 +9,44 @@ Quick reference guide to all Mental Health Journal documentation.
 **New to the project?** Start with these:
 1. [README.md](README.md) - Project overview, features, and quick start
 2. [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md) - How to deploy to Azure
-3. [TESTING_GUIDE.md](TESTING_GUIDE.md) - How to test the application
+3. [PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md) - Cost optimization, freemium model, and production readiness
+4. [TESTING_GUIDE.md](TESTING_GUIDE.md) - How to test the application
+
+---
+
+## 🚀 Production & Operations
+
+### **[PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md)** - Complete production readiness guide
+
+Includes:
+- 💰 **Cost Analysis** - Per-user costs and optimization strategies (67% reduction achieved)
+- 💎 **Freemium Model** - Tier structure, quotas, token tracking, revenue projections
+- ⚡ **Performance** - Retry policies, caching, code splitting, monitoring
+- 🎯 **Deployment** - Azure resource setup, configuration, testing procedures
+- 📊 **Monitoring** - KQL queries, metrics, alerts, dashboards
+- 🔧 **Configuration** - Environment variables, rate limiting, rollback procedures
+
+### **[AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)** - Deployment procedures
+- Azure resource provisioning
+- App Service configuration
+- CI/CD setup
+- Production deployment steps
+
+### **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing procedures
+- Unit tests (xUnit)
+- Integration tests
+- Manual testing procedures
+- Test coverage reports
 
 ---
 
 ## 🌐 Web Application (React + .NET)
 
-### Features & Implementation
-**[WEB_FEATURES.md](WEB_FEATURES.md)** - Complete web app feature documentation
+### **[WEB_FEATURES.md](WEB_FEATURES.md)** - Complete web app feature documentation
 
 Includes:
 - 🎙️ Voice Recording - Speech-to-text with Azure Speech Services
-- 🤖 AI-Powered Analysis - Sentiment, key phrases, affirmations
+- 🤖 AI-Powered Analysis - Sentiment, key phrases, affirmations, crisis detection
 - 📊 Data Visualizations - Charts and insights dashboard
 - 🆘 Crisis Support - AI detection and crisis resources
 - 🔐 Authentication - Google OAuth and security
@@ -32,8 +58,7 @@ Includes:
 
 ## 📱 Mobile Application (React Native + Expo)
 
-### Features & Implementation
-**[MOBILE_FEATURES.md](MOBILE_FEATURES.md)** - Complete mobile app feature documentation
+### **[MOBILE_FEATURES.md](MOBILE_FEATURES.md)** - Complete mobile app feature documentation
 
 Includes:
 - 🎨 UI Components Library - 15+ reusable components
@@ -47,6 +72,70 @@ Includes:
 - 🌓 Dark Mode - Automatic theme switching
 - 📳 Haptic Feedback - Tactile responses
 - 🔗 Deep Linking - URL schemes and navigation
+
+---
+
+## 🔐 Authentication Setup
+
+### **[GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)** - Google OAuth configuration
+- Google Cloud Console setup
+- OAuth 2.0 credentials
+- Frontend and backend integration
+
+### **[MICROSOFT_LOGIN_SETUP.md](MICROSOFT_LOGIN_SETUP.md)** - Microsoft OAuth configuration
+- Azure AD app registration
+- Microsoft authentication setup
+- Integration guide
+
+---
+
+## ⚖️ Legal
+
+### **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** - Privacy policy
+- Data collection practices
+- User rights and consent
+- Security measures
+
+### **[TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md)** - Terms of service
+- User agreements
+- Service terms
+- Liability and disclaimers
+
+---
+
+## 📊 Documentation Structure
+
+```
+docs/
+├── README.md                    # Project overview
+├── PRODUCTION_GUIDE.md          # ⭐ Production readiness (cost, freemium, performance)
+├── AZURE_DEPLOYMENT.md          # Deployment procedures
+├── TESTING_GUIDE.md             # Testing guide
+├── WEB_FEATURES.md              # Web app features
+├── MOBILE_FEATURES.md           # Mobile app features
+├── GOOGLE_OAUTH_SETUP.md        # Google OAuth setup
+├── MICROSOFT_LOGIN_SETUP.md     # Microsoft OAuth setup
+├── PRIVACY_POLICY.md            # Privacy policy
+└── TERMS_OF_SERVICE.md          # Terms of service
+```
+
+---
+
+## 🔍 Quick Find
+
+**I want to...**
+- **Deploy to Azure** → [AZURE_DEPLOYMENT.md](AZURE_DEPLOYMENT.md)
+- **Understand costs and monetization** → [PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md)
+- **Set up monitoring** → [PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md#monitoring--analytics)
+- **Run tests** → [TESTING_GUIDE.md](TESTING_GUIDE.md)
+- **Learn about features** → [WEB_FEATURES.md](WEB_FEATURES.md) or [MOBILE_FEATURES.md](MOBILE_FEATURES.md)
+- **Configure OAuth** → [GOOGLE_OAUTH_SETUP.md](GOOGLE_OAUTH_SETUP.md)
+- **Check configuration options** → [PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md#configuration-reference)
+- **Set up cost alerts** → [PRODUCTION_GUIDE.md](PRODUCTION_GUIDE.md#4-set-up-cost-alerts)
+
+---
+
+**Last Updated:** April 30, 2026
 
 ### Progress & Planning
 - **[MOBILE_PROGRESS.md](MOBILE_PROGRESS.md)** - Sprint summaries, statistics, achievements
