@@ -140,24 +140,6 @@ const handleMicrosoftLogin = async () => {
 
             // All checks passed, log in
             login(authResponse);
-
-                        <div className="login-divider">
-                            <span>or</span>
-                        </div>
-
-                        <button 
-                            className="microsoft-login-button"
-                            onClick={handleMicrosoftLogin}
-                            disabled={isLoading}
-                        >
-                            <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="10" height="10" fill="#F25022"/>
-                                <rect x="11" width="10" height="10" fill="#7FBA00"/>
-                                <rect y="11" width="10" height="10" fill="#00A4EF"/>
-                                <rect x="11" y="11" width="10" height="10" fill="#FFB900"/>
-                            </svg>
-                            {isLoading ? 'Signing in...' : 'Sign in with Microsoft'}
-                        </button>
         } catch (error) {
             console.error('Microsoft login failed:', error);
             alert('Microsoft login failed. Please try again.');
@@ -191,6 +173,24 @@ const handleMicrosoftLogin = async () => {
                                 shape="rectangular"
                             />
                         </div>
+
+                        <div className="login-divider">
+                            <span>or</span>
+                        </div>
+
+                        <button 
+                            className="microsoft-login-button"
+                            onClick={handleMicrosoftLogin}
+                            disabled={isLoading}
+                        >
+                            <svg width="21" height="21" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="10" height="10" fill="#F25022"/>
+                                <rect x="11" width="10" height="10" fill="#7FBA00"/>
+                                <rect y="11" width="10" height="10" fill="#00A4EF"/>
+                                <rect x="11" y="11" width="10" height="10" fill="#FFB900"/>
+                            </svg>
+                            {isLoading ? 'Signing in...' : 'Sign in with Microsoft'}
+                        </button>
                     </div>
 
                     <div className="login-footer">

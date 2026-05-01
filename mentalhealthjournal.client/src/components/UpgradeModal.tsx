@@ -1,9 +1,5 @@
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-
-// Initialize Stripe with your publishable key
-// Replace with your actual Stripe publishable key in production
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_...');
+// Stripe.js SDK not needed - using server-side Checkout redirect
 
 interface UpgradeModalProps {
   isOpen: boolean;

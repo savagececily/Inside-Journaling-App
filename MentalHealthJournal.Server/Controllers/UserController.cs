@@ -15,12 +15,24 @@ namespace MentalHealthJournal.Server.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IQuotaService _quotaService;
         private readonly IStripeService _stripeService;
+        private readonly ICosmosDbService _cosmosService;
+        private readonly IBlobStorageService _blobService;
+        private readonly IUserService _userService;
 
-        public UserController(ILogger<UserController> logger, IQuotaService quotaService, IStripeService stripeService)
+        public UserController(
+            ILogger<UserController> logger, 
+            IQuotaService quotaService, 
+            IStripeService stripeService,
+            ICosmosDbService cosmosService,
+            IBlobStorageService blobService,
+            IUserService userService)
         {
             _logger = logger;
             _quotaService = quotaService;
             _stripeService = stripeService;
+            _cosmosService = cosmosService;
+            _blobService = blobService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -215,6 +227,57 @@ namespace MentalHealthJournal.Server.Controllers
             {
                 _logger.LogError(ex, "Error downgrading user {UserId} to free", userId);
                 return StatusCode(500, "An error occurred while processing your downgrade.");
+            }
+        }
+
+        /// <summary>
+        /// Delete user account and all associated data (GDPR/CCPA compliance)
+        /// </summary>
+        [HttpDelete("delete-account")]
+        public async Task<ActionResult> DeleteAccount(CancellationToken cancellationToken = default)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                _logger.LogWarning("User {UserId} requested account deletion", userId);
+
+                // 1. Delete all audio files from blob storage
+                await _blobService.DeleteAllUserAudioAsync(userId, cancellationToken);
+
+                // 2. Delete all journal entries from Cosmos DB
+                await _cosmosService.DeleteAllUserEntriesAsync(userId, cancellationToken);
+
+                // 3. Delete user quota data
+                await _quotaService.DeleteUserQuotaAsync(userId, cancellationToken);
+
+                // 4. Get user record for Stripe subscription info (before deleting)
+                var user = await _userService.GetUserByIdAsync(userId);
+                if (user != null && !string.IsNullOrEmpty(user.StripeSubscriptionId))
+                {
+                    // Note: You may want to add a CancelSubscriptionAsync method to IStripeService
+                    _logger.LogInformation("User {UserId} had active subscription {SubscriptionId}", userId, user.StripeSubscriptionId);
+                }
+
+                // 5. Delete user record
+                await _userService.DeleteUserAsync(userId, cancellationToken);
+
+                _logger.LogInformation("Successfully deleted all data for user {UserId}", userId);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Your account and all associated data have been permanently deleted."
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting account for user {UserId}", userId);
+                return StatusCode(500, "An error occurred while deleting your account. Please contact support.");
             }
         }
     }

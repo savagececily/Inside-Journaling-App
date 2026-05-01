@@ -29,6 +29,29 @@ const CrisisAlert: React.FC<CrisisAlertProps> = ({ isVisible, reason, resources,
                 </div>
                 
                 <div className="crisis-alert-content">
+                    <div className="emergency-disclaimer">
+                        <p style={{ 
+                            background: '#dc3545', 
+                            color: 'white', 
+                            padding: '12px', 
+                            borderRadius: '6px', 
+                            fontWeight: 'bold',
+                            marginBottom: '16px'
+                        }}>
+                            ⚠️ EMERGENCY: If you are in immediate danger or experiencing a medical emergency, 
+                            call 911 (US) or your local emergency number immediately.
+                        </p>
+                        <p style={{ 
+                            fontSize: '13px', 
+                            color: '#666', 
+                            marginBottom: '20px',
+                            fontStyle: 'italic'
+                        }}>
+                            These resources are for informational purposes only and do not constitute medical advice, 
+                            diagnosis, or treatment. This app is not a substitute for professional mental health care.
+                        </p>
+                    </div>
+                    
                     {reason && (
                         <div className="crisis-reason">
                             <p><strong>Why you're seeing this:</strong> {reason}</p>

@@ -208,7 +208,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             </p>
 
             <div className="last-updated">
-                Last Updated: February 9, 2026
+                Last Updated: May 1, 2026
             </div>
 
             {onBack && (

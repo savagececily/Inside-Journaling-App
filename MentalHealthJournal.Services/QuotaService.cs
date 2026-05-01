@@ -199,5 +199,53 @@ namespace MentalHealthJournal.Services
             
             return results;
         }
+
+        public async Task DeleteUserQuotaAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                // Delete UserQuota record
+                await _quotaContainer.DeleteItemAsync<UserQuota>(
+                    userId,
+                    new PartitionKey(userId),
+                    cancellationToken: cancellationToken
+                );
+                
+                _logger.LogInformation("Deleted quota record for user {UserId}", userId);
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                _logger.LogWarning("Quota record not found for user {UserId}, skipping deletion", userId);
+            }
+
+            // Delete all TokenUsage records
+            try
+            {
+                var query = new QueryDefinition("SELECT * FROM c WHERE c.userId = @userId")
+                    .WithParameter("@userId", userId);
+                
+                var iterator = _tokenUsageContainer.GetItemQueryIterator<TokenUsage>(query);
+                
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync(cancellationToken);
+                    foreach (var usage in response)
+                    {
+                        await _tokenUsageContainer.DeleteItemAsync<TokenUsage>(
+                            usage.Id,
+                            new PartitionKey(userId),
+                            cancellationToken: cancellationToken
+                        );
+                    }
+                }
+                
+                _logger.LogInformation("Deleted all token usage records for user {UserId}", userId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting token usage records for user {UserId}", userId);
+                throw;
+            }
+        }
     }
 }

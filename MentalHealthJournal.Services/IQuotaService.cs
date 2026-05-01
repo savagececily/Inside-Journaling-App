@@ -48,5 +48,10 @@ namespace MentalHealthJournal.Services
         /// Get user's token usage for current month
         /// </summary>
         Task<List<TokenUsage>> GetMonthlyTokenUsageAsync(string userId, CancellationToken cancellationToken = default);
+        
+        /// <summary>
+        /// Delete all user quota data (for account deletion)
+        /// </summary>
+        Task DeleteUserQuotaAsync(string userId, CancellationToken cancellationToken = default);
     }
 }

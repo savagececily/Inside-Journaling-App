@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useAppInsightsContext } from '@microsoft/applicationinsights-react-js';
 import { useAuth } from './hooks/useAuth';
+import CookieConsent from 'react-cookie-consent';
 import Login from './components/Login';
 import UsernameSetup from './components/UsernameSetup';
 import About from './About';
@@ -14,6 +15,7 @@ import CrisisAlert from './components/CrisisAlert';
 import { journalService } from './services/journalService';
 import './App.css';
 import './Tabs.css';
+import './Footer.css';
 
 // Lazy load heavy components
 const DataExport = lazy(() => import('./components/DataExport').then(module => ({ default: module.DataExport })));
@@ -903,6 +905,61 @@ function App() {
                 resources={crisisData.resources}
                 onClose={() => setShowCrisisAlert(false)}
             />
+            
+            {/* GDPR Cookie Consent Banner */}
+            <CookieConsent
+                location="bottom"
+                buttonText="Accept"
+                declineButtonText="Decline"
+                enableDeclineButton
+                cookieName="mentalHealthJournalConsent"
+                style={{ background: "#2B373B", fontSize: "14px" }}
+                buttonStyle={{ 
+                    background: "#4CAF50", 
+                    color: "white", 
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    padding: "8px 16px"
+                }}
+                declineButtonStyle={{
+                    background: "#757575",
+                    color: "white",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    padding: "8px 16px"
+                }}
+                expires={365}
+            >
+                This website uses cookies to enhance your user experience and for analytics.{" "}
+                <a 
+                    href="#" 
+                    onClick={(e) => { e.preventDefault(); setShowPrivacyPolicy(true); }}
+                    style={{ color: "#4CAF50", textDecoration: "underline" }}
+                >
+                    Learn more
+                </a>
+            </CookieConsent>
+            
+            {/* App Footer with Disclaimers */}
+            {isAuthenticated && (
+                <footer className="app-footer">
+                    <div className="disclaimer">
+                        ⚠️ <strong>Important:</strong> This app provides wellness support and is not a substitute for 
+                        professional mental health care. If you are in a crisis, call <strong>988</strong> (US) or 
+                        your local emergency services immediately.
+                    </div>
+                    <div className="footer-links">
+                        <button onClick={() => setShowPrivacyPolicy(true)}>Privacy Policy</button>
+                        <span>•</span>
+                        <button onClick={() => setShowTermsOfService(true)}>Terms of Service</button>
+                        <span>•</span>
+                        <button onClick={() => setShowAbout(true)}>About</button>
+                    </div>
+                    <div className="footer-copyright">
+                        © {new Date().getFullYear()} Mental Health Journal. All rights reserved.
+                    </div>
+                </footer>
+            )}
         </div>
     );
 }
