@@ -1,6 +1,6 @@
 # Mobile App Features Documentation
 
-Complete reference for all features implemented in the Mental Health Journal mobile app (React Native/Expo).
+Complete reference for all features implemented in the Inside Journaling App mobile app (React Native/Expo).
 
 ---
 

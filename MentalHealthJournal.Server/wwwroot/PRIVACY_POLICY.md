@@ -1,13 +1,13 @@
 # Privacy Policy
 
-**Last Updated:** February 11, 2026  
-**Version:** 1.0
+**Last Updated:** May 1, 2026  
+**Version:** 1.1
 
 ---
 
 ## Introduction
 
-Mental Health Journal ("we," "us," "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mental health journaling service (the "Service").
+Inside Journaling App ("we," "us," "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our journaling service (the "Service").
 
 **By using the Service, you consent to the data practices described in this policy.**
 
@@ -97,23 +97,17 @@ We maintain comprehensive audit logs that record:
 
 ## 4. Data Sharing and Disclosure
 
-### 4.1 Third-Party Service Providers
+### 4.1 Service Providers
 
-We share your data with the following services **only** for providing and improving the Service:
+We work with trusted service providers to deliver and improve our journaling service. These providers help us with:
 
-#### Microsoft Azure Services
-- **Azure Cosmos DB** - Stores journal entries, user profiles, and metadata
-- **Azure Blob Storage** - Stores audio recordings
-- **Azure OpenAI (GPT-4)** - Generates personalized affirmations
-- **Azure Cognitive Services** - Provides sentiment analysis and key phrase extraction
-- **Azure Speech Services** - Transcribes audio recordings
-- **Azure App Configuration** - Manages application settings
-- **Application Insights** - Monitors app performance and errors
+- **Secure cloud storage** - Your entries and recordings are stored in secure, encrypted cloud infrastructure
+- **AI-powered insights** - Professional AI services analyze your entries to provide sentiment insights and affirmations
+- **Voice transcription** - Audio recordings are transcribed to text using speech recognition services
+- **Authentication** - Third-party login services (like Google) verify your identity
+- **Performance monitoring** - We track app performance to identify and fix issues
 
-**Important:** Your data is protected by Microsoft Azure's enterprise privacy policies and **is NOT used to train public AI models**.
-
-#### Authentication Providers
-- **Google OAuth** - Handles account authentication (Google's privacy policy applies)
+**Important:** Your private journal content is protected by enterprise privacy policies and **is NOT used to train public AI models or shown to other users**.
 
 ### 4.2 What We Do NOT Do
 We do **NOT**:
@@ -137,20 +131,18 @@ If we are acquired, merged, or undergo restructuring, your data may be transferr
 ## 5. Data Security
 
 ### 5.1 Security Measures
-We implement industry-standard security practices:
-- ✅ **Encryption at rest** (Cosmos DB and Blob Storage use AES-256 encryption)
-- ✅ **Encryption in transit** (all data transmitted via HTTPS/TLS)
-- ✅ **Azure Managed Identity** (no stored credentials)
-- ✅ **Authentication** (JWT tokens with 30-minute expiration)
-- ✅ **Audit logging** (comprehensive tracking of data access)
-- ✅ **Access controls** (role-based permissions, you can only access your own data)
-- ✅ **Security monitoring** (Application Insights alerts)
+We implement industry-standard security practices to protect your data:
+- ✅ **Strong encryption** - Your data is encrypted both when stored and when transmitted
+- ✅ **Secure authentication** - Your login sessions are protected with automatic timeout
+- ✅ **Comprehensive logging** - We track access to your data to detect unauthorized activity
+- ✅ **Access controls** - You can only access your own journal entries
+- ✅ **Security monitoring** - We actively monitor for potential security threats
 
 ### 5.2 Data Retention
-- **Active accounts**: Data is retained as long as your account is active
-- **Deleted accounts**: Data is permanently deleted within **30 days** of account deletion request
-- **Audit logs**: Retained for **7 years** for legal compliance (cannot be deleted by users)
-- **Consent records**: Retained permanently for legal compliance
+- **Active accounts**: Your data is kept as long as your account remains active
+- **Deleted accounts**: All your data is permanently deleted within **30 days** of your deletion request
+- **Legal records**: Some records (audit logs, consent history) must be retained for legal compliance
+- **Backup systems**: Deleted data is removed from backup systems within 30 days
 
 ### 5.3 Your Responsibility
 You are responsible for:
@@ -162,41 +154,30 @@ You are responsible for:
 ## 6. Your Privacy Rights
 
 ### 6.1 Right to Access
-You can:
-- View all your journal entries and data
+You can view all your journal entries and personal data at any time through your account settings. You can also:
 - Download your data in a portable format
-- **View your audit logs** (see who accessed your data and when)
-
-**API:** `GET /api/UserData/audit-logs`
+- View a history of access to your data
 
 ### 6.2 Right to Deletion
-You can:
-- Delete individual journal entries
+You have complete control over your data:
+- Delete individual journal entries anytime
 - Delete specific audio recordings
-- **Delete your entire account and all data** (irreversible)
+- **Delete your entire account and all associated data** (this action is permanent)
 
-**API:** `DELETE /api/UserData/delete-all`
-
-**What gets deleted:**
+**When you delete your account, we remove:**
 - ✅ All journal entries
 - ✅ All audio recordings
-- ✅ User profile
-- ✅ AI-generated insights
-- ⚠️ Audit logs (retained for 7 years for compliance)
-- ⚠️ Consent records (retained for legal compliance)
+- ✅ Your user profile
+- ✅ All AI-generated insights
+- ⚠️ Legal compliance records are retained as required by law
 
-### 6.3 Right to Consent Management
-You can:
-- **Grant consent** for specific data processing activities
-- **View consent history** (all consents you've given)
-- **Revoke consent** (though this may limit Service functionality)
+### 6.3 Right to Control Data Processing
+You can manage your privacy preferences:
+- **Grant or revoke consent** for specific features
+- **View your consent history** - see what permissions you've given
+- **Control AI analysis** - choose whether to use AI-powered features
 
-**Consent Types:**
-1. **Terms of Service** - Agreement to our terms (required)
-2. **Privacy Policy** - Acknowledgment of data practices (required)
-3. **AI Processing** - Permission for AI analysis of entries (required for AI features)
-
-**API:** `POST /api/Consent/record`, `GET /api/Consent/status`, `POST /api/Consent/revoke`
+**Note:** Some features require specific consents to function. Revoking certain consents may limit Service functionality.
 
 ### 6.4 Right to Data Portability
 You can export your data in machine-readable formats (JSON, CSV) for transfer to other services.
@@ -389,4 +370,4 @@ By clicking "I Agree" or using the Service, you acknowledge that you have read, 
 
 **Effective Date:** February 11, 2026
 
-© 2026 Mental Health Journal. All rights reserved.
+© 2026 Inside Journaling App. All rights reserved.

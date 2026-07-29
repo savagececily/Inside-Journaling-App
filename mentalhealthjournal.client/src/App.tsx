@@ -956,7 +956,7 @@ function App() {
                         <button onClick={() => setShowAbout(true)}>About</button>
                     </div>
                     <div className="footer-copyright">
-                        © {new Date().getFullYear()} Mental Health Journal. All rights reserved.
+                        © {new Date().getFullYear()} Inside Journaling App. All rights reserved.
                     </div>
                 </footer>
             )}

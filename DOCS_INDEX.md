@@ -1,6 +1,6 @@
 # Documentation Index
 
-Quick reference guide to all Mental Health Journal documentation.
+Quick reference guide to all Inside Journaling App documentation.
 
 ---
 
@@ -8,24 +8,31 @@ Quick reference guide to all Mental Health Journal documentation.
 
 **New to the project?** Start with these:
 1. [README.md](README.md) - Project overview, features, and quick start
-2. [OPERATIONS.md](OPERATIONS.md) - Complete deployment and production operations guide
-3. [TESTING_GUIDE.md](TESTING_GUIDE.md) - How to test the application
+2. [TESTING_GUIDE.md](TESTING_GUIDE.md) - How to test the application
+3. [azure-setup/README.md](azure-setup/README.md) - Deployment scripts and procedures
 
 ---
 
-## 🚀 Production & Operations
+## 🚀 Deployment & Configuration
 
-### **[OPERATIONS.md](OPERATIONS.md)** - Complete deployment and operations guide
+### **[azure-setup/README.md](azure-setup/README.md)** - Deployment scripts
 
-Includes:
-- 🚀 **Azure Deployment** - App Service setup, managed identity, CI/CD pipelines
-- 💰 **Cost Analysis** - Per-user costs and optimization strategies (67% reduction achieved)
-- 💎 **Freemium Model** - Tier structure, quotas, token tracking, revenue projections
-- ⚡ **Performance** - Retry policies, caching, code splitting, monitoring
-- 📊 **Monitoring** - Application Insights, KQL queries, metrics, alerts
-- 🔧 **Configuration** - Environment variables, rate limiting, rollback procedures
-- 🧪 **Testing** - Production testing procedures
-- 🔒 **Security** - Managed identity, quota bypass prevention, privacy
+**⚡ Automated deployment scripts**
+
+Available scripts:
+- 🔧 **configure-app-settings.sh** - Set up all app settings for both slots
+- 🚀 **deploy-to-dev.sh** - Build and deploy to development slot
+- 🔄 **swap-to-production.sh** - Promote development to production
+- ⏪ **rollback-production.sh** - Emergency rollback if needed
+
+**Azure Resources:**
+- **Resource Group:** InsideJournalingAppRG
+- **Web App:** inside-journaling-app (production) with development slot
+- **Cosmos DB:** inside-journaling-app-cosmosdb
+- **Storage:** sainsidejournalingapp
+- **Azure AI Foundry Hub:** Inside-Journaling-App-Foundry
+- **AI Models:** gpt-4o-mini, gpt-4o (serverless, 250 capacity each)
+- **Managed Identities:** Inside-Journaling-App-UAMI (prod), Inside-Journaling-App-DEV-UAMI (dev)
 
 ### **[PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md)** - Payment and subscription implementation
 
@@ -38,10 +45,16 @@ Includes:
 - 📊 **Analytics** - Revenue metrics, conversion tracking, monitoring queries
 
 ### **[TESTING_GUIDE.md](TESTING_GUIDE.md)** - Testing procedures
-- Unit tests (xUnit)
-- Integration tests
-- Manual testing procedures
-- Test coverage reports
+
+Includes:
+- 🧪 **Unit tests** (xUnit) - Service layer and controller tests
+- 🔗 **Integration tests** - End-to-end API testing
+- 📋 **Manual testing** - Step-by-step testing procedures
+- 📊 **Coverage reports** - Test coverage analysis
+
+### **[AUTHENTICATION.md](AUTHENTICATION.md)** - Authentication implementation
+
+Details on Google OAuth, JWT tokens, and security implementation.
 
 ---
 
@@ -60,6 +73,49 @@ Includes:
 - 🧪 Testing - Unit and integration tests
 
 ---
+
+## 📱 Mobile Application (React Native)
+
+### **[MOBILE_FEATURES.md](MOBILE_FEATURES.md)** - Complete mobile app feature documentation
+
+Includes:
+- 📱 **Offline-First Architecture** - Complete offline support with automatic background sync
+- 🎙️ **Voice Recording** - Native audio recording with speech-to-text
+- 🤖 **AI Analysis** - Sentiment analysis, key phrases, affirmations, crisis detection
+- 📊 **Data Visualizations** - Sentiment charts, streak counter, calendar view, word clouds
+- 🆘 **Crisis Support** - Emergency hotlines, breathing exercises, grounding techniques
+- 🔐 **Authentication** - Secure Google OAuth integration
+- 🔄 **Sync Engine** - Smart background sync with conflict resolution
+- 📦 **Tech Stack** - React Native (Expo), TypeScript, AsyncStorage, NetInfo
+
+---
+
+## 📄 Legal & Privacy
+
+### **[PRIVACY_POLICY.md](PRIVACY_POLICY.md)** - Privacy policy
+User data handling, privacy rights, and compliance.
+
+### **[TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md)** - Terms of service
+User agreement, acceptable use, and service terms.
+
+---
+
+## 🎯 Quick Links
+
+- **Live App:** [inside-journaling-app.azurewebsites.net](https://inside-journaling-app.azurewebsites.net)
+- **Dev Slot:** [inside-journaling-app-development.azurewebsites.net](https://inside-journaling-app-development.azurewebsites.net)
+- **Azure Portal:** [InsideJournalingAppRG](https://portal.azure.com/#@/resource/subscriptions/a7c4f882-34af-44dc-9bd7-ccac4f1ec402/resourceGroups/InsideJournalingAppRG/overview)
+
+---
+
+## 🛠️ Development Workflow
+
+1. **Local Development**: Make changes to code
+2. **Test Locally**: Run unit tests with `dotnet test`
+3. **Deploy to Dev**: Use `./azure-setup/deploy-to-dev.sh`
+4. **Test in Dev Slot**: Verify at development URL
+5. **Swap to Production**: Use `./azure-setup/swap-to-production.sh`
+6. **Rollback if Needed**: Use `./azure-setup/rollback-production.sh`
 
 ## 📱 Mobile Application (React Native + Expo)
 
@@ -109,16 +165,25 @@ Includes:
 ## 📊 Documentation Structure
 
 ```
-docs/
-├── README.md                    # Project overview
-├── OPERATIONS.md                # ⭐ Complete deployment and operations guide
-├── PAYMENT_STRATEGY.md          # 💳 Payment & subscription implementation
-├── AUTHENTICATION.md            # 🔐 OAuth setup (Google & Microsoft)
-├── TESTING_GUIDE.md             # Testing guide
-├── WEB_FEATURES.md              # Web app features
-├── MOBILE_FEATURES.md           # Mobile app features
-├── PRIVACY_POLICY.md            # Privacy policy
-└── TERMS_OF_SERVICE.md          # Terms of service
+/
+├── README.md                       # Project overview
+├── MIGRATION_PLAN.md               # ⭐ Deployment strategy and phases
+├── APP_SETTINGS_MIGRATION.md       # 💰 Configuration approach and cost savings
+├── FOUNDRY_ARCHITECTURE_UPDATE.md  # 🤖 Azure AI Foundry architecture
+├── DATA_MIGRATION_GUIDE.md         # 📦 Data migration reference (completed)
+├── AUTHENTICATION.md               # 🔐 OAuth setup (Google & Microsoft)
+├── PAYMENT_STRATEGY.md             # 💳 Payment & subscription implementation
+├── TESTING_GUIDE.md                # 🧪 Testing guide
+├── WEB_FEATURES.md                 # 🌐 Web app features
+├── MOBILE_FEATURES.md              # 📱 Mobile app features
+├── PRIVACY_POLICY.md               # ⚖️ Privacy policy
+├── TERMS_OF_SERVICE.md             # ⚖️ Terms of service
+└── azure-setup/
+    ├── README.md                   # 📖 Script documentation
+    ├── configure-app-settings.sh   # 🔧 Configure both slots
+    ├── deploy-to-dev.sh            # 🚀 Deploy to development
+    ├── swap-to-production.sh       # 🔄 Promote to production
+    └── rollback-production.sh      # ⏪ Emergency rollback
 ```
 
 ---
@@ -126,39 +191,36 @@ docs/
 ## 🔍 Quick Find
 
 **I want to...**
-- **Deploy to Azure** → [OPERATIONS.md](OPERATIONS.md)
-- **Understand costs and monetization** → [OPERATIONS.md](OPERATIONS.md#cost-analysis--optimization)
-- **Set up CI/CD** → [OPERATIONS.md](OPERATIONS.md#continuous-deployment-with-github-actions)
-- **Implement payments** → [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md)
-- **Set up Stripe** → [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md#-web-implementation-stripe-checkout)
-- **Set up mobile IAP** → [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md#-mobile-implementation-in-app-purchases)
-- **Configure Google OAuth** → [AUTHENTICATION.md](AUTHENTICATION.md#google-oauth-setup)
-- **Configure Microsoft OAuth** → [AUTHENTICATION.md](AUTHENTICATION.md#microsoft-oauth-setup)
-- **Set up monitoring** → [OPERATIONS.md](OPERATIONS.md#monitoring--analytics)
+- **Deploy to Azure** → [MIGRATION_PLAN.md](MIGRATION_PLAN.md)
+- **Configure app settings** → [APP_SETTINGS_MIGRATION.md](APP_SETTINGS_MIGRATION.md)
+- **Run deployment scripts** → [azure-setup/README.md](azure-setup/README.md)
+- **Understand Azure AI architecture** → [FOUNDRY_ARCHITECTURE_UPDATE.md](FOUNDRY_ARCHITECTURE_UPDATE.md)
+- **Set up payments** → [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md)
+- **Configure OAuth** → [AUTHENTICATION.md](AUTHENTICATION.md)
 - **Run tests** → [TESTING_GUIDE.md](TESTING_GUIDE.md)
 - **Learn about features** → [WEB_FEATURES.md](WEB_FEATURES.md) or [MOBILE_FEATURES.md](MOBILE_FEATURES.md)
-- **Check configuration options** → [OPERATIONS.md](OPERATIONS.md#configuration-reference)
-- **Troubleshoot deployment** → [OPERATIONS.md](OPERATIONS.md#troubleshooting)
-- **Optimize costs** → [OPERATIONS.md](OPERATIONS.md#key-optimizations-implemented)
+- **Review data migration** → [DATA_MIGRATION_GUIDE.md](DATA_MIGRATION_GUIDE.md)
+- **Understand cost savings** → [APP_SETTINGS_MIGRATION.md](APP_SETTINGS_MIGRATION.md#-cost-savings)
 
 ---
 
-## 📝 Consolidation History
+## 📝 Architecture Updates
+
+**July 25, 2026** - Configuration simplification and cost optimization:
+- ✅ **Migrated to direct app settings** - Eliminated Azure App Configuration service
+- ✅ **Cost savings** - ~$40/month reduction using environment variables
+- ✅ **Simplified deployment** - Single script configures both production and development slots
+- ✅ **Data migration complete** - 90 items migrated to development database
+- ✅ **Cleaned up obsolete scripts** - Removed completed migration and old configuration scripts
 
 **May 1, 2026** - Documentation consolidated from 12 files to 10:
 - ✅ **AUTHENTICATION.md** (new) ← GOOGLE_OAUTH_SETUP.md + MICROSOFT_LOGIN_SETUP.md
-- ✅ **OPERATIONS.md** (new) ← AZURE_DEPLOYMENT.md + PRODUCTION_GUIDE.md
 - Result: Clearer navigation, reduced redundancy, comprehensive guides
-
-**Previous Consolidation (March 2026):**
-- ✅ **WEB_FEATURES.md** ← Crisis Support, Data Visualization, Voice Recording features
-- ✅ **MOBILE_FEATURES.md** ← UI Components, Offline Sync, OAuth features
-- Result: From 25 docs to 12 focused documents
 
 ---
 
-**Last Updated:** May 1, 2026  
-**Documentation Version:** 3.0 (Aggressive Consolidation)
+**Last Updated:** July 25, 2026  
+**Documentation Version:** 4.0 (Simplified Architecture)
 
 ## 📂 Documentation Structure
 
@@ -191,8 +253,12 @@ MentalHealthJournal/
 ├── README.md                       # Project overview & quick start
 ├── DOCS_INDEX.md                   # This file - documentation navigator
 │
+├── MIGRATION_PLAN.md               # Deployment strategy & phases
+├── APP_SETTINGS_MIGRATION.md       # Configuration & cost savings
+├── FOUNDRY_ARCHITECTURE_UPDATE.md  # Azure AI architecture
+├── DATA_MIGRATION_GUIDE.md         # Data migration reference
+│
 ├── AUTHENTICATION.md               # OAuth setup (Google & Microsoft)
-├── OPERATIONS.md                   # Complete deployment & operations
 ├── PAYMENT_STRATEGY.md             # Payment & subscription implementation
 ├── TESTING_GUIDE.md                # Testing procedures
 │
@@ -210,7 +276,10 @@ MentalHealthJournal/
 ### "I want to..."
 
 #### Deploy the Application
-→ [OPERATIONS.md](OPERATIONS.md)
+→ [MIGRATION_PLAN.md](MIGRATION_PLAN.md)
+
+#### Configure App Settings
+→ [APP_SETTINGS_MIGRATION.md](APP_SETTINGS_MIGRATION.md)
 
 #### Configure OAuth
 → [AUTHENTICATION.md](AUTHENTICATION.md)
@@ -229,22 +298,3 @@ MentalHealthJournal/
 
 #### Review Privacy/Legal
 → [PRIVACY_POLICY.md](PRIVACY_POLICY.md) & [TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md)
-
----
-
-## 📝 Consolidation History
-
-**May 1, 2026** - Documentation consolidated from 12 files to 10:
-- ✅ **AUTHENTICATION.md** (new) ← GOOGLE_OAUTH_SETUP.md + MICROSOFT_LOGIN_SETUP.md
-- ✅ **OPERATIONS.md** (new) ← AZURE_DEPLOYMENT.md + PRODUCTION_GUIDE.md
-- Result: Clearer navigation, reduced redundancy, comprehensive guides
-
-**Previous Consolidation (March 2026):**
-- ✅ **WEB_FEATURES.md** ← Crisis Support, Data Visualization, Voice Recording features
-- ✅ **MOBILE_FEATURES.md** ← UI Components, Offline Sync, OAuth features
-- Result: From 25 docs to 12 focused documents
-
----
-
-**Last Updated:** May 1, 2026  
-**Documentation Version:** 3.0 (Aggressive Consolidation)

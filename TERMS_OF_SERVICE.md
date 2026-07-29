@@ -7,18 +7,18 @@
 
 ## 1. Acceptance of Terms
 
-By accessing or using Mental Health Journal (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
+By accessing or using Inside Journaling App (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
 
-These Terms constitute a legally binding agreement between you ("User" or "you") and Mental Health Journal ("we," "us," or "our").
+These Terms constitute a legally binding agreement between you ("User" or "you") and Inside Journaling App ("we," "us," or "our").
 
 ## 2. Description of Service
 
-Mental Health Journal is a digital journaling application that:
-- Allows users to create and manage personal mental health journal entries
-- Provides AI-powered sentiment analysis and insights
+Inside Journaling App is a digital journaling application that:
+- Allows you to create and manage personal journal entries
+- Provides AI-powered emotional insights and sentiment analysis
 - Offers voice recording and transcription capabilities
-- Delivers personalized affirmations and mental wellness tracking
-- Stores user data securely in the cloud
+- Delivers personalized affirmations and wellness tracking
+- Stores your data securely in the cloud with encryption
 
 ## 3. Age Requirements and Eligibility
 
@@ -56,19 +56,18 @@ For your security, sessions automatically expire after **30 minutes of inactivit
 - By using the Service, you grant us a limited license to store, process, and analyze your User Content solely for providing and improving the Service
 
 ### 5.2 Data Processing
-- Your journal entries may be processed by AI services (Azure OpenAI, Azure Cognitive Services) to provide:
-  - Sentiment analysis
-  - Key phrase extraction
+- Your journal entries may be processed by AI services to provide:
+  - Emotional tone analysis
+  - Theme and pattern identification
   - Personalized affirmations
-  - Summary generation
+  - Insightful summaries
 - You consent to this processing by using AI features of the Service
-- Your data is **not used to train public AI models**
+- Your personal journal content is **not used to train public AI models**
 
 ### 5.3 Data Storage
-- Your data is stored securely using Microsoft Azure services
-- We implement industry-standard encryption at rest and in transit (HTTPS)
-- Audio recordings are stored in Azure Blob Storage
-- Journal entries and user data are stored in Azure Cosmos DB
+- Your data is stored securely with encryption
+- We use professional cloud infrastructure services
+- Audio recordings and journal entries are encrypted at rest and in transit
 
 ## 6. Privacy and Data Protection
 
@@ -142,15 +141,15 @@ You may not:
 
 ### 10.1 Third-Party Integration
 The Service integrates with third-party services including:
-- Google OAuth (authentication)
-- Microsoft Azure services (hosting, AI, storage)
-- Azure OpenAI (GPT-4 for affirmations)
-- Azure Cognitive Services (sentiment analysis)
-- Azure Speech Services (voice transcription)
+- Google OAuuses third-party providers for:
+- Authentication services (e.g., Google login)
+- Secure cloud hosting and storage
+- AI-powered insights and analysis
+- Voice transcription services
+- Performance monitoring
 
 ### 10.2 Third-Party Terms
-Your use of third-party services is subject to their respective terms of service and privacy policies. We are not responsible for third-party services.
-
+Your use of third-party authentication
 ## 11. Service Availability and Modifications
 
 ### 11.1 Availability
@@ -214,7 +213,7 @@ We are not liable for:
 
 ## 14. Indemnification
 
-You agree to indemnify, defend, and hold harmless Mental Health Journal, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
+You agree to indemnify, defend, and hold harmless Inside Journaling App, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
 - Your use of the Service
 - Your violation of these Terms
 - Your violation of any rights of another party
@@ -251,7 +250,7 @@ We may disclose your information if required by law, court order, or to protect 
 ## 17. Miscellaneous
 
 ### 17.1 Entire Agreement
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and Mental Health Journal.
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and Inside Journaling App.
 
 ### 17.2 Severability
 If any provision of these Terms is found invalid or unenforceable, the remaining provisions remain in full effect.
@@ -284,4 +283,4 @@ By clicking "I Agree" or by using the Service, you acknowledge that:
 
 **Effective Date:** February 11, 2026
 
-© 2026 Mental Health Journal. All rights reserved.
+© 2026 Inside Journaling App. All rights reserved.

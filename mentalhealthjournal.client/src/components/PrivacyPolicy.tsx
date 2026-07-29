@@ -18,7 +18,7 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
 
             <h2>Data Collection</h2>
             <p>
-                Mental Health Journal collects and stores the following information:
+                Inside Journaling App collects and stores the following information:
             </p>
             <ul>
                 <li><strong>Authentication Data:</strong> Your Google account email, name, and profile picture</li>

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
+using Azure.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.CognitiveServices.Speech;
 using Microsoft.CognitiveServices.Speech.Audio;
 using Microsoft.Extensions.Configuration;
@@ -11,21 +13,39 @@ namespace MentalHealthJournal.Services
     public class SpeechToTextService: ISpeechToTextService
     {
         private readonly ILogger<SpeechToTextService> _logger;
-        private readonly string _speechKey;
+        private readonly string _speechEndpoint;
         private readonly string _region;
+        private readonly string? _managedIdentityClientId;
 
         public SpeechToTextService(ILogger<SpeechToTextService> logger, IOptions<AppSettings> configuration)
         {
             _logger = logger;
-            _speechKey = configuration.Value.AzureCognitiveServices.Key ?? throw new ArgumentNullException("AzureCognitiveServices:Key");
-            _region = configuration.Value.AzureCognitiveServices.Region ?? throw new ArgumentNullException("AzureCognitiveServices:Region");
+            // Use Azure AI Foundry Hub endpoint for Speech-to-Text
+            _speechEndpoint = configuration.Value.AzureOpenAI.Endpoint ?? throw new ArgumentNullException("AzureOpenAI:Endpoint");
+            _region = configuration.Value.AzureCognitiveServices.Region ?? "eastus";
+            _managedIdentityClientId = configuration.Value.ManagedIdentityClientId;
         }
 
         public async Task<string> TranscribeAsync(IFormFile audioFile, CancellationToken cancellationToken = default)
         {
             try
             {
-                var config = SpeechConfig.FromSubscription(_speechKey, _region);
+                // Use managed identity authentication with Foundry Hub endpoint
+                var speechConfig = SpeechConfig.FromEndpoint(new Uri(_speechEndpoint));
+                
+                // Set up managed identity authentication
+                if (!string.IsNullOrEmpty(_managedIdentityClientId))
+                {
+                    var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+                    {
+                        ManagedIdentityClientId = _managedIdentityClientId
+                    });
+                    var tokenRequestContext = new TokenRequestContext(new[] { "https://cognitiveservices.azure.com/.default" });
+                    var token = await credential.GetTokenAsync(tokenRequestContext, cancellationToken);
+                    speechConfig.AuthorizationToken = token.Token;
+                }
+                
+                var config = speechConfig;
                 config.SpeechRecognitionLanguage = "en-US";
 
                 using var stream = audioFile.OpenReadStream();

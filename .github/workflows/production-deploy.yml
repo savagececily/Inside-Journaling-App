@@ -1,0 +1,103 @@
+name: Deploy Inside Journaling App to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.x'
+  NODE_VERSION: '22.x'
+  AZURE_WEBAPP_NAME: insidejournal-webapp
+  RESOURCE_GROUP: rg-insidejournal-prod
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: mentalhealthjournal.client/package-lock.json
+
+      - name: Restore .NET dependencies
+        run: dotnet restore MentalHealthJournal.Server/MentalHealthJournal.Server.csproj
+
+      - name: Install Node dependencies
+        working-directory: mentalhealthjournal.client
+        run: npm ci
+
+      - name: Build Vite SPA
+        working-directory: mentalhealthjournal.client
+        run: npm run build
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING }}
+
+      - name: Copy Vite dist to ASP.NET wwwroot
+        run: |
+          rm -rf MentalHealthJournal.Server/wwwroot/*
+          cp -r mentalhealthjournal.client/dist/* MentalHealthJournal.Server/wwwroot/
+          cp PRIVACY_POLICY.md MentalHealthJournal.Server/wwwroot/
+          cp TERMS_OF_SERVICE.md MentalHealthJournal.Server/wwwroot/
+
+      - name: Run .NET tests
+        run: dotnet test MentalHealthJournal.Tests/MentalHealthJournal.Tests.csproj --configuration Release
+
+      - name: Publish ASP.NET Core app
+        run: dotnet publish MentalHealthJournal.Server/MentalHealthJournal.Server.csproj -c Release -o ${{ env.DOTNET_ROOT }}/myapp
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-app
+          path: ${{ env.DOTNET_ROOT }}/myapp
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: Production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-app
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Azure Web App
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: .
+
+      - name: Health Check
+        run: |
+          echo "Waiting for app to start..."
+          sleep 30
+          echo "Checking app health..."
+          curl -f https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/ || echo "App may still be starting..."

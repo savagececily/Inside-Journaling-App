@@ -1,4 +1,4 @@
-# Mental Health Journal - Mobile App
+# Inside Journaling App - Mobile App
 
 React Native mobile application built with Expo for iOS and Android.
 

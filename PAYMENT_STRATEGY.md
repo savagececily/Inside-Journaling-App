@@ -5,7 +5,7 @@
 
 ## Overview
 
-This document outlines the payment and subscription strategy for the Mental Health Journal freemium model, including provider selection, implementation approach, and platform-specific considerations.
+This document outlines the payment and subscription strategy for the Inside Journaling App freemium model, including provider selection, implementation approach, and platform-specific considerations.
 
 ---
 
@@ -1327,7 +1327,7 @@ customEvents
 
 ---
 
-### Recommendation for Mental Health Journal
+### Recommendation for Inside Journaling App
 
 **Phase 1: Conservative Approach (Launch)**
 - Android app: Show upgrade button (use external browser)

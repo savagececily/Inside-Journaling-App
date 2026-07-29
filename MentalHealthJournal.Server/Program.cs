@@ -9,6 +9,7 @@ using Azure.AI.TextAnalytics;
 using OpenAI;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -32,14 +33,27 @@ namespace MentalHealthJournal.Server
                 ManagedIdentityClientId = Environment.GetEnvironmentVariable("ManagedIdentityClientId")
             });
 
-            // Load Azure App Configuration FIRST before accessing other config values
-            var configurationUri = Environment.GetEnvironmentVariable("AzureAppConfiguration") ?? throw new InvalidOperationException("AzureAppConfiguration is not configured");
-            builder.Configuration.AddAzureAppConfiguration(options =>
+            // Load configuration from Azure App Configuration
+            var configurationUri = Environment.GetEnvironmentVariable("AzureAppConfiguration");
+            if (!string.IsNullOrEmpty(configurationUri))
             {
-                options.Connect(new Uri(configurationUri), defaultCredential);
-            });
+                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+                var label = environment == "Development" ? "development" : null;
+                
+                builder.Configuration.AddAzureAppConfiguration(options =>
+                {
+                    options.Connect(new Uri(configurationUri), defaultCredential)
+                        // Load all keys without label (production/shared values)
+                        .Select("*", LabelFilter.Null)
+                        // Load environment-specific values if label is set
+                        .Select("*", label);
+                });
+            }
+            else
+            {
+                Console.WriteLine("WARNING: AzureAppConfiguration environment variable not set. Using local configuration only.");
+            }
 
-            // Rebuild configuration to include App Configuration values
             var config = builder.Configuration;
 
             // Add Application Insights telemetry with explicit connection string
@@ -82,11 +96,12 @@ namespace MentalHealthJournal.Server
                     .WithCredential(defaultCredential);
             });
 
-            // === Text Analytics with Managed Identity ===
+            // === Text Analytics with Managed Identity (uses Foundry Hub) ===
             builder.Services.AddSingleton<TextAnalyticsClient>(serviceProvider =>
             {
-                var cognitiveEndpoint = config["AzureCognitiveServices:Endpoint"] ?? throw new InvalidOperationException("AzureCognitiveServices:Endpoint is not configured");
-                return new TextAnalyticsClient(new Uri(cognitiveEndpoint), defaultCredential);
+                // Use Azure AI Foundry Hub endpoint for Text Analytics
+                var foundryEndpoint = config["AzureOpenAI:Endpoint"] ?? throw new InvalidOperationException("AzureOpenAI:Endpoint is not configured");
+                return new TextAnalyticsClient(new Uri(foundryEndpoint), defaultCredential);
             });
 
             // === Cosmos DB with Managed Identity ===
@@ -196,7 +211,7 @@ namespace MentalHealthJournal.Server
 
             var logger = app.Services.GetRequiredService<ILogger<Program>>();
             logger.LogInformation("======================================");
-            logger.LogInformation("Mental Health Journal Application Starting");
+            logger.LogInformation("Inside Journaling App Starting");
             logger.LogInformation("Environment: {Environment}", app.Environment.EnvironmentName);
             
             var appInsightsConnString = config["APPLICATIONINSIGHTS_CONNECTION_STRING"];

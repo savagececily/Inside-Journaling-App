@@ -3,6 +3,7 @@
         "dotnet add": true,
         "dotnet build": true,
         "npm install": true,
-        "npm run build": true
+        "npm run build": true,
+        "az": true
     }
 }

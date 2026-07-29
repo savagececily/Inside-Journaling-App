@@ -1,10 +1,10 @@
-# 🧠 Mental Health Journal
+# 📔 Inside Journaling App
 
-A modern, AI-powered journaling application for mental health and wellness tracking. Built with React, .NET, and Azure services.
+A modern, AI-powered journaling application for personal growth and wellness tracking. Built with React, .NET, and Azure services.
 
 ## 📋 Overview
 
-Mental Health Journal is a full-stack web application that helps users track their mental wellness through journaling. The application uses Azure Cognitive Services and OpenAI to provide intelligent insights, sentiment analysis, and personalized feedback on journal entries.
+Inside Journaling App is a full-stack web application that helps users track their wellness through journaling. The application uses Azure Cognitive Services and OpenAI to provide intelligent insights, sentiment analysis, and personalized feedback on journal entries.
 
 ## ✨ Key Features
 
@@ -97,7 +97,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 2. **Configure Azure Services**
    - Create an Azure account and resource group
-   - Set up required Azure services (see [OPERATIONS.md](OPERATIONS.md))
+   - Set up required Azure services (see [MIGRATION_PLAN.md](MIGRATION_PLAN.md))
    - Configure `appsettings.json` with your Azure service connections
 
 3. **Backend Setup**
@@ -189,7 +189,7 @@ The application can be deployed to Azure using multiple approaches:
 2. **Azure Static Web Apps + Functions**
 3. **Azure Container Apps**
 
-For detailed deployment instructions, see [OPERATIONS.md](OPERATIONS.md).
+For detailed deployment instructions, see [MIGRATION_PLAN.md](MIGRATION_PLAN.md).
 
 ### Quick Deploy to Azure App Service
 ```bash
@@ -198,7 +198,7 @@ az login
 
 # Deploy (from project root)
 dotnet publish -c Release
-# Follow deployment steps in OPERATIONS.md
+# Follow deployment steps in MIGRATION_PLAN.md
 ```
 
 ## 📚 Documentation
@@ -207,7 +207,8 @@ dotnet publish -c Release
 
 ### Getting Started
 - [README.md](README.md) - This file, project overview and quick start
-- [Operations Guide](OPERATIONS.md) - Complete deployment, operations, cost optimization, and monitoring
+- [Migration & Deployment Plan](MIGRATION_PLAN.md) - Deployment strategy, phases, and testing
+- [App Settings Migration](APP_SETTINGS_MIGRATION.md) - Configuration approach and cost savings
 - [Testing Guide](TESTING_GUIDE.md) - How to test the application end-to-end
 
 ### Feature Documentation

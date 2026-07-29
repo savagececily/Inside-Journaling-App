@@ -91,7 +91,6 @@ namespace MentalHealthJournal.Tests.Helpers
                 },
                 AzureCognitiveServices = new AzureCognitiveServicesSettings
                 {
-                    Endpoint = "https://test-cognitive.cognitiveservices.azure.com",
                     Region = "eastus"
                 },
                 AzureBlobStorage = new AzureBlobStorageSettings

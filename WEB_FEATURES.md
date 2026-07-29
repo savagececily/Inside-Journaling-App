@@ -1,6 +1,6 @@
 # Web App Features Documentation
 
-Complete reference for all features implemented in the Mental Health Journal web application (React + .NET).
+Complete reference for all features implemented in the Inside Journaling App web application (React + .NET).
 
 ---
 
@@ -469,7 +469,8 @@ When concerning content detected:
 - Rollback capabilities
 
 **Key Files:**
-- `OPERATIONS.md` - Complete deployment and operations guide
+- `MIGRATION_PLAN.md` - Deployment strategy and phases
+- `APP_SETTINGS_MIGRATION.md` - Configuration approach
 - `.github/workflows/` - CI/CD pipelines
 
 ---
@@ -520,4 +521,4 @@ When concerning content detected:
 ✅ **Testing:** Comprehensive test coverage  
 ✅ **Documentation:** Complete guides and references  
 
-**[View Operations Guide →](OPERATIONS.md)** | **[View Testing Guide →](TESTING_GUIDE.md)**
+**[View Deployment Guide →](MIGRATION_PLAN.md)** | **[View Testing Guide →](TESTING_GUIDE.md)**

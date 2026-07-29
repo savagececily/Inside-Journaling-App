@@ -1,8 +1,8 @@
-# Mental Health Journal - Testing AI Analysis & Trends
+# Inside Journaling App - Testing AI Analysis & Trends
 
 ## ✅ What's Been Enhanced
 
-Your Mental Health Journal now includes:
+Your Inside Journaling App now includes:
 
 1. **AI-Powered Analysis** - Each journal entry is analyzed for:
    - 😊 Sentiment (Positive, Negative, Neutral, Mixed)
@@ -242,6 +242,6 @@ Once you've verified the AI analysis and trends work correctly, you could:
 
 ---
 
-**Your Mental Health Journal is now equipped with powerful AI analysis and trend tracking!** 🌱✨
+**Your Inside Journaling App is now equipped with powerful AI analysis and trend tracking!** 🌱✨
 
 Write a few entries and watch the AI provide insights into your emotional patterns.

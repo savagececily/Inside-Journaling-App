@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Mental Health Journal",
+    "name": "Inside Journaling App",
     "slug": "mental-health-journal",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -78,7 +78,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow Mental Health Journal to use Face ID for secure authentication."
+          "faceIDPermission": "Allow Inside Journaling App to use Face ID for secure authentication."
         }
       ],
       "@react-native-community/datetimepicker"

@@ -154,7 +154,7 @@ Complete guide for setting up Microsoft login (via Microsoft Entra ID) for both 
 #### 1.2 Register Your Application
 
 **Basic Settings:**
-- **Name**: `Mental Health Journal` (or your preferred app name)
+- **Name**: `Inside Journaling App` (or your preferred app name)
 - **Supported account types**: Select one of the following:
   - **Accounts in any organizational directory and personal Microsoft accounts** (Recommended for multi-tenant)
   - **Accounts in this organizational directory only** (Single tenant)

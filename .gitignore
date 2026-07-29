@@ -61,6 +61,7 @@ bld/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
+*.lscache
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -87,10 +88,24 @@ artifacts/
 # Publish directories
 publish/
 [Pp]ublish/
+publish-dev/
+app-deploy/
 
 # Deployment artifacts
 *.zip
 *-deploy.zip
+deploy-package.zip
+deploy.zip
+*-logs/
+*-logs.zip
+dev-logs/
+app-logs/
+
+# App settings with secrets (keep .Example files)
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+!**/appsettings.Example.json
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
