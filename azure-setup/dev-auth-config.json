@@ -1,0 +1,37 @@
+{
+  "properties": {
+    "platform": {
+      "enabled": true
+    },
+    "globalValidation": {
+      "requireAuthentication": true,
+      "unauthenticatedClientAction": "RedirectToLoginPage"
+    },
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "enabled": true,
+        "registration": {
+          "openIdIssuer": "https://login.microsoftonline.com/common/v2.0",
+          "clientId": "2bdef97c-c4a9-43ed-9947-944b43cf8e97",
+          "clientSecretSettingName": "MICROSOFT_PROVIDER_AUTHENTICATION_SECRET"
+        },
+        "validation": {
+          "allowedAudiences": [
+            "2bdef97c-c4a9-43ed-9947-944b43cf8e97",
+            "api://2bdef97c-c4a9-43ed-9947-944b43cf8e97",
+            "https://inside-journaling-app-development.azurewebsites.net"
+          ],
+          "jwtClaimChecks": {},
+          "defaultAuthorizationPolicy": {
+            "allowedPrincipals": {}
+          }
+        }
+      }
+    },
+    "login": {
+      "tokenStore": {
+        "enabled": true
+      }
+    }
+  }
+}

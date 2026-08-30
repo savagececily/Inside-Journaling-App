@@ -240,6 +240,9 @@ namespace MentalHealthJournal.Server
 
             app.UseCors("AllowFrontend");
 
+            // Easy Auth middleware (for Azure App Service Authentication)
+            app.UseMiddleware<EasyAuthMiddleware>();
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseRateLimiter(); // Cost protection

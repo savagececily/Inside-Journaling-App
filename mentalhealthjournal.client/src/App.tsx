@@ -168,10 +168,16 @@ function App() {
         try {
             setLoading(true);
             setLoadingError(null);
+            
+            // Build headers based on authentication method
+            const headers: HeadersInit = {};
+            if (token !== 'easyauth') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
             const response = await fetch('/api/journal', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers,
+                credentials: 'include' // Include cookies for Easy Auth
             });
             
             if (isCancelled) return; // Don't update state if cancelled
@@ -292,11 +298,16 @@ function App() {
                 const formData = new FormData();
                 formData.append('audioFile', audioBlob, 'recording.webm');
 
+                // Build headers based on authentication method
+                const uploadHeaders: HeadersInit = {};
+                if (token !== 'easyauth') {
+                    uploadHeaders['Authorization'] = `Bearer ${token}`;
+                }
+
                 const uploadResponse = await fetch('/api/journal/voice', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: uploadHeaders,
+                    credentials: 'include', // Include cookies for Easy Auth
                     body: formData,
                 });
 
@@ -312,12 +323,18 @@ function App() {
                 setIsTranscribing(false);
             }
 
+            // Build headers based on authentication method
+            const headers: HeadersInit = {
+                'Content-Type': 'application/json',
+            };
+            if (token !== 'easyauth') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
             const response = await fetch('/api/journal/analyze', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers,
+                credentials: 'include', // Include cookies for Easy Auth
                 body: JSON.stringify({
                     text: textToSubmit,
                     isVoiceEntry,
@@ -912,7 +929,7 @@ function App() {
                 buttonText="Accept"
                 declineButtonText="Decline"
                 enableDeclineButton
-                cookieName="mentalHealthJournalConsent"
+                cookieName="insideJournalConsent"
                 style={{ background: "#2B373B", fontSize: "14px" }}
                 buttonStyle={{ 
                     background: "#4CAF50", 

@@ -7,17 +7,17 @@
 
 ## 1. Acceptance of Terms
 
-By accessing or using Mental Health Journal (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
+By accessing or using Inside Journaling App (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
 
-These Terms constitute a legally binding agreement between you ("User" or "you") and Mental Health Journal ("we," "us," or "our").
+These Terms constitute a legally binding agreement between you ("User" or "you") and Inside Journaling App ("we," "us," or "our").
 
 ## 2. Description of Service
 
-Mental Health Journal is a digital journaling application that:
-- Allows users to create and manage personal mental health journal entries
+Inside Journaling App is a digital journaling application that:
+- Allows users to create and manage personal journal entries
 - Provides AI-powered sentiment analysis and insights
 - Offers voice recording and transcription capabilities
-- Delivers personalized affirmations and mental wellness tracking
+- Delivers personalized affirmations and wellness tracking
 - Stores user data securely in the cloud
 
 ## 3. Age Requirements and Eligibility

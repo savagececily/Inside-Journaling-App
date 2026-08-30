@@ -77,7 +77,7 @@ export default function PremiumSuccess() {
         )}
 
         <div className="support-note">
-          Need help? Contact us at support@mentalhealthjournal.com
+          Need help? Contact us at support@insidejournal.com
         </div>
       </div>
     </div>

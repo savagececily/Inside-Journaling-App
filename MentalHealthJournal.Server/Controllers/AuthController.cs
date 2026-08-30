@@ -602,4 +602,90 @@ public class AuthController : ControllerBase
         
         return age;
     }
+
+    /// <summary>
+    /// Get or create user for Easy Auth (Azure App Service Authentication)
+    /// This endpoint is called when the user is already authenticated via Easy Auth
+    /// </summary>
+    [HttpGet("easyauth/me")]
+    [Authorize]
+    public async Task<ActionResult<User>> GetOrCreateEasyAuthUser()
+    {
+        try
+        {
+            // User is already authenticated via Easy Auth middleware
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                _logger.LogWarning("User is not authenticated via Easy Auth");
+                return Unauthorized("Not authenticated via Easy Auth");
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var name = User.FindFirst(ClaimTypes.Name)?.Value;
+            var provider = User.FindFirst("Provider")?.Value ?? "aad";
+            var providerId = User.FindFirst("ProviderId")?.Value ?? userId;
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(providerId))
+            {
+                _logger.LogError("Easy Auth: Missing required claims. UserId={UserId}, ProviderId={ProviderId}", userId, providerId);
+                return BadRequest("Missing required user information from Easy Auth");
+            }
+
+            _logger.LogInformation("Easy Auth user request: UserId={UserId}, Email={Email}, Provider={Provider}", 
+                userId, email, provider);
+
+            // Check if user exists
+            var existingUser = await _userService.GetUserByProviderIdAsync(providerId, provider);
+
+            User user;
+            if (existingUser != null)
+            {
+                _logger.LogInformation("Existing Easy Auth user found: UserId={UserId}", existingUser.userId);
+                user = existingUser;
+                user.LastLoginAt = DateTime.UtcNow;
+                
+                // Update email and name from Easy Auth if available
+                if (!string.IsNullOrEmpty(email))
+                {
+                    user.Email = email;
+                }
+                if (!string.IsNullOrEmpty(name))
+                {
+                    user.Name = name;
+                }
+                
+                await _userService.CreateOrUpdateUserAsync(user);
+            }
+            else
+            {
+                // Create new user
+                _logger.LogInformation("Creating new Easy Auth user: ProviderId={ProviderId}, Provider={Provider}", providerId, provider);
+                
+                user = new User
+                {
+                    userId = Guid.NewGuid().ToString(),
+                    ProviderId = providerId,
+                    Provider = provider,
+                    Email = email ?? $"{providerId}@{provider}.auth",
+                    Name = name ?? "User",
+                    ProfilePictureUrl = null,
+                    CreatedAt = DateTime.UtcNow,
+                    LastLoginAt = DateTime.UtcNow,
+                    AgeVerified = false, // Will need to verify age
+                    DateOfBirth = null
+                };
+
+                user = await _userService.CreateOrUpdateUserAsync(user);
+                _logger.LogInformation("New Easy Auth user created: UserId={UserId}", user.userId);
+            }
+
+            return Ok(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting or creating Easy Auth user");
+            return StatusCode(500, new { error = "Failed to process Easy Auth login" });
+        }
+    }
 }

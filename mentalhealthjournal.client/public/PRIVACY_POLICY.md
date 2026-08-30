@@ -7,7 +7,7 @@
 
 ## Introduction
 
-Mental Health Journal ("we," "us," "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mental health journaling service (the "Service").
+Inside Journaling App ("we," "us," "our") respects your privacy and is committed to protecting your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our journaling service (the "Service").
 
 **By using the Service, you consent to the data practices described in this policy.**
 
@@ -213,7 +213,7 @@ If you are a California resident, you have additional rights:
 To exercise any of these rights:
 - Use the in-app features (Account Settings, Data Management)
 - Use the provided API endpoints
-- Contact us at [privacy@mentalhealthjournal.com]
+- Contact us at [privacy@insidejournal.com]
 
 ## 7. Children's Privacy (COPPA Compliance)
 
@@ -224,7 +224,7 @@ To exercise any of these rights:
 
 ### 7.2 Parental Rights
 If you are a parent or guardian and believe your child under 13 has created an account:
-- Contact us immediately at [privacy@mentalhealthjournal.com]
+- Contact us immediately at [privacy@insidejournal.com]
 - We will delete the account and all data promptly
 
 ### 7.3 Data Collection from Minors

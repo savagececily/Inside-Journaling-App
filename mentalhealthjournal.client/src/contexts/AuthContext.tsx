@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { User, AuthResponse } from '../types/auth';
 import { AuthContext, type AuthContextType } from './AuthContextDefinition';
+import { easyAuthService } from '../services/easyAuthService';
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -24,13 +25,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     const logout = useCallback(() => {
+        // Check if user is authenticated via Easy Auth
+        if (token === 'easyauth') {
+            // Use Easy Auth logout
+            easyAuthService.logout();
+            return;
+        }
+
+        // Traditional logout
         setToken(null);
         setUser(null);
         setShowSessionWarning(false);
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
         localStorage.removeItem('loginTime');
-    }, []);
+    }, [token]);
 
     // Check token expiration and auto-logout
     useEffect(() => {
@@ -77,23 +86,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, [token, logout]);
 
     useEffect(() => {
-        // Load token and user from localStorage on mount
-        const storedToken = localStorage.getItem('authToken');
-        const storedUser = localStorage.getItem('user');
-
-        if (storedToken && storedUser) {
-            // Check if token is still valid
-            const expirationTime = getTokenExpiration(storedToken);
-            if (expirationTime && expirationTime > Date.now()) {
-                setToken(storedToken);
-                setUser(JSON.parse(storedUser));
-            } else {
-                // Token expired, clear storage
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('user');
+        // Check for authentication on mount
+        const checkAuth = async () => {
+            // First, try to check if user is authenticated via Easy Auth
+            try {
+                const easyAuthResult = await easyAuthService.checkAuthentication();
+                if (easyAuthResult.authenticated && easyAuthResult.user) {
+                    console.log('User authenticated via Easy Auth:', easyAuthResult.user);
+                    setUser(easyAuthResult.user);
+                    // For Easy Auth, we don't need a token since authentication is handled at the platform level
+                    // We'll use a placeholder token to indicate authentication
+                    setToken('easyauth');
+                    setIsLoading(false);
+                    return;
+                }
+            } catch (error) {
+                console.log('Easy Auth not available, falling back to traditional auth:', error);
             }
-        }
-        setIsLoading(false);
+
+            // Fall back to traditional JWT authentication
+            const storedToken = localStorage.getItem('authToken');
+            const storedUser = localStorage.getItem('user');
+
+            if (storedToken && storedUser) {
+                // Check if token is still valid
+                const expirationTime = getTokenExpiration(storedToken);
+                if (expirationTime && expirationTime > Date.now()) {
+                    setToken(storedToken);
+                    setUser(JSON.parse(storedUser));
+                } else {
+                    // Token expired, clear storage
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('user');
+                }
+            }
+            setIsLoading(false);
+        };
+
+        checkAuth();
     }, []);
 
     const login = (authResponse: AuthResponse) => {

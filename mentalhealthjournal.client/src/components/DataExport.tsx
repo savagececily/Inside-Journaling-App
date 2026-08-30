@@ -18,7 +18,7 @@ export function DataExport({ token }: DataExportProps) {
 
         try {
             const blob = await exportService.exportData(token, format);
-            const fileName = `mental-health-journal-export-${new Date().toISOString().split('T')[0]}.${format}`;
+            const fileName = `inside-journal-export-${new Date().toISOString().split('T')[0]}.${format}`;
             exportService.downloadFile(blob, fileName);
             
             setExportSuccess(`Successfully exported your data as ${format.toUpperCase()}`);
