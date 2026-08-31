@@ -176,6 +176,21 @@ namespace MentalHealthJournal.Server
                     ValidAudience = jwtAudience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
                 };
+
+                // Allow Easy Auth to bypass JWT Bearer authentication
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        // If Easy Auth has already authenticated the user (via EasyAuthMiddleware),
+                        // skip JWT Bearer authentication
+                        if (context.HttpContext.User?.Identity?.IsAuthenticated == true)
+                        {
+                            context.Success();
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
             builder.Services.AddAuthorization();

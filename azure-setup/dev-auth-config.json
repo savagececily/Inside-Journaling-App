@@ -4,8 +4,8 @@
       "enabled": true
     },
     "globalValidation": {
-      "requireAuthentication": true,
-      "unauthenticatedClientAction": "RedirectToLoginPage"
+      "requireAuthentication": false,
+      "unauthenticatedClientAction": "AllowAnonymous"
     },
     "identityProviders": {
       "azureActiveDirectory": {
