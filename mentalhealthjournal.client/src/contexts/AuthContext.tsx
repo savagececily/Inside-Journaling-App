@@ -86,25 +86,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }, [token, logout]);
 
     useEffect(() => {
-        // Check for authentication on mount
+        // Check for authentication on mount - only check local storage, not Easy Auth
         const checkAuth = async () => {
-            // First, try to check if user is authenticated via Easy Auth
-            try {
-                const easyAuthResult = await easyAuthService.checkAuthentication();
-                if (easyAuthResult.authenticated && easyAuthResult.user) {
-                    console.log('User authenticated via Easy Auth:', easyAuthResult.user);
-                    setUser(easyAuthResult.user);
-                    // For Easy Auth, we don't need a token since authentication is handled at the platform level
-                    // We'll use a placeholder token to indicate authentication
-                    setToken('easyauth');
-                    setIsLoading(false);
-                    return;
-                }
-            } catch (error) {
-                console.log('Easy Auth not available, falling back to traditional auth:', error);
-            }
-
-            // Fall back to traditional JWT authentication
+            // Check traditional JWT authentication from local storage
             const storedToken = localStorage.getItem('authToken');
             const storedUser = localStorage.getItem('user');
 
