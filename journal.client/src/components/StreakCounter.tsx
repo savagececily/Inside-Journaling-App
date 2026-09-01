@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './StreakCounter.css';
 
 interface StreakData {
@@ -23,7 +24,7 @@ export function StreakCounter({ token }: StreakCounterProps) {
             // Get user's timezone offset in minutes (negative for west of UTC)
             const timezoneOffsetMinutes = -new Date().getTimezoneOffset();
             
-            const response = await fetch(`/api/journal/streak?timezoneOffsetMinutes=${timezoneOffsetMinutes}`, {
+            const response = await fetch(`${API_BASE_URL}/journal/streak?timezoneOffsetMinutes=${timezoneOffsetMinutes}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

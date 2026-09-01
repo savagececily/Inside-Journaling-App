@@ -13,6 +13,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import CrisisAlert from './components/CrisisAlert';
 import { journalService } from './services/journalService';
+import { API_BASE_URL } from './config/api';
 import './App.css';
 import './Tabs.css';
 import './Footer.css';
@@ -175,7 +176,7 @@ function App() {
                 headers['Authorization'] = `Bearer ${token}`;
             }
             
-            const response = await fetch('/api/journal', {
+            const response = await fetch(`${API_BASE_URL}/journal`, {
                 headers,
                 credentials: 'include' // Include cookies for Easy Auth
             });
@@ -304,7 +305,7 @@ function App() {
                     uploadHeaders['Authorization'] = `Bearer ${token}`;
                 }
 
-                const uploadResponse = await fetch('/api/journal/voice', {
+                const uploadResponse = await fetch(`${API_BASE_URL}/journal/voice`, {
                     method: 'POST',
                     headers: uploadHeaders,
                     credentials: 'include', // Include cookies for Easy Auth
@@ -331,7 +332,7 @@ function App() {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await fetch('/api/journal/analyze', {
+            const response = await fetch(`${API_BASE_URL}/journal/analyze`, {
                 method: 'POST',
                 headers,
                 credentials: 'include', // Include cookies for Easy Auth
@@ -484,7 +485,7 @@ function App() {
                             className="crisis-help-button" 
                             onClick={async () => {
                                 try {
-                                    const response = await fetch('/api/crisis-resources');
+                                    const response = await fetch(`${API_BASE_URL}/crisis-resources`);
                                     if (!response.ok) {
                                         throw new Error(`Failed to load crisis resources: ${response.status}`);
                                     }

@@ -2,7 +2,42 @@ import type { AuthResponse } from '../types/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+export interface DevTestUser {
+    id: string;
+    email: string;
+    name: string;
+    description?: string;
+}
+
 export const authService = {
+    async getDevTestUsers(): Promise<DevTestUser[]> {
+        const response = await fetch(`${API_BASE_URL}/devauth/users`);
+
+        // The endpoint returns 404 when dev sign-in is not enabled for the environment.
+        if (!response.ok) {
+            return [];
+        }
+
+        return response.json();
+    },
+
+    async loginAsDevUser(id: string): Promise<AuthResponse> {
+        const response = await fetch(`${API_BASE_URL}/devauth/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Test user sign-in failed: ${error}`);
+        }
+
+        return response.json();
+    },
+
     async loginWithGoogle(idToken: string, dateOfBirth?: string): Promise<AuthResponse> {
         const body: any = { idToken };
         if (dateOfBirth) {

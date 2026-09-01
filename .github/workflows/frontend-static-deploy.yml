@@ -48,7 +48,7 @@ jobs:
         env:
           VITE_API_URL: https://inside-journal-api-development.azurewebsites.net/api
           VITE_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID_DEV }}
           VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING_DEV }}
 
       - name: Deploy to Azure Static Web Apps

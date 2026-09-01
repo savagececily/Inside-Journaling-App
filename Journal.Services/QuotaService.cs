@@ -1,6 +1,7 @@
 using Journal.Models;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Journal.Services
 {
@@ -14,12 +15,13 @@ namespace Journal.Services
         public QuotaService(
             ICosmosDbService cosmosDbService,
             ILogger<QuotaService> logger,
-            CosmosClient cosmosClient)
+            CosmosClient cosmosClient,
+            IOptions<AppSettings> appSettings)
         {
             _cosmosDbService = cosmosDbService;
             _logger = logger;
-            
-            var database = cosmosClient.GetDatabase("JournalDb");
+
+            var database = cosmosClient.GetDatabase(appSettings.Value.CosmosDb.DatabaseName);
             _quotaContainer = database.GetContainer("UserQuotas");
             _tokenUsageContainer = database.GetContainer("TokenUsage");
         }

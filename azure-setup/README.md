@@ -51,7 +51,7 @@ Settings use the ASP.NET Core double-underscore convention, for example `CosmosD
 | Setting | Value |
 | --- | --- |
 | `CosmosDb__Endpoint` | `https://inside-journaling-app-cosmosdb.documents.azure.com:443/` |
-| `CosmosDb__DatabaseName` | `JournalDb` |
+| `CosmosDb__DatabaseName` | Production `inside-journaling-app`, development `inside-journaling-app-dev`; slot setting |
 | `CosmosDb__JournalEntryContainer` | `JournalEntries` |
 | `CosmosDb__UserContainer` | `Users` |
 | `BlobStorage__ServiceUri` | `https://sainsidejournalingapp.blob.core.windows.net` |
@@ -124,6 +124,35 @@ Or use the script, which also runs the test suite:
 ## Restricting Development Access
 
 See [RESTRICT_DEV_ACCESS.md](RESTRICT_DEV_ACCESS.md) for locking the development slot down to admin users with App Service Authentication.
+
+## Development Sign-In
+
+The development environment can sign in as a preconfigured test user instead of using Google or Microsoft. The login screen shows a test user list whenever the API reports one.
+
+This requires both conditions, so configuration alone cannot enable it in production:
+
+- `ASPNETCORE_ENVIRONMENT` is not `Production`
+- `DevAuth__Enabled` is `true`
+
+When unavailable, `GET /api/DevAuth/users` and `POST /api/DevAuth/login` return 404 rather than 403, so the endpoints are not discoverable.
+
+Test users are an explicit allowlist; arbitrary email addresses are rejected. Add one with indexed settings:
+
+```bash
+az webapp config appsettings set \
+  --name inside-journal-api \
+  --resource-group InsideJournalingAppRG \
+  --slot development \
+  --slot-settings \
+    "DevAuth__Enabled=true" \
+    "DevAuth__TestUsers__0__Id=free" \
+    "DevAuth__TestUsers__0__Email=free-user@test.local" \
+    "DevAuth__TestUsers__0__Name=Free Tier User"
+```
+
+A test user whose email appears in `AdminEmails` receives the `Admin` role, which is how admin behaviour is exercised in development.
+
+Never set `DevAuth__Enabled` on the production slot. These settings are marked as slot settings so they cannot follow a swap.
 
 ## Troubleshooting
 

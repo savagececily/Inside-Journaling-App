@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_BASE_URL } from '../config/api';
 // Stripe.js SDK not needed - using server-side Checkout redirect
 
 interface UpgradeModalProps {
@@ -16,7 +17,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       setError(null);
 
       // Call your backend to create a Stripe Checkout session
-      const response = await fetch('/api/user/upgrade', {
+      const response = await fetch(`${API_BASE_URL}/user/upgrade`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,

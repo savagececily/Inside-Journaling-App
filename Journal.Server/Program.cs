@@ -1,6 +1,7 @@
 
 using Journal.Services;
 using Journal.Models;
+using Journal.Server.Services;
 using Azure;
 using Azure.Core;
 using Microsoft.Extensions.Azure;
@@ -114,6 +115,11 @@ namespace Journal.Server
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IDataExportService, DataExportService>();
             builder.Services.AddSingleton<IStreakService, StreakService>();
+            builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+
+            // Development-only sign-in. The controller additionally requires a
+            // non-production environment, so configuration alone cannot enable it.
+            builder.Services.Configure<DevAuthSettings>(builder.Configuration.GetSection("DevAuth"));
             
             // === Freemium Model Services ===
             builder.Services.AddSingleton<IQuotaService, QuotaService>();

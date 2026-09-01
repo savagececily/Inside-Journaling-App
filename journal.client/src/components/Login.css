@@ -224,3 +224,48 @@
         margin-bottom: 2.5rem;
     }
 }
+
+.dev-login {
+    margin-top: 0.5rem;
+}
+
+.dev-login-hint {
+    margin: 0 0 0.75rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+.dev-login-button {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0.6rem 0.9rem;
+    margin-bottom: 0.5rem;
+    background: #f9fafb;
+    border: 1px dashed #9ca3af;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dev-login-button:hover:not(:disabled) {
+    background: #f3f4f6;
+}
+
+.dev-login-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.dev-login-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111827;
+}
+
+.dev-login-description {
+    font-size: 0.75rem;
+    color: #6b7280;
+}

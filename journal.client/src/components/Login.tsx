@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { useAuth } from '../hooks/useAuth';
-import { authService } from '../services/authService';
+import { authService, type DevTestUser } from '../services/authService';
 import { consentService } from '../services/consentService';
 import { loginWithMicrosoft } from '../services/microsoftAuth';
 import { AgeVerificationModal } from './AgeVerificationModal';
@@ -19,6 +19,25 @@ const Login: React.FC<LoginProps> = ({ onViewPrivacyPolicy, onViewTerms }) => {
     const [showConsentGate, setShowConsentGate] = useState(false);
     const [tempAuthResponse, setTempAuthResponse] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [devUsers, setDevUsers] = useState<DevTestUser[]>([]);
+
+    // Returns an empty list unless the API has dev sign-in enabled, so this is
+    // inert in production even if the build somehow reaches it.
+    useEffect(() => {
+        authService.getDevTestUsers().then(setDevUsers).catch(() => setDevUsers([]));
+    }, []);
+
+    const handleDevLogin = async (id: string) => {
+        setIsLoading(true);
+        try {
+            login(await authService.loginAsDevUser(id));
+        } catch (error) {
+            console.error('Test user sign-in failed:', error);
+            alert('Test user sign-in failed.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
         try {
@@ -191,6 +210,28 @@ const handleMicrosoftLogin = async () => {
                             </svg>
                             {isLoading ? 'Signing in...' : 'Sign in with Microsoft'}
                         </button>
+
+                        {devUsers.length > 0 && (
+                            <div className="dev-login">
+                                <div className="login-divider">
+                                    <span>development only</span>
+                                </div>
+                                <p className="dev-login-hint">Sign in as a test user</p>
+                                {devUsers.map((u) => (
+                                    <button
+                                        key={u.id}
+                                        className="dev-login-button"
+                                        onClick={() => handleDevLogin(u.id)}
+                                        disabled={isLoading}
+                                    >
+                                        <span className="dev-login-name">{u.name}</span>
+                                        {u.description && (
+                                            <span className="dev-login-description">{u.description}</span>
+                                        )}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="login-footer">
