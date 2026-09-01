@@ -9,7 +9,8 @@ The backend and frontend are deployed independently.
 | Component | Azure resource | Notes |
 | --- | --- | --- |
 | Backend API | App Service `inside-journal-api` | .NET 8 on Windows, with a `development` slot |
-| Frontend | Static Web App `inside-journal-app` | React and Vite build output |
+| Frontend (production) | Static Web App `inside-journal-app` | React and Vite build output |
+| Frontend (development) | Static Web App `inside-journal-app-dev` | Points at the API development slot |
 | Mobile | Expo / React Native | Consumes the same API |
 
 ## Azure Resources
@@ -18,14 +19,16 @@ The backend and frontend are deployed independently.
 | --- | --- |
 | Resource group | `InsideJournalingAppRG` (East US 2) |
 | App Service | `inside-journal-api` |
-| App Service plan | `InsideJournalingApp-ASP` |
-| Static Web App | `inside-journal-app` |
+| App Service plan | `InsideJournalingApp-ASP` (P0v3) |
+| Static Web App (production) | `inside-journal-app` |
+| Static Web App (development) | `inside-journal-app-dev` |
 | Cosmos DB | `inside-journaling-app-cosmosdb`, database `JournalDb` |
 | Cosmos containers | `Users`, `JournalEntries`, `UserQuotas`, `TokenUsage` |
 | Blob Storage | `sainsidejournalingapp`, container `journal-audio` |
 | Azure AI Foundry | `Inside-Journaling-App-Foundry` (`gpt-4o-mini`, `gpt-4o`) |
-| Managed identity (dev) | `Inside-Journaling-App-DEV-UAMI` |
-| Application Insights | `inside-journaling-app` |
+| Managed identity (production) | `Inside-Journaling-App-UAMI` |
+| Managed identity (development) | `Inside-Journaling-App-DEV-UAMI` |
+| Application Insights | `inside-journaling-app`, `inside-journaling-app-dev` |
 
 ## URLs
 
@@ -34,13 +37,14 @@ The backend and frontend are deployed independently.
 | API (production) | https://inside-journal-api.azurewebsites.net |
 | API (development) | https://inside-journal-api-development.azurewebsites.net |
 | Swagger | https://inside-journal-api-development.azurewebsites.net/swagger |
-| Frontend | https://polite-island-0c8b5cb0f.5.azurestaticapps.net |
+| Frontend (production) | https://polite-island-0c8b5cb0f.5.azurestaticapps.net |
+| Frontend (development) | https://kind-sand-09f05e10f.6.azurestaticapps.net |
 
 ## Configuration
 
-Configuration comes from `appsettings.json` and App Service application settings. Azure App Configuration is not used, which saves roughly $40/month.
+Configuration comes from `appsettings.json` and App Service application settings. Azure App Configuration is not used; the store was deleted since every value now lives in application settings.
 
-Azure services are accessed with Managed Identity. Do not add connection strings or API keys for Azure resources.
+Azure services are accessed with user-assigned managed identity. Do not add connection strings or API keys for Azure resources. `ManagedIdentityClientId` selects which identity `DefaultAzureCredential` uses, so it is marked as a slot setting on each slot.
 
 Settings use the ASP.NET Core double-underscore convention, for example `CosmosDb__Endpoint`.
 
@@ -59,7 +63,17 @@ Settings use the ASP.NET Core double-underscore convention, for example `CosmosD
 | `AzureCognitiveServices__Region` | `eastus` |
 | `Jwt__Issuer` | `Journal` |
 | `Jwt__Audience` | `JournalApp` |
-| `ManagedIdentityClientId` | `136abc9f-ef3a-4073-a6d2-e6f915ba1f0f` |
+| `Jwt__Key` | Randomly generated per slot; slot setting |
+| `Google__ClientId` | Google OAuth web client ID (public value) |
+| `Microsoft__ClientId` | `2bdef97c-c4a9-43ed-9947-944b43cf8e97` |
+| `Microsoft__TenantId` | `common` |
+| `AdminEmails` | Comma-separated admin addresses |
+| `Cors__AllowedOrigins` | Comma-separated origins; slot setting |
+| `ManagedIdentityClientId` | Production `ebd7a708-...`, development `136abc9f-...`; slot setting |
+
+Slot settings (`Jwt__Key`, `ManagedIdentityClientId`, `Cors__AllowedOrigins`, `ASPNETCORE_ENVIRONMENT`, `APPLICATIONINSIGHTS_CONNECTION_STRING`) stay with their slot during a swap, so development never inherits production identity or origins.
+
+CORS is handled entirely by the application. Do not configure App Service platform CORS (`az webapp cors`) — it intercepts requests before the application and silently overrides `Cors__AllowedOrigins`.
 
 Azure rejects application settings that begin with `AzureBlobStorage__`. Use the `BlobStorage__` prefix instead.
 
@@ -136,6 +150,16 @@ Confirm the "Cosmos DB Built-in Data Contributor" role is assigned to the app's 
 ### Setting an application setting returns "Bad Request"
 
 The setting name uses a prefix Azure reserves. `AzureBlobStorage__` is known to fail; use `BlobStorage__`.
+
+### CORS changes have no effect
+
+Check whether App Service platform CORS is configured:
+
+```bash
+az webapp cors show -n inside-journal-api -g InsideJournalingAppRG --slot development
+```
+
+If `allowedOrigins` is non-empty, the platform layer is intercepting requests before the application and `Cors__AllowedOrigins` is ignored. Remove the platform entries so the application controls CORS.
 
 ### OAuth redirect fails
 

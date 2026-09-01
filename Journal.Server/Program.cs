@@ -180,17 +180,25 @@ namespace Journal.Server
 
             // Add CORS policy for web frontend only
             // Note: Mobile apps don't need CORS - CORS is browser-only security
+            var allowedOrigins = (config["Cors:AllowedOrigins"] ?? string.Empty)
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (allowedOrigins.Length == 0)
+            {
+                allowedOrigins = new[]
+                {
+                    "http://localhost:54551",
+                    "http://localhost:5173",
+                    "https://localhost:54551",
+                    "https://localhost:5173"
+                };
+            }
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
                 {
-                    policy.WithOrigins(
-                        "http://localhost:54551",
-                        "http://localhost:5173",
-                        "https://localhost:54551",
-                        "https://localhost:5173",
-                        "https://polite-island-0c8b5cb0f.5.azurestaticapps.net"
-                    )
+                    policy.WithOrigins(allowedOrigins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

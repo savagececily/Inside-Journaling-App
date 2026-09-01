@@ -41,7 +41,8 @@ All Azure service access uses Managed Identity. Configuration comes from `appset
 | Backend API (production) | https://inside-journal-api.azurewebsites.net |
 | Backend API (development) | https://inside-journal-api-development.azurewebsites.net |
 | API reference (Swagger) | https://inside-journal-api-development.azurewebsites.net/swagger |
-| Frontend | https://polite-island-0c8b5cb0f.5.azurestaticapps.net |
+| Frontend (production) | https://polite-island-0c8b5cb0f.5.azurestaticapps.net |
+| Frontend (development) | https://kind-sand-09f05e10f.6.azurestaticapps.net |
 
 ## Azure Resources
 
@@ -49,11 +50,13 @@ All Azure service access uses Managed Identity. Configuration comes from `appset
 | --- | --- |
 | Resource group | InsideJournalingAppRG |
 | App Service (API) | inside-journal-api |
-| Static Web App | inside-journal-app |
+| Static Web App (production) | inside-journal-app |
+| Static Web App (development) | inside-journal-app-dev |
 | Cosmos DB | inside-journaling-app-cosmosdb (database `JournalDb`) |
 | Blob Storage | sainsidejournalingapp |
 | Azure AI Foundry | Inside-Journaling-App-Foundry (gpt-4o-mini, gpt-4o) |
-| Managed identity (dev) | Inside-Journaling-App-DEV-UAMI |
+| Managed identity (production) | Inside-Journaling-App-UAMI |
+| Managed identity (development) | Inside-Journaling-App-DEV-UAMI |
 
 ## Development Workflow
 
