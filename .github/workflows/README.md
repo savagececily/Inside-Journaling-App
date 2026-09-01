@@ -4,7 +4,7 @@ This repository uses GitHub Actions to automatically deploy the Inside Journal a
 
 ## Workflows
 
-### 🔧 Backend API Deployment
+### Backend API Deployment
 **File**: `backend-api-deploy.yml`
 
 Deploys the .NET 8.0 backend API to Azure App Service (`inside-journal-api`).
@@ -23,7 +23,7 @@ Deploys the .NET 8.0 backend API to Azure App Service (`inside-journal-api`).
 3. Publishes the API
 4. Deploys to Azure App Service slot
 
-### 🎨 Frontend Static Web App Deployment
+### Frontend Static Web App Deployment
 **File**: `frontend-static-deploy.yml`
 
 Deploys the React + Vite frontend to Azure Static Web Apps.
@@ -40,7 +40,7 @@ Deploys the React + Vite frontend to Azure Static Web Apps.
 
 ## Required GitHub Secrets
 
-Configure these secrets in your repository settings (`Settings` → `Secrets and variables` → `Actions`):
+Configure these secrets in your repository settings (`Settings` `Secrets and variables` `Actions`):
 
 ### Azure Authentication
 ```
@@ -167,7 +167,7 @@ git push --force
           │                        │
           │ GitHub Actions         │ GitHub Actions
           │ (backend-api-deploy)   │ (frontend-static-deploy)
-          ▼                        ▼
+
 ┌─────────────────────┐  ┌──────────────────────────┐
 │  Azure App Service  │  │ Azure Static Web Apps    │
 │  inside-journal-api │  │ inside-journal-app       │
@@ -179,11 +179,11 @@ git push --force
 
 ## Best Practices
 
-✅ **Always test locally before pushing**
-✅ **Review PR preview before merging**
-✅ **Deploy to development first, then production**
-✅ **Monitor logs after deployment**
-✅ **Keep secrets up to date**
+ **Always test locally before pushing**
+ **Review PR preview before merging**
+ **Deploy to development first, then production**
+ **Monitor logs after deployment**
+ **Keep secrets up to date**
 
 ## Archive
 

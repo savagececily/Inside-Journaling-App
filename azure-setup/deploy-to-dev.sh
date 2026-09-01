@@ -13,7 +13,7 @@ echo "=========================================="
 
 # Configuration
 RESOURCE_GROUP="InsideJournalingAppRG"
-WEBAPP_NAME="inside-journaling-app"
+WEBAPP_NAME="inside-journal-api"
 SLOT_NAME="development"
 FRONTEND_DIR="journal.client"
 BACKEND_DIR="Journal.Server"
@@ -158,7 +158,7 @@ echo ""
 echo "🏥 Step 7: Performing health check..."
 echo ""
 
-SLOT_URL="https://inside-journaling-app-development.azurewebsites.net"
+SLOT_URL="https://inside-journal-api-development.azurewebsites.net"
 
 echo "Waiting for app to start (30 seconds)..."
 sleep 30
@@ -204,6 +204,6 @@ echo "  [ ] Account deletion"
 echo "  [ ] Data export"
 echo ""
 echo "📖 After Testing Successfully:"
-echo "  Run ./azure-setup/swap-to-production.sh to promote to production"
+echo "  Promote to production via the Backend API Deploy workflow in GitHub Actions"
 echo ""
 echo "=========================================="

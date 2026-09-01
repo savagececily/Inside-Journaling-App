@@ -7,13 +7,13 @@
 
 ## 1. Acceptance of Terms
 
-By accessing or using Mental Health Journal (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
+By accessing or using Inside Journaling App (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
 
-These Terms constitute a legally binding agreement between you ("User" or "you") and Mental Health Journal ("we," "us," or "our").
+These Terms constitute a legally binding agreement between you ("User" or "you") and Inside Journaling App ("we," "us," or "our").
 
 ## 2. Description of Service
 
-Mental Health Journal is a digital journaling application that:
+Inside Journaling App is a digital journaling application that:
 - Allows users to create and manage personal mental health journal entries
 - Provides AI-powered sentiment analysis and insights
 - Offers voice recording and transcription capabilities
@@ -214,7 +214,7 @@ We are not liable for:
 
 ## 14. Indemnification
 
-You agree to indemnify, defend, and hold harmless Mental Health Journal, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
+You agree to indemnify, defend, and hold harmless Inside Journaling App, its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising from:
 - Your use of the Service
 - Your violation of these Terms
 - Your violation of any rights of another party
@@ -251,7 +251,7 @@ We may disclose your information if required by law, court order, or to protect 
 ## 17. Miscellaneous
 
 ### 17.1 Entire Agreement
-These Terms, together with our Privacy Policy, constitute the entire agreement between you and Mental Health Journal.
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and Inside Journaling App.
 
 ### 17.2 Severability
 If any provision of these Terms is found invalid or unenforceable, the remaining provisions remain in full effect.
@@ -270,12 +270,12 @@ For questions about these Terms, contact us at:
 ## 18. Consent and Acknowledgment
 
 By clicking "I Agree" or by using the Service, you acknowledge that:
-- ✅ You have read and understood these Terms of Service
-- ✅ You are at least 13 years old (or have parental consent if under 18)
-- ✅ You agree to be bound by these Terms
-- ✅ You understand this is NOT a substitute for professional mental health care
-- ✅ You consent to data processing as described in these Terms and our Privacy Policy
-- ✅ You understand your account and data rights
+- You have read and understood these Terms of Service
+- You are at least 13 years old (or have parental consent if under 18)
+- You agree to be bound by these Terms
+- You understand this is NOT a substitute for professional mental health care
+- You consent to data processing as described in these Terms and our Privacy Policy
+- You understand your account and data rights
 
 ---
 
@@ -284,4 +284,4 @@ By clicking "I Agree" or by using the Service, you acknowledge that:
 
 **Effective Date:** February 11, 2026
 
-© 2026 Mental Health Journal. All rights reserved.
+ 2026 Inside Journaling App. All rights reserved.

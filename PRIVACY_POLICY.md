@@ -111,12 +111,12 @@ We work with trusted service providers to deliver and improve our journaling ser
 
 ### 4.2 What We Do NOT Do
 We do **NOT**:
-- ❌ Sell your personal information to third parties
-- ❌ Share your journal entries with advertisers
-- ❌ Use your data to train public AI models
-- ❌ Share your data with social media platforms (beyond authentication)
-- ❌ Allow third-party analytics to track your journal content
-- ❌ Browse or read your journal entries unless required for support or legal compliance
+- Sell your personal information to third parties
+- Share your journal entries with advertisers
+- Use your data to train public AI models
+- Share your data with social media platforms (beyond authentication)
+- Allow third-party analytics to track your journal content
+- Browse or read your journal entries unless required for support or legal compliance
 
 ### 4.3 Legal Requirements
 We may disclose your information if required to:
@@ -132,11 +132,11 @@ If we are acquired, merged, or undergo restructuring, your data may be transferr
 
 ### 5.1 Security Measures
 We implement industry-standard security practices to protect your data:
-- ✅ **Strong encryption** - Your data is encrypted both when stored and when transmitted
-- ✅ **Secure authentication** - Your login sessions are protected with automatic timeout
-- ✅ **Comprehensive logging** - We track access to your data to detect unauthorized activity
-- ✅ **Access controls** - You can only access your own journal entries
-- ✅ **Security monitoring** - We actively monitor for potential security threats
+- **Strong encryption** - Your data is encrypted both when stored and when transmitted
+- **Secure authentication** - Your login sessions are protected with automatic timeout
+- **Comprehensive logging** - We track access to your data to detect unauthorized activity
+- **Access controls** - You can only access your own journal entries
+- **Security monitoring** - We actively monitor for potential security threats
 
 ### 5.2 Data Retention
 - **Active accounts**: Your data is kept as long as your account remains active
@@ -165,11 +165,11 @@ You have complete control over your data:
 - **Delete your entire account and all associated data** (this action is permanent)
 
 **When you delete your account, we remove:**
-- ✅ All journal entries
-- ✅ All audio recordings
-- ✅ Your user profile
-- ✅ All AI-generated insights
-- ⚠️ Legal compliance records are retained as required by law
+- All journal entries
+- All audio recordings
+- Your user profile
+- All AI-generated insights
+- Legal compliance records are retained as required by law
 
 ### 6.3 Right to Control Data Processing
 You can manage your privacy preferences:
@@ -344,18 +344,18 @@ We believe in transparency. Our audit logging system allows you to:
 | Age information | To verify 13+ requirement | Stored securely, not shared |
 
 **Your Controls:**
-- ✅ Delete your account anytime
-- ✅ View all your data
-- ✅ Export your data
-- ✅ View audit logs (transparency)
-- ✅ Revoke consent
-- ✅ 30-minute session timeout (security)
+- Delete your account anytime
+- View all your data
+- Export your data
+- View audit logs (transparency)
+- Revoke consent
+- 30-minute session timeout (security)
 
 **What We Don't Do:**
-- ❌ Sell your data
-- ❌ Share entries with advertisers
-- ❌ Train AI models on your data
-- ❌ Read your journals unless legally required
+- Sell your data
+- Share entries with advertisers
+- Train AI models on your data
+- Read your journals unless legally required
 
 ---
 
@@ -370,4 +370,4 @@ By clicking "I Agree" or using the Service, you acknowledge that you have read, 
 
 **Effective Date:** February 11, 2026
 
-© 2026 Inside Journaling App. All rights reserved.
+ 2026 Inside Journaling App. All rights reserved.

@@ -6,7 +6,7 @@
 set -e
 
 RESOURCE_GROUP="InsideJournalingAppRG"
-APP_NAME="inside-journaling-app"
+APP_NAME="inside-journal-api"
 SLOT_NAME="development"
 
 echo "======================================"
@@ -59,7 +59,7 @@ if [ -z "$APP_REG_EXISTS" ]; then
   APP_ID=$(az ad app create \
     --display-name "Inside-Journaling-App-Dev-Auth" \
     --sign-in-audience AzureADMyOrg \
-    --web-redirect-uris "https://inside-journaling-app-development.azurewebsites.net/.auth/login/aad/callback" \
+    --web-redirect-uris "https://inside-journal-api-development.azurewebsites.net/.auth/login/aad/callback" \
     --query appId -o tsv)
   
   echo "Created app registration: $APP_ID"
@@ -99,4 +99,4 @@ echo "   - Properties > Set 'Assignment required?' to 'Yes'"
 echo "   - Users and groups > Add user/group > Select admins"
 echo ""
 echo "Development slot will now require authentication!"
-echo "URL: https://inside-journaling-app-development.azurewebsites.net"
+echo "URL: https://inside-journal-api-development.azurewebsites.net"

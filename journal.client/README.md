@@ -1,6 +1,6 @@
-# Mental Health Journal - Frontend
+# Inside Journaling App - Frontend
 
-This is the React frontend for the Mental Health Journal application.
+This is the React frontend for the Inside Journaling App application.
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ For complete documentation, see the main [README.md](../README.md) in the projec
 ### Key Documentation
 - [Main README](../README.md) - Full application overview
 - [Testing Guide](../TESTING_GUIDE.md) - How to test the application
-- [Performance Optimizations](../PERFORMANCE_OPTIMIZATIONS.md) - Frontend optimizations including lazy loading
+- [Web Features](../WEB_FEATURES.md) - Feature reference for the web app
 
 ## Build
 

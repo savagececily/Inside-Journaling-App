@@ -14,7 +14,7 @@ echo "=========================================="
 
 # Configuration
 RESOURCE_GROUP="InsideJournalingAppRG"
-WEBAPP_NAME="inside-journaling-app"
+WEBAPP_NAME="inside-journal-api"
 PROD_IDENTITY_NAME="Inside-Journaling-App-UAMI"
 DEV_IDENTITY_NAME="Inside-Journaling-App-DEV-UAMI"
 COSMOS_ACCOUNT="inside-journaling-app-cosmosdb"
@@ -156,9 +156,9 @@ az webapp config appsettings set \
         "AzureOpenAI__AffirmationDeploymentName=gpt-4o-mini" \
         "AzureOpenAI__CrisisDeploymentName=gpt-4o" \
         "CosmosDb__Endpoint=$COSMOS_ENDPOINT" \
-        "CosmosDb__DatabaseName=inside-journaling-app" \
-        "AzureBlobStorage__BlobServiceUri=$STORAGE_ENDPOINT" \
-        "AzureBlobStorage__ContainerName=journalaudio" \
+        "CosmosDb__DatabaseName=JournalDb" \
+        "BlobStorage__ServiceUri=$STORAGE_ENDPOINT" \
+        "BlobStorage__ContainerName=journalaudio" \
         "AzureCognitiveServices__Region=eastus" \
         "Jwt__Key=$JWT_KEY" \
         "Jwt__Issuer=Journal" \
@@ -194,13 +194,13 @@ az webapp config appsettings set \
         "AzureOpenAI__AffirmationDeploymentName=gpt-4o-mini" \
         "AzureOpenAI__CrisisDeploymentName=gpt-4o" \
         "CosmosDb__Endpoint=$COSMOS_ENDPOINT" \
-        "CosmosDb__DatabaseName=inside-journaling-app-dev" \
-        "AzureBlobStorage__BlobServiceUri=$STORAGE_ENDPOINT" \
-        "AzureBlobStorage__ContainerName=journalaudio-dev" \
+        "CosmosDb__DatabaseName=JournalDb" \
+        "BlobStorage__ServiceUri=$STORAGE_ENDPOINT" \
+        "BlobStorage__ContainerName=journalaudio-dev" \
         "AzureCognitiveServices__Region=eastus" \
         "Jwt__Key=$JWT_KEY" \
-        "Jwt__Issuer=https://inside-journaling-app-development.azurewebsites.net" \
-        "Jwt__Audience=https://inside-journaling-app-development.azurewebsites.net" \
+        "Jwt__Issuer=https://inside-journal-api-development.azurewebsites.net" \
+        "Jwt__Audience=https://inside-journal-api-development.azurewebsites.net" \
         "GoogleOAuth__ClientId=$GOOGLE_CLIENT_ID" \
         "GoogleOAuth__ClientSecret=$GOOGLE_CLIENT_SECRET" \
         "MicrosoftOAuth__ClientId=$MICROSOFT_CLIENT_ID" \
@@ -224,7 +224,7 @@ echo ""
 echo "📋 Configured settings for:"
 echo ""
 echo "PRODUCTION SLOT:"
-echo "  • Database: inside-journaling-app"
+echo "  • Database: JournalDb"
 echo "  • Storage: journalaudio"
 echo "  • Identity: $PROD_IDENTITY_CLIENT_ID"
 echo "  • Environment: Production"
@@ -250,5 +250,5 @@ echo ""
 echo "📋 Next Steps:"
 echo "  1. Deploy to development: ./azure-setup/deploy-to-dev.sh"
 echo "  2. Test development slot thoroughly"
-echo "  3. Swap to production: ./azure-setup/swap-to-production.sh"
+echo "  3. Promote to production: run the Backend API Deploy workflow in GitHub Actions"
 echo ""

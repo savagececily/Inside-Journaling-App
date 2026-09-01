@@ -1,4 +1,4 @@
-# 💳 Payment Strategy
+# Payment Strategy
 
 **Last Updated:** April 30, 2026  
 **Status:** Planning Phase
@@ -9,7 +9,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ---
 
-## 🎯 Pricing Model
+## Pricing Model
 
 ### Premium Tier: $4.99/month
 
@@ -27,11 +27,11 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ---
 
-## 🏦 Payment Provider Comparison
+## Payment Provider Comparison
 
 ### Recommended: Stripe
 
-**✅ Pros:**
+** Pros:**
 - Industry-standard, trusted by millions
 - Excellent developer experience with comprehensive APIs
 - Built-in subscription management
@@ -45,7 +45,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 - PCI DSS Level 1 compliant (handles card data security)
 - React/TypeScript SDK available
 
-**❌ Cons:**
+** Cons:**
 - Requires business verification for payouts
 - 7-day rolling payout schedule initially
 
@@ -55,13 +55,13 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ### Alternative: PayPal
 
-**✅ Pros:**
+** Pros:**
 - Widely recognized and trusted
 - No setup fees
 - Quick integration
 - Users can pay without credit cards (PayPal balance)
 
-**❌ Cons:**
+** Cons:**
 - Higher fees: 3.49% + $0.49 per transaction
 - Less developer-friendly API
 - Limited subscription customization
@@ -73,12 +73,12 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ### Alternative: Square
 
-**✅ Pros:**
+** Pros:**
 - Simple pricing: 2.9% + $0.30
 - Great for small businesses
 - In-person payment options (if needed later)
 
-**❌ Cons:**
+** Cons:**
 - Less international support
 - Fewer subscription features than Stripe
 - Limited webhooks
@@ -87,7 +87,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ---
 
-## 🎯 Recommended Approach: **Stripe**
+## Recommended Approach: **Stripe**
 
 **Reasoning:**
 1. Best developer experience and documentation
@@ -98,7 +98,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ---
 
-## 🛠️ Technical Implementation
+## Technical Implementation
 
 ### Architecture Overview
 
@@ -130,7 +130,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 ---
 
-## 💻 Web Implementation (Stripe Checkout)
+## Web Implementation (Stripe Checkout)
 
 ### Phase 1: Basic Implementation (Week 1)
 
@@ -546,10 +546,10 @@ export function UpgradeModal({ isOpen, onClose, token }: Props) {
         <div className="pricing-card">
           <h3>$4.99/month</h3>
           <ul>
-            <li>✅ Unlimited AI-analyzed entries</li>
-            <li>✅ Unlimited voice transcriptions</li>
-            <li>✅ Advanced analytics</li>
-            <li>✅ Priority support</li>
+ <li> Unlimited AI-analyzed entries</li>
+ <li> Unlimited voice transcriptions</li>
+ <li> Advanced analytics</li>
+ <li> Priority support</li>
           </ul>
         </div>
 
@@ -567,7 +567,7 @@ export function UpgradeModal({ isOpen, onClose, token }: Props) {
         </div>
 
         <p className="secure-payment-notice">
-          🔒 Secure payment powered by Stripe
+ Secure payment powered by Stripe
         </p>
       </div>
     </div>
@@ -599,7 +599,7 @@ export function PremiumSuccess() {
 
   return (
     <div className="success-page">
-      <div className="success-icon">✅</div>
+ <div className="success-icon"></div>
       <h1>Welcome to Premium!</h1>
       <p>Your subscription is now active.</p>
       <p>You now have unlimited access to all features.</p>
@@ -650,19 +650,19 @@ const handleManageBilling = async () => {
 
 ---
 
-## 📱 Mobile Implementation (Web Browser Flow)
+## Mobile Implementation (Web Browser Flow)
 
 ### Recommended: External Browser + Stripe
 
 **Strategy:** Open web browser from mobile app for payment, then return to app.
 
-**✅ Benefits:**
+** Benefits:**
 - Same 3.4% Stripe fees as web ($4.82 net per subscription)
 - No 30% Apple tax
 - Unified payment system (one codebase)
 - Better margins = more money for development
 
-**⚠️ App Store Compliance Note:**
+** App Store Compliance Note:**
 Apple's App Store Review Guideline 3.1.1 requires digital subscriptions use Apple IAP. However, many apps successfully use this pattern by:
 - Framing premium as "web features" rather than "app subscription"
 - Ensuring core app functionality works without payment
@@ -676,7 +676,7 @@ Apple's App Store Review Guideline 3.1.1 requires digital subscriptions use Appl
 | Platform | Your Revenue | Fee | Net Revenue |
 |----------|--------------|-----|-------------|
 | **Web (Stripe)** | $4.99 | $0.17 (3.4%) | **$4.82** |
-| **Mobile → Web Browser (Stripe)** | $4.99 | $0.17 (3.4%) | **$4.82** |
+| **Mobile Web Browser (Stripe)** | $4.99 | $0.17 (3.4%) | **$4.82** |
 | iOS (Apple IAP) | $4.99 | $1.50 (30%) | $3.49 |
 | Android (Google IAP) | $4.99 | $0.75 (15%) | $4.24 |
 
@@ -688,11 +688,11 @@ Apple's App Store Review Guideline 3.1.1 requires digital subscriptions use Appl
 1. User taps "Upgrade to Premium" in mobile app
 2. App opens device browser with Stripe Checkout
 3. User completes payment in browser
-4. Success page shows: "✅ Payment Complete! You may close this page and return to the app."
+4. Success page shows: " Payment Complete! You may close this page and return to the app."
 5. User returns to app
-6. App checks premium status → shows premium features unlocked
+6. App checks premium status shows premium features unlocked
 
-**No app store required, no 30% fee! 🎉**
+**No app store required, no 30% fee! **
 
 ---
 
@@ -760,7 +760,7 @@ export function UpgradeButton({ userId, token }: Props) {
         
         if (data.tier === 'premium') {
           Alert.alert(
-            '🎉 Welcome to Premium!',
+ ' Welcome to Premium!',
             'Your subscription is now active. Enjoy unlimited features!',
             [{ text: 'Get Started', onPress: () => navigation.navigate('Dashboard') }]
           );
@@ -791,7 +791,7 @@ export function UpgradeButton({ userId, token }: Props) {
       disabled={checking}
     >
       <Text style={styles.buttonText}>
-        {checking ? 'Checking Status...' : '✨ Upgrade to Premium'}
+ {checking ? 'Checking Status...' : ' Upgrade to Premium'}
       </Text>
     </TouchableOpacity>
   );
@@ -835,7 +835,7 @@ export function PremiumSuccess() {
 
   return (
     <div className="success-page">
-      <div className="success-icon">✅</div>
+ <div className="success-icon"></div>
       <h1>Payment Complete!</h1>
       
       {isMobile ? (
@@ -844,7 +844,7 @@ export function PremiumSuccess() {
             Your subscription is now active.
           </p>
           <div className="return-notice">
-            <p>✨ You may now close this page and return to the app.</p>
+ <p> You may now close this page and return to the app.</p>
             <p className="small-text">
               Your premium features will be available immediately.
             </p>
@@ -1033,10 +1033,10 @@ const canShowUpgrade = Platform.OS === 'android' || __DEV__;
 **Approach: External Browser + Stripe (Recommended)**
 
 **Unified Payment System:**
-1. **All platforms** → Open browser with Stripe Checkout
-2. **Single backend** → StripeService handles everything
-3. **Same margins** → 3.4% fees everywhere
-4. **Simple codebase** → No platform-specific payment code
+1. **All platforms** Open browser with Stripe Checkout
+2. **Single backend** StripeService handles everything
+3. **Same margins** 3.4% fees everywhere
+4. **Simple codebase** No platform-specific payment code
 
 **Compliance Strategy:**
 - **Android:** Show upgrade button freely (Google allows external payments with 4% fee)
@@ -1047,9 +1047,9 @@ const canShowUpgrade = Platform.OS === 'android' || __DEV__;
 
 **User Flow:**
 ```
-Mobile User → Taps Upgrade → Browser Opens → Stripe Checkout → 
-Payment Complete → "Close this page" → Returns to App → 
-App Refreshes Quota → Premium Unlocked ✨
+Mobile User Taps Upgrade Browser Opens Stripe Checkout
+Payment Complete "Close this page" Returns to App
+App Refreshes Quota Premium Unlocked
 ```
 
 **Revenue Per Platform:**
@@ -1062,7 +1062,7 @@ App Refreshes Quota → Premium Unlocked ✨
 
 ---
 
-## 🧪 Testing Strategy
+## Testing Strategy
 
 ### Stripe Test Mode
 
@@ -1105,7 +1105,7 @@ cd Journal.Mobile
 npm start
 ```
 
-2. **Tap upgrade button** → Should open device browser
+2. **Tap upgrade button** Should open device browser
 
 3. **Complete test payment** using Stripe test card:
    - Card: 4242 4242 4242 4242
@@ -1114,7 +1114,7 @@ npm start
    - ZIP: Any 5 digits (e.g., 90210)
 
 4. **Verify success page** shows:
-   - ✅ Payment Complete!
+ - Payment Complete!
    - "You may close this page and return to the app"
    - Close button
 
@@ -1126,11 +1126,11 @@ npm start
    - Verify unlimited access unlocked
 
 **Test Cases:**
-- ✅ Successful payment → Premium activated
-- ✅ User cancels checkout → Returns to free tier
-- ✅ Payment fails → Error message, remains free
-- ✅ Network failure → Graceful error handling
-- ✅ App backgrounded during payment → Status refresh on return
+- Successful payment Premium activated
+- User cancels checkout Returns to free tier
+- Payment fails Error message, remains free
+- Network failure Graceful error handling
+- App backgrounded during payment Status refresh on return
 
 **iOS Testing (Pre-Production):**
 - Test on physical device with TestFlight
@@ -1144,11 +1144,11 @@ npm start
 
 ---
 
-## 🔒 Security & Compliance
+## Security & Compliance
 
 ### PCI Compliance
 
-**✅ Using Stripe = Automatic PCI compliance:**
+** Using Stripe = Automatic PCI compliance:**
 - Card data never touches your servers
 - Stripe handles all card processing
 - You're automatically PCI DSS Level 1 compliant
@@ -1175,14 +1175,14 @@ var stripeEvent = EventUtility.ConstructEvent(
 ### Data Privacy
 
 **Store minimal payment data:**
-- ✅ Stripe Customer ID (for portal access)
-- ✅ Subscription ID (for status checks)
-- ❌ Card numbers (never store these)
-- ❌ CVV codes (never store these)
+- Stripe Customer ID (for portal access)
+- Subscription ID (for status checks)
+- Card numbers (never store these)
+- CVV codes (never store these)
 
 ---
 
-## 📊 Analytics & Monitoring
+## Analytics & Monitoring
 
 ### Key Metrics
 
@@ -1193,7 +1193,7 @@ var stripeEvent = EventUtility.ConstructEvent(
 - ARPU (Average Revenue Per User)
 
 **Conversion Metrics:**
-- Free → Premium conversion rate
+- Free Premium conversion rate
 - Checkout abandonment rate
 - Payment failure rate
 
@@ -1240,7 +1240,7 @@ customEvents
 
 ### Recommended Approaches (Ranked by Risk)
 
-#### ✅ Lowest Risk: Android-Only Upgrade in App
+#### Lowest Risk: Android-Only Upgrade in App
 
 **Implementation:**
 ```typescript
@@ -1270,7 +1270,7 @@ customEvents
 
 ---
 
-#### ⚠️ Medium Risk: "Web Features" Positioning
+#### Medium Risk: "Web Features" Positioning
 
 **Implementation:**
 ```typescript
@@ -1294,7 +1294,7 @@ customEvents
 
 ---
 
-#### ⚠️ Higher Risk: Upgrade Button for All Users
+#### Higher Risk: Upgrade Button for All Users
 
 **Implementation:**
 ```typescript
@@ -1347,7 +1347,7 @@ customEvents
 
 ---
 
-## �🚀 Implementation Timeline
+## � Implementation Timeline
 
 ### Week 1: Stripe Web Integration
 - [ ] Set up Stripe account
@@ -1377,7 +1377,7 @@ customEvents
 
 ---
 
-## 💡 Future Enhancements
+## Future Enhancements
 
 ### Phase 3: Advanced Features
 
@@ -1406,7 +1406,7 @@ customEvents
 
 ---
 
-## ✅ Go-Live Checklist
+## Go-Live Checklist
 
 ### Stripe Setup
 - [ ] Create production Stripe account
@@ -1443,7 +1443,7 @@ customEvents
 
 ---
 
-## 📚 Resources
+## Resources
 
 **Stripe Documentation:**
 - [Stripe Subscriptions](https://stripe.com/docs/billing/subscriptions/overview)
@@ -1466,7 +1466,7 @@ customEvents
 
 ---
 
-## 📞 Support
+## Support
 
 For payment integration questions:
 - Stripe Support: support@stripe.com
@@ -1475,6 +1475,6 @@ For payment integration questions:
 
 ---
 
-**Status:** Ready to implement Stripe integration 🚀
+**Status:** Ready to implement Stripe integration
 
 **Recommended First Step:** Set up Stripe test account and implement web checkout (Week 1)

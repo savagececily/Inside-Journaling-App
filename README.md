@@ -1,33 +1,33 @@
-# 📔 Inside Journaling App
+# Inside Journaling App
 
 A modern, AI-powered journaling application for personal growth and wellness tracking. Built with React, .NET, and Azure services.
 
-## 📋 Overview
+## Overview
 
 Inside Journaling App is a full-stack web application that helps users track their wellness through journaling. The application uses Azure Cognitive Services and OpenAI to provide intelligent insights, sentiment analysis, and personalized feedback on journal entries.
 
-## ✨ Key Features
+## Key Features
 
-### 🎙️ **Voice Recording**
+### **Voice Recording**
 - Record journal entries using your voice
 - Automatic speech-to-text transcription via Azure Speech Services
 - Real-time recording timer and visual feedback
 - Audio preview and playback
 
-### 🤖 **AI-Powered Analysis**
+### **AI-Powered Analysis**
 - **Sentiment Analysis**: Automatically detects emotional tone (Positive, Negative, Neutral, Mixed)
 - **Key Phrase Extraction**: Identifies important topics and themes in your entries
 - **AI-Generated Summaries**: Contextual summaries with confidence scores
 - **GPT-4o-mini Affirmations**: Personalized encouraging messages tailored to your entry
 - **Crisis Detection**: Intelligent screening with GPT-4o for safety support
 
-### 📊 **Trend Visualization**
+### **Trend Visualization**
 - Visual charts showing sentiment trends over time
 - Emotional patterns and insights
 - Track your mental wellness journey
 - Dashboard overview of your progress
 
-### 🔐 **Secure Authentication**
+### **Secure Authentication**
 - Google OAuth integration
 - JWT-based authentication
 - Secure user data management
@@ -39,11 +39,11 @@ Inside Journaling App is a full-stack web application that helps users track the
 - Rate limiting for abuse prevention
 - Reliable and secure data persistence
 
-## 📱 Mobile Application
+## Mobile Application
 
 A native iOS and Android mobile app built with **React Native (Expo)** with complete feature parity to the web application.
 
-### ✅ Features
+### Features
 - **Full Journal Management**: Create, edit, delete entries with voice recording and speech-to-text
 - **Offline-First Architecture**: Complete offline support with automatic background sync
 - **Data Visualizations**: Sentiment charts, streak counter, calendar view, word clouds, time patterns
@@ -53,9 +53,9 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 - **Native Features**: Dark mode, haptic feedback, deep linking
 - **Google OAuth**: Secure authentication with token management
 
-**[View Mobile Features Documentation →](MOBILE_FEATURES.md)**
+**[View Mobile Features Documentation ](MOBILE_FEATURES.md)**
 
-## 🏗️ Architecture
+## Architecture
 
 ### Frontend
 - **React 19** with TypeScript
@@ -78,7 +78,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 - **Azure Speech Services**: Speech-to-text transcription
 - **Application Insights**: Monitoring and telemetry
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -97,7 +97,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 2. **Configure Azure Services**
    - Create an Azure account and resource group
-   - Set up required Azure services (see [MIGRATION_PLAN.md](MIGRATION_PLAN.md))
+   - Set up required Azure services (see [azure-setup/README.md](azure-setup/README.md))
    - Configure `appsettings.json` with your Azure service connections
 
 3. **Backend Setup**
@@ -119,7 +119,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
    - Frontend: http://localhost:5173
    - Backend API: http://localhost:5000
 
-## 🔧 Configuration
+## Configuration
 
 ### Backend Configuration (`appsettings.json`)
 
@@ -138,7 +138,7 @@ Configuration is loaded from `appsettings.json` and can be overridden by environ
 
 See [appsettings.Example.json](Journal.Server/appsettings.Example.json) for a complete configuration template.
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 Journal/
@@ -150,7 +150,7 @@ Journal/
 │   │   ├── hooks/                  # Custom React hooks
 │   │   └── types/                  # TypeScript type definitions
 │   └── public/                     # Static assets
-├── Journal.Mobile/     # React Native app (iOS/Android) 📱
+├── Journal.Mobile/ # React Native app (iOS/Android)
 │   ├── src/
 │   │   ├── components/             # UI components
 │   │   ├── screens/                # App screens
@@ -172,7 +172,7 @@ Journal/
 └── Journal.Tests/      # Unit tests
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Run Backend Tests
 ```bash
@@ -182,7 +182,7 @@ dotnet test
 
 See [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing documentation.
 
-## 🚀 Deployment
+## Deployment
 
 The application can be deployed to Azure using multiple approaches:
 
@@ -190,7 +190,7 @@ The application can be deployed to Azure using multiple approaches:
 2. **Azure Static Web Apps + Functions**
 3. **Azure Container Apps**
 
-For detailed deployment instructions, see [MIGRATION_PLAN.md](MIGRATION_PLAN.md).
+For detailed deployment instructions, see [azure-setup/README.md](azure-setup/README.md).
 
 ### Quick Deploy to Azure App Service
 ```bash
@@ -199,43 +199,40 @@ az login
 
 # Deploy (from project root)
 dotnet publish -c Release
-# Follow deployment steps in MIGRATION_PLAN.md
+# Follow deployment steps in azure-setup/README.md
 ```
 
-## 📚 Documentation
+## Documentation
 
-**[📖 Complete Documentation Index →](DOCS_INDEX.md)** - Quick navigation to all project documentation
+**[ Complete Documentation Index ](DOCS_INDEX.md)** - Quick navigation to all project documentation
 
 ### Getting Started
 - [README.md](README.md) - This file, project overview and quick start
-- [Migration & Deployment Plan](MIGRATION_PLAN.md) - Deployment strategy, phases, and testing
-- [App Settings Migration](APP_SETTINGS_MIGRATION.md) - Configuration approach and cost savings
+- [Azure Setup & Deployment](azure-setup/README.md) - Azure resources, configuration, and deployment
 - [Testing Guide](TESTING_GUIDE.md) - How to test the application end-to-end
 
 ### Feature Documentation
 - **[Web Features](WEB_FEATURES.md)** - Complete web app feature reference (voice, AI analysis, visualizations, crisis support)
 - **[Mobile Features](MOBILE_FEATURES.md)** - Complete mobile app feature reference (offline sync, notifications, biometrics, dark mode)
-- [Mobile Progress Summary](MOBILE_PROGRESS.md) - Sprint progress, statistics, and achievements
-- [Phase 2 Development Plan](PHASE_2_PLAN.md) - 6-sprint mobile development roadmap
 
 ### Technical Documentation
-- [Performance Optimizations](PERFORMANCE_OPTIMIZATIONS.md) - Caching, retry policies, and optimization strategies
-- [Unit Test Summary](UNIT_TEST_SUMMARY.md) - Current test coverage and results
+- [Authentication](AUTHENTICATION.md) - Easy Auth, JWT, and OAuth provider setup
+- [Payment Strategy](PAYMENT_STRATEGY.md) - Freemium model and Stripe integration
 
 ### Legal
 - [Privacy Policy](PRIVACY_POLICY.md) - Data collection, usage, and user rights
 - [Terms of Service](TERMS_OF_SERVICE.md) - User agreement and service terms
 
-## 🔒 Security
+## Security
 
-- All sensitive configuration stored in Azure App Configuration
+- All sensitive configuration stored in App Service application settings
 - Managed Identity for secure Azure service authentication
 - JWT-based authentication with secure token handling
 - Google OAuth for user authentication
 - HTTPS enforced in production
 - Environment-specific configuration management
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 **Web Frontend**
 - React 19
@@ -271,18 +268,18 @@ dotnet publish -c Release
 - Google OAuth 2.0
 - JWT (JSON Web Tokens)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
 
-## 📧 Support
+## Support
 
 For questions or support, please open an issue in the repository.
 
 ---
 
-**Built with ❤️ for mental health and wellness**
+**Built with for a mindful lifestyle and wellness**

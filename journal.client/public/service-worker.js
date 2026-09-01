@@ -1,5 +1,5 @@
 /**
- * Mental Health Journal - Service Worker
+ * Inside Journaling App - Service Worker
  * Provides offline support and caching for the PWA
  * Cache Strategy: Cache-first for static assets, Network-first for API calls
  */
@@ -231,7 +231,7 @@ self.addEventListener('push', (event) => {
     console.log('[Service Worker] Push notification received');
     
     const data = event.data ? event.data.json() : {};
-    const title = data.title || 'Mental Health Journal';
+    const title = data.title || 'Inside Journaling App';
     const options = {
         body: data.body || 'Time to check in with yourself',
         icon: '/icon-192x192.png',

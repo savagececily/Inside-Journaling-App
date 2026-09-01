@@ -269,12 +269,12 @@ For questions about these Terms, contact us at:
 ## 18. Consent and Acknowledgment
 
 By clicking "I Agree" or by using the Service, you acknowledge that:
-- ✅ You have read and understood these Terms of Service
-- ✅ You are at least 13 years old (or have parental consent if under 18)
-- ✅ You agree to be bound by these Terms
-- ✅ You understand this is NOT a substitute for professional mental health care
-- ✅ You consent to data processing as described in these Terms and our Privacy Policy
-- ✅ You understand your account and data rights
+- You have read and understood these Terms of Service
+- You are at least 13 years old (or have parental consent if under 18)
+- You agree to be bound by these Terms
+- You understand this is NOT a substitute for professional mental health care
+- You consent to data processing as described in these Terms and our Privacy Policy
+- You understand your account and data rights
 
 ---
 
@@ -283,4 +283,4 @@ By clicking "I Agree" or by using the Service, you acknowledge that:
 
 **Effective Date:** February 11, 2026
 
-© 2026 Inside Journaling App. All rights reserved.
+ 2026 Inside Journaling App. All rights reserved.

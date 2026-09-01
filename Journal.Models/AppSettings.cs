@@ -6,7 +6,7 @@ namespace Journal.Models
         public string ManagedIdentityClientId { get; set; } = string.Empty;
         public AzureCognitiveServicesSettings AzureCognitiveServices { get; set; } = new();
         public AzureOpenAISettings AzureOpenAI { get; set; } = new();
-        public AzureBlobStorageSettings AzureBlobStorage { get; set; } = new();
+        public BlobStorageSettings BlobStorage { get; set; } = new();
         public CosmosDbSettings CosmosDb { get; set; } = new();
     }
 
@@ -26,7 +26,7 @@ namespace Journal.Models
         public string CrisisDeploymentName { get; set; } = string.Empty;
     }
 
-    public class AzureBlobStorageSettings
+    public class BlobStorageSettings
     {
         public string ConnectionString { get; set; } = string.Empty;
         public string ServiceUri { get; set; } = string.Empty;

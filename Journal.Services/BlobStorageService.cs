@@ -20,7 +20,7 @@ namespace Journal.Services
         {
             _logger = logger;
             _blobServiceClient = blobServiceClient;
-            _audioContainerName = configuration.Value.AzureBlobStorage.ContainerName ?? throw new ArgumentNullException("AzureBlobStorage:ContainerName");
+            _audioContainerName = configuration.Value.BlobStorage.ContainerName ?? throw new ArgumentNullException("BlobStorage:ContainerName");
             _auditLogService = auditLogService;
         }
 

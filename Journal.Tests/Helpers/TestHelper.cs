@@ -93,7 +93,7 @@ namespace Journal.Tests.Helpers
                 {
                     Region = "eastus"
                 },
-                AzureBlobStorage = new AzureBlobStorageSettings
+                BlobStorage = new BlobStorageSettings
                 {
                     ServiceUri = "https://test.blob.core.windows.net",
                     ContainerName = "test-audio"

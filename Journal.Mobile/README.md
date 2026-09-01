@@ -2,7 +2,7 @@
 
 React Native mobile application built with Expo for iOS and Android.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Run the App
 
@@ -28,9 +28,9 @@ npm run android
 2. Start the dev server: `npm start`
 3. Scan the QR code with your phone camera (iOS) or Expo Go app (Android)
 
-## ✅ What's Implemented (Sprint 1, Complete!)
+## What's Implemented (Sprint 1, Complete!)
 
-### ✨ Foundation & Components Complete!
+### Foundation & Components Complete!
 
 - [x] **Project Setup**
   - Expo SDK 55 with TypeScript
@@ -58,7 +58,7 @@ npm run android
   - Login/logout functionality
   - API client with auth interceptors
 
-- [x] **UI Components Library** ⭐ NEW!
+- [x] **UI Components Library** NEW!
   - Common components: Button, Input, Card, Badge, LoadingSpinner, EmptyState
   - Journal components: JournalCard, SentimentBadge, VoiceRecorder
   - Theme-integrated with colors, spacing, typography
@@ -83,7 +83,7 @@ npm run android
   - Insights dashboard screen
   - Profile screen with logout
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 src/
@@ -109,7 +109,7 @@ src/
 └── theme/           # Design system (colors, typography)
 ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **React Native 0.76+** via Expo SDK 55
 - **TypeScript 5.6+** for type safety
@@ -122,7 +122,7 @@ src/
   - expo-av (audio recording)
   - AsyncStorage (local data)
 
-## 🔧 Configuration
+## Configuration
 
 ### API Endpoint
 
@@ -139,7 +139,7 @@ export const API_BASE_URL = __DEV__
 
 ### Google OAuth Setup
 
-**Status:** ✅ Implemented in Sprint 1, Task 2
+**Status:** Implemented in Sprint 1, Task 2
 
 The mobile app uses Google OAuth for authentication. Follow these steps to configure it:
 
@@ -156,7 +156,7 @@ The mobile app uses Google OAuth for authentication. Follow these steps to confi
 You need **THREE** separate OAuth client IDs:
 
 **A. Web Client ID** (for Expo Go and web testing)
-1. Go to **Credentials** → **Create Credentials** → **OAuth 2.0 Client ID**
+1. Go to **Credentials** **Create Credentials** **OAuth 2.0 Client ID**
 2. Application type: **Web application**
 3. Add authorized redirect URIs:
    - `https://auth.expo.io/@YOUR_EXPO_USERNAME/journal-mobile`
@@ -247,23 +247,23 @@ For standalone production builds (not Expo Go):
 - **Android:** Uses `GOOGLE_CLIENT_ID_ANDROID`
 - These require proper bundle IDs and signing certificates configured
 
-## 🧪 Testing the App
+## Testing the App
 
 ### Current State
 The app is ready to run with complete UI components! You'll see:
-- **✅ Google OAuth Login** - Fully functional (requires OAuth setup)
-- **✅ Authentication Flow** - Login, token storage, automatic session restore
-- **✅ Bottom Tab Navigation** - Journal, Insights, Profile tabs
-- **✅ UI Components Library** - 9 reusable components ready to use
-- **✅ Placeholder Screens** - Journal list, Insights dashboard, Profile
-- **✅ Logout Functionality** - Clears auth state and returns to login
+- ** Google OAuth Login** - Fully functional (requires OAuth setup)
+- ** Authentication Flow** - Login, token storage, automatic session restore
+- ** Bottom Tab Navigation** - Journal, Insights, Profile tabs
+- ** UI Components Library** - 9 reusable components ready to use
+- ** Placeholder Screens** - Journal list, Insights dashboard, Profile
+- ** Logout Functionality** - Clears auth state and returns to login
 
 ### Next Steps (Sprint 2)
 - **Task 4:** Journal entry creation screen with AI analysis
 - **Task 5:** Journal entry list with real data
 - **Task 6:** Offline sync implementation
 
-## 📝 Development Tips
+## Development Tips
 
 ### Hot Reload
 The app supports fast refresh - changes appear instantly while keeping state.
@@ -285,7 +285,7 @@ npm run ios
 npm run android
 ```
 
-## 🚧 What'2 (Week 2):
+## What'2 (Week 2):
 - **Task 4:** Journal entry creation with voice recording and AI analysis
 - **Task 5:** Journal entry list with real API integration
 - **Task 6:** Offline sync with AsyncStorage and sync queuetion with AI analysis
@@ -310,20 +310,20 @@ npm run android
 - App Store submission (iOS)
 - Google Play submission (Android)
 
-## 🔗 Related Files
+## Related Files
 
 - **Phase 2 Plan:** `../PHASE_2_PLAN.md` - Complete roadmap
 - **Backend:** `../Journal.Server/` - .NET API
 - **Web App:** `../journal.client/` - React web app
 
-## 📚 Resources
+## Resources
 
 - [Expo Documentation](https://docs.expo.dev/)
 - [React Navigation](https://reactnavigation.org/)
 - [React Native Docs](https://reactnative.dev/)
 - [TanStack Query](https://tanstack.com/query/latest)
 
-## ❓ Troubleshooting
+## Troubleshooting
 
 ### Metro bundler cache issues
 ```bash
@@ -341,10 +341,10 @@ npm install
 cd ios && pod install && cd ..
 ```
 
-## 📧 Support
+## Support
 
 For issues or questions, refer to the main project README in the repository root.
 
 ---
 
-**Built with ❤️ using Expo & React Native**
+**Built with using Expo & React Native**

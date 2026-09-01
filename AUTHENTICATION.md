@@ -1,4 +1,4 @@
-# 🔐 Authentication Setup Guide
+# Authentication Setup Guide
 
 Complete guide for configuring Google and Microsoft OAuth authentication for web and mobile apps.
 
@@ -61,7 +61,7 @@ https://auth.expo.io
 https://auth.expo.io/@savagececily/mental-health-journal
 ```
 
-⚠️ **Critical**: The redirect URI must EXACTLY match your Expo slug:
+ **Critical**: The redirect URI must EXACTLY match your Expo slug:
 - Current slug from app.json: `@savagececily/mental-health-journal`
 - Required redirect URI: `https://auth.expo.io/@savagececily/mental-health-journal`
 
@@ -362,7 +362,7 @@ npm install react-native-app-auth
 #### Debugging Tips
 
 1. **Enable logging** in your app to see OAuth flow details
-2. **Check Azure AD sign-in logs** in Azure Portal → Microsoft Entra ID → Sign-in logs
+2. **Check Azure AD sign-in logs** in Azure Portal Microsoft Entra ID Sign-in logs
 3. **Verify token** at [jwt.ms](https://jwt.ms) - paste the ID token to see claims
 4. **Test with different account types** (personal, work/school) to ensure multi-tenant works
 
@@ -416,5 +416,5 @@ npm install react-native-app-auth
 
 ---
 
-**Authentication configured! 🔐**  
+**Authentication configured! **
 Users can now sign in with Google or Microsoft accounts.

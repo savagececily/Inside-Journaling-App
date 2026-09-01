@@ -71,7 +71,7 @@ namespace Journal.Server
             builder.Services.AddAzureClients(clients =>
             {
                 // Use Blob Storage with Managed Identity
-                var blobServiceUri = config["AzureBlobStorage:ServiceUri"] ?? throw new InvalidOperationException("AzureBlobStorage:ServiceUri is not configured");
+                var blobServiceUri = config["BlobStorage:ServiceUri"] ?? throw new InvalidOperationException("BlobStorage:ServiceUri is not configured");
                 clients.AddBlobServiceClient(new Uri(blobServiceUri))
                     .WithCredential(defaultCredential);
             });

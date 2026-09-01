@@ -220,7 +220,7 @@ namespace Journal.Server.Controllers
 
         [HttpPost("voice")]
         [EnableRateLimiting("voice-transcription")] // Cost protection: limit expensive speech-to-text calls
-        public async Task<ActionResult<object>> ProcessVoiceEntry([FromForm] IFormFile audioFile, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<object>> ProcessVoiceEntry(IFormFile audioFile, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))

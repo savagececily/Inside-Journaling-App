@@ -1,19 +1,19 @@
 # Inside Journaling App - Testing AI Analysis & Trends
 
-## ✅ What's Been Enhanced
+## What's Been Enhanced
 
 Your Inside Journaling App now includes:
 
 1. **AI-Powered Analysis** - Each journal entry is analyzed for:
-   - 😊 Sentiment (Positive, Negative, Neutral, Mixed)
-   - 🔑 Key Phrase Extraction
-   - 📝 AI-Generated Summaries
-   - 💫 Personalized Affirmations (via Azure OpenAI GPT-4)
+ - Sentiment (Positive, Negative, Neutral, Mixed)
+ - Key Phrase Extraction
+ - AI-Generated Summaries
+ - Personalized Affirmations (via Azure OpenAI GPT-4)
 
 2. **Trend Visualization** - Track your mental wellness over time:
    - Total entry count
    - Sentiment distribution chart
-   - Recent trend indicator (improving 📈, declining 📉, or stable ➡️)
+ - Recent trend indicator (improving , declining , or stable )
    - Visual bar charts showing sentiment breakdown
 
 3. **Enhanced UI** - Better user experience:
@@ -22,7 +22,7 @@ Your Inside Journaling App now includes:
    - Color-coded sentiment badges
    - Responsive design
 
-## 🚀 How to Test
+## How to Test
 
 ### Step 1: Start the Backend
 
@@ -50,7 +50,7 @@ The frontend will start on `http://localhost:54551/`
    - In the left sidebar, type a journal entry (e.g., "I had a wonderful day today! I feel grateful for my friends and family.")
    - Click "Save & Analyze Entry"
    - Watch the button change to "Analyzing with AI..." 
-   - You'll see a message: "🤖 AI is analyzing your entry for sentiment, key phrases, and generating insights..."
+ - You'll see a message: " AI is analyzing your entry for sentiment, key phrases, and generating insights..."
 
 2. **View AI Results**
    - The entry will appear in the main section with:
@@ -69,50 +69,50 @@ The frontend will start on `http://localhost:54551/`
 
 ### Step 4: View Trends
 
-1. **After creating 3-5 entries**, you'll see the "📊 Your Trends" section appear in the sidebar
+1. **After creating 3-5 entries**, you'll see the " Your Trends" section appear in the sidebar
 2. Click the "Show" button to expand the trends
 3. You'll see:
    - **Total Entries** - How many journal entries you've created
    - **Recent Trend** - Analysis of your last 5 entries
    - **Sentiment Distribution** - Visual bar chart showing breakdown by sentiment type
 
-## 🔍 What to Look For
+## What to Look For
 
 ### AI Analysis Verification
 
-✅ **Sentiment Detection**
+ **Sentiment Detection**
 - Hover over the sentiment badge to see the confidence score
 - Scores should range from 0.0 to 1.0
 - Positive entries should show green badges, negative should show red
 
-✅ **Key Phrases**
+ **Key Phrases**
 - Should extract meaningful topics from your entry
 - Examples: "wonderful day", "friends and family", "feeling stressed"
 - Displayed as rounded tags below the entry
 
-✅ **AI Summaries**
+ **AI Summaries**
 - Should provide a brief, contextual summary
 - Includes confidence percentage
 - Tailored to the sentiment detected
 
-✅ **GPT-4 Affirmations**
+ **GPT-4 Affirmations**
 - Should be personalized and encouraging
 - Written in second person ("You...")
 - Specific to your entry's content and tone
 
 ### Trend Analysis Verification
 
-✅ **Sentiment Distribution Chart**
+ **Sentiment Distribution Chart**
 - Bars should accurately represent the count of each sentiment type
 - Bar width proportional to percentage
 - Only shows sentiment types that have entries
 
-✅ **Recent Trend**
-- "Improving" 📈: Last 5 entries have more positive than negative
-- "Declining" 📉: Last 5 entries have more negative than positive
-- "Stable" ➡️: Balanced or not enough data
+ **Recent Trend**
+- "Improving" : Last 5 entries have more positive than negative
+- "Declining" : Last 5 entries have more negative than positive
+- "Stable" : Balanced or not enough data
 
-## 🧪 Test Scenarios
+## Test Scenarios
 
 ### Scenario 1: Track Mood Over Week
 Create 7 entries simulating a week:
@@ -143,7 +143,7 @@ Create an entry with specific topics:
    - Feature preview boxes (Sentiment Analysis, Key Phrases, etc.)
    - No trends section
 
-## 🛠 Backend Configuration
+## Backend Configuration
 
 Your app is using Azure App Configuration to load settings. The key services:
 
@@ -166,7 +166,7 @@ Your app is using Azure App Configuration to load settings. The key services:
 - **Container**: journalAudio
 - **Used For**: Storing voice entry audio files (future feature)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Problem: "Failed to save journal entry"
 **Solution**: 
@@ -192,7 +192,7 @@ Your app is using Azure App Configuration to load settings. The key services:
 - Azure Cognitive Services extracts phrases based on significance
 - Try longer, more descriptive entries
 
-## 📊 Sample Test Data
+## Sample Test Data
 
 Use these entries to quickly populate your journal:
 
@@ -212,7 +212,7 @@ Use these entries to quickly populate your journal:
 7. "I'm proud of myself for setting boundaries at work today. It wasn't easy but it was necessary."
 ```
 
-## ✨ Next Steps
+## Next Steps
 
 Once you've verified the AI analysis and trends work correctly, you could:
 
@@ -242,6 +242,6 @@ Once you've verified the AI analysis and trends work correctly, you could:
 
 ---
 
-**Your Inside Journaling App is now equipped with powerful AI analysis and trend tracking!** 🌱✨
+**Your Inside Journaling App is now equipped with powerful AI analysis and trend tracking!**
 
 Write a few entries and watch the AI provide insights into your emotional patterns.

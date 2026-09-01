@@ -4,7 +4,7 @@ Complete reference for all features implemented in the Inside Journaling App web
 
 ---
 
-## 🎙️ Voice Recording
+## Voice Recording
 
 ### Overview
 Voice recording functionality allows users to create journal entries by recording their voice instead of typing.
@@ -51,7 +51,7 @@ Voice recording functionality allows users to create journal entries by recordin
 - Links audio to journal entry in database
 
 ### User Experience
-- Record voice → Preview audio → Submit → Transcription → Sentiment analysis → Entry saved
+- Record voice Preview audio Submit Transcription Sentiment analysis Entry saved
 - Can retry recording before submission
 - Transcription status indicator
 - Audio playback available in entry details
@@ -64,7 +64,7 @@ Voice recording functionality allows users to create journal entries by recordin
 
 ---
 
-## 🤖 AI-Powered Analysis
+## AI-Powered Analysis
 
 ### Overview
 Comprehensive AI analysis of journal entries using Azure Cognitive Services and OpenAI.
@@ -130,7 +130,7 @@ Comprehensive AI analysis of journal entries using Azure Cognitive Services and 
 
 ---
 
-## 📊 Data Visualizations
+## Data Visualizations
 
 ### Overview
 Interactive charts and visualizations for mental wellness insights.
@@ -191,7 +191,7 @@ Interactive charts and visualizations for mental wellness insights.
 
 ---
 
-## 🆘 Crisis Support Integration
+## Crisis Support Integration
 
 ### Overview
 Intelligent crisis detection and immediate access to professional resources.
@@ -217,7 +217,7 @@ When concerning content detected:
 - Option to dismiss but resources remain accessible
 
 #### **3. Manual Access Button**
-"🆘 Need Help Now?" button in app header:
+" Need Help Now?" button in app header:
 - Visible from any page
 - No judgment - available for proactive support
 - Same resource list as automatic detection
@@ -264,7 +264,7 @@ When concerning content detected:
 
 ---
 
-## 🔐 Authentication & Security
+## Authentication & Security
 
 ### Google OAuth Integration
 - Google Sign-In for web
@@ -295,7 +295,7 @@ When concerning content detected:
 
 ---
 
-## 💾 Data Storage
+## Data Storage
 
 ### Azure Cosmos DB
 - NoSQL database for journal entries and user data
@@ -325,7 +325,7 @@ When concerning content detected:
 
 ---
 
-## ⚡ Performance Optimizations
+## Performance Optimizations
 
 ### Implemented Optimizations
 
@@ -374,7 +374,7 @@ When concerning content detected:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Backend Tests
 - **Unit Tests**: 40+ tests for services and controllers
@@ -417,7 +417,7 @@ When concerning content detected:
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 ### Frontend (React)
 - React 19
@@ -447,7 +447,7 @@ When concerning content detected:
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Azure App Service
 - .NET 8 runtime
@@ -469,13 +469,12 @@ When concerning content detected:
 - Rollback capabilities
 
 **Key Files:**
-- `MIGRATION_PLAN.md` - Deployment strategy and phases
-- `APP_SETTINGS_MIGRATION.md` - Configuration approach
+- `azure-setup/README.md` - Azure resources, configuration, and deployment
 - `.github/workflows/` - CI/CD pipelines
 
 ---
 
-## 📋 Legal & Compliance
+## Legal & Compliance
 
 ### Privacy Policy
 - Data collection transparency
@@ -511,14 +510,14 @@ When concerning content detected:
 
 ---
 
-## 🎯 Development Status
+## Development Status
 
 **Current Phase:** Phase 1 Complete, Phase 2 (Mobile) In Progress
 
-✅ **Web Application:** Fully deployed and operational  
-✅ **Azure Infrastructure:** Production-ready  
-✅ **Core Features:** Voice, AI, visualizations, crisis support  
-✅ **Testing:** Comprehensive test coverage  
-✅ **Documentation:** Complete guides and references  
+ **Web Application:** Fully deployed and operational
+ **Azure Infrastructure:** Production-ready
+ **Core Features:** Voice, AI, visualizations, crisis support
+ **Testing:** Comprehensive test coverage
+ **Documentation:** Complete guides and references
 
-**[View Deployment Guide →](MIGRATION_PLAN.md)** | **[View Testing Guide →](TESTING_GUIDE.md)**
+**[View Deployment Guide](azure-setup/README.md)** | **[View Testing Guide](TESTING_GUIDE.md)**

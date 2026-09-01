@@ -1,18 +1,18 @@
 # PWA Icons Setup Guide
 
-## Icon Generation Complete ✅
+## Icon Generation Complete
 
 All required PWA icons have been generated from your logo files and are committed to the repository.
 
 ### Generated Files in `public/`:
-- ✅ `logo-light.png` - Source logo (500x500)
-- ✅ `logo-dark.png` - Dark mode logo (500x500)
-- ✅ `pwa-64x64.png` - Small icon
-- ✅ `pwa-192x192.png` - Standard PWA icon
-- ✅ `pwa-512x512.png` - Large icon
-- ✅ `maskable-icon-512x512.png` - Android adaptive icon
-- ✅ `apple-touch-icon-180x180.png` - iOS home screen
-- ✅ `favicon.ico` - Browser tab icon
+- `logo-light.png` - Source logo (500x500)
+- `logo-dark.png` - Dark mode logo (500x500)
+- `pwa-64x64.png` - Small icon
+- `pwa-192x192.png` - Standard PWA icon
+- `pwa-512x512.png` - Large icon
+- `maskable-icon-512x512.png` - Android adaptive icon
+- `apple-touch-icon-180x180.png` - iOS home screen
+- `favicon.ico` - Browser tab icon
 
 ---
 
@@ -32,12 +32,12 @@ This will recreate all icon sizes automatically.
 ## Required Icon Sizes (Generated Automatically)
 
 After running the generator, these files are created in `public/`:
-- ✅ `pwa-64x64.png` - Small icon
-- ✅ `pwa-192x192.png` - Standard PWA icon
-- ✅ `pwa-512x512.png` - Large icon
-- ✅ `maskable-icon-512x512.png` - Android adaptive icon
-- ✅ `apple-touch-icon-180x180.png` - iOS home screen
-- ✅ `favicon.ico` - Browser tab icon
+- `pwa-64x64.png` - Small icon
+- `pwa-192x192.png` - Standard PWA icon
+- `pwa-512x512.png` - Large icon
+- `maskable-icon-512x512.png` - Android adaptive icon
+- `apple-touch-icon-180x180.png` - iOS home screen
+- `favicon.ico` - Browser tab icon
 
 All icons are automatically generated from your source logo file.
 
@@ -56,7 +56,7 @@ Your source logo file should be:
 - Journal book icon
 - Brain with heart symbol
 - Peaceful/wellness icon
-- Growth plant (🌱 like the app uses)
+- Growth plant ( like the app uses)
 
 ---
 
@@ -114,7 +114,7 @@ After generating icons, test them:
    ```
 
 2. **Check in DevTools:**
-   - Open Chrome DevTools → Application → Manifest
+ - Open Chrome DevTools Application Manifest
    - Verify all icon URLs load correctly
    - Check for manifest warnings
 

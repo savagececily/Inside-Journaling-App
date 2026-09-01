@@ -32,14 +32,14 @@ az webapp auth show \
 ### Option 2: Azure Portal (Visual)
 
 1. Go to [Azure Portal](https://portal.azure.com)
-2. Navigate to: **inside-journaling-app** → **Deployment slots** → **development**
+2. Navigate to: **inside-journaling-app** **Deployment slots** **development**
 3. In left menu, click **Authentication**
 4. Click **Add identity provider**
 5. Choose **Microsoft**
 6. Set:
    - **Client ID**: Use existing app registration
    - **Tenant type**: Workforce (current tenant)
-   - **Restrict access**: ✅ **Require authentication**
+ - **Restrict access**: **Require authentication**
    - **Unauthenticated requests**: **HTTP 401 Unauthorized (recommended for APIs)** or **HTTP 302 redirect** for web
 7. Click **Add**
 
@@ -51,7 +51,7 @@ After enabling authentication, restrict to specific users:
 
 ### In Azure Portal:
 
-1. Go to **Microsoft Entra ID** → **Enterprise Applications**
+1. Go to **Microsoft Entra ID** **Enterprise Applications**
 2. Search for your app registration (e.g., "inside-journaling-app-dev")
 3. Go to **Properties**
 4. Set **Assignment required?** to **Yes**
@@ -63,9 +63,9 @@ After enabling authentication, restrict to specific users:
 
 ### Result:
 
-✅ Only assigned users can access the development slot  
-✅ Unauthenticated users get 401 or redirected to login  
-✅ Non-admin users see "You don't have permission to access this application"
+ Only assigned users can access the development slot
+ Unauthenticated users get 401 or redirected to login
+ Non-admin users see "You don't have permission to access this application"
 
 ---
 
@@ -89,8 +89,8 @@ open https://inside-journaling-app-development.azurewebsites.net
 **Development slot:** Restrict to internal admins only (Microsoft Entra ID)
 
 This gives you:
-- 🌍 Public production site for all users
-- 🔒 Private development site for testing and validation
+- Public production site for all users
+- Private development site for testing and validation
 
 ---
 

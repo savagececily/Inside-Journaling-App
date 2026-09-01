@@ -117,12 +117,12 @@ We share your data with the following services **only** for providing and improv
 
 ### 4.2 What We Do NOT Do
 We do **NOT**:
-- ❌ Sell your personal information to third parties
-- ❌ Share your journal entries with advertisers
-- ❌ Use your data to train public AI models
-- ❌ Share your data with social media platforms (beyond authentication)
-- ❌ Allow third-party analytics to track your journal content
-- ❌ Browse or read your journal entries unless required for support or legal compliance
+- Sell your personal information to third parties
+- Share your journal entries with advertisers
+- Use your data to train public AI models
+- Share your data with social media platforms (beyond authentication)
+- Allow third-party analytics to track your journal content
+- Browse or read your journal entries unless required for support or legal compliance
 
 ### 4.3 Legal Requirements
 We may disclose your information if required to:
@@ -138,13 +138,13 @@ If we are acquired, merged, or undergo restructuring, your data may be transferr
 
 ### 5.1 Security Measures
 We implement industry-standard security practices:
-- ✅ **Encryption at rest** (Cosmos DB and Blob Storage use AES-256 encryption)
-- ✅ **Encryption in transit** (all data transmitted via HTTPS/TLS)
-- ✅ **Azure Managed Identity** (no stored credentials)
-- ✅ **Authentication** (JWT tokens with 30-minute expiration)
-- ✅ **Audit logging** (comprehensive tracking of data access)
-- ✅ **Access controls** (role-based permissions, you can only access your own data)
-- ✅ **Security monitoring** (Application Insights alerts)
+- **Encryption at rest** (Cosmos DB and Blob Storage use AES-256 encryption)
+- **Encryption in transit** (all data transmitted via HTTPS/TLS)
+- **Azure Managed Identity** (no stored credentials)
+- **Authentication** (JWT tokens with 30-minute expiration)
+- **Audit logging** (comprehensive tracking of data access)
+- **Access controls** (role-based permissions, you can only access your own data)
+- **Security monitoring** (Application Insights alerts)
 
 ### 5.2 Data Retention
 - **Active accounts**: Data is retained as long as your account is active
@@ -178,12 +178,12 @@ You can:
 **API:** `DELETE /api/UserData/delete-all`
 
 **What gets deleted:**
-- ✅ All journal entries
-- ✅ All audio recordings
-- ✅ User profile
-- ✅ AI-generated insights
-- ⚠️ Audit logs (retained for 7 years for compliance)
-- ⚠️ Consent records (retained for legal compliance)
+- All journal entries
+- All audio recordings
+- User profile
+- AI-generated insights
+- Audit logs (retained for 7 years for compliance)
+- Consent records (retained for legal compliance)
 
 ### 6.3 Right to Consent Management
 You can:
@@ -363,18 +363,18 @@ We believe in transparency. Our audit logging system allows you to:
 | Age information | To verify 13+ requirement | Stored securely, not shared |
 
 **Your Controls:**
-- ✅ Delete your account anytime
-- ✅ View all your data
-- ✅ Export your data
-- ✅ View audit logs (transparency)
-- ✅ Revoke consent
-- ✅ 30-minute session timeout (security)
+- Delete your account anytime
+- View all your data
+- Export your data
+- View audit logs (transparency)
+- Revoke consent
+- 30-minute session timeout (security)
 
 **What We Don't Do:**
-- ❌ Sell your data
-- ❌ Share entries with advertisers
-- ❌ Train AI models on your data
-- ❌ Read your journals unless legally required
+- Sell your data
+- Share entries with advertisers
+- Train AI models on your data
+- Read your journals unless legally required
 
 ---
 
@@ -389,4 +389,4 @@ By clicking "I Agree" or using the Service, you acknowledge that you have read, 
 
 **Effective Date:** February 11, 2026
 
-© 2026 Mental Health Journal. All rights reserved.
+ 2026 Inside Journaling App. All rights reserved.
