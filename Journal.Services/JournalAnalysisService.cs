@@ -47,17 +47,20 @@ namespace Journal.Services
             _openAIClient = openAIClient;
             _quotaService = quotaService;
             
-            // Support both old single deployment and new cost-optimized dual deployment approach
             var config = configuration.Value.AzureOpenAI;
-            _openAIDeployment = config.DeploymentName ?? throw new ArgumentNullException("AzureOpenAI:DeploymentName");
             
-            // Use dedicated deployments if configured, otherwise fall back to main deployment
+            // Use dedicated deployments for cost optimization
+            // If old single DeploymentName is set, use it as fallback
+            var fallbackDeployment = config.DeploymentName ?? config.AffirmationDeploymentName ?? "gpt-4o-mini";
+            
             _affirmationDeployment = !string.IsNullOrEmpty(config.AffirmationDeploymentName) 
                 ? config.AffirmationDeploymentName 
-                : _openAIDeployment;
+                : fallbackDeployment;
             _crisisDeployment = !string.IsNullOrEmpty(config.CrisisDeploymentName) 
                 ? config.CrisisDeploymentName 
-                : _openAIDeployment;
+                : fallbackDeployment;
+            
+            _openAIDeployment = _affirmationDeployment; // For backwards compatibility
             
             _logger.LogInformation("OpenAI deployments - Affirmation: {Affirmation}, Crisis: {Crisis}", 
                 _affirmationDeployment, _crisisDeployment);

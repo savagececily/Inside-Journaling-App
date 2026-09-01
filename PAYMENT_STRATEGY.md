@@ -138,7 +138,7 @@ This document outlines the payment and subscription strategy for the Inside Jour
 
 **1. Install Stripe SDK**
 ```bash
-cd MentalHealthJournal.Server
+cd Journal.Server
 dotnet add package Stripe.net
 ```
 
@@ -150,15 +150,15 @@ dotnet add package Stripe.net
     "PublishableKey": "pk_test_...",
     "WebhookSecret": "whsec_...",
     "PriceId": "price_...",
-    "SuccessUrl": "https://mentalhealthjournal.com/premium/success",
-    "CancelUrl": "https://mentalhealthjournal.com/premium/cancel"
+    "SuccessUrl": "https://inside-journal.app/premium/success",
+    "CancelUrl": "https://inside-journal.app/premium/cancel"
   }
 }
 ```
 
 **3. Create Stripe Service**
 
-Create `MentalHealthJournal.Services/IStripeService.cs`:
+Create `Journal.Services/IStripeService.cs`:
 ```csharp
 public interface IStripeService
 {
@@ -168,7 +168,7 @@ public interface IStripeService
 }
 ```
 
-Create `MentalHealthJournal.Services/StripeService.cs`:
+Create `Journal.Services/StripeService.cs`:
 ```csharp
 using Stripe;
 using Stripe.Checkout;
@@ -241,7 +241,7 @@ public class StripeService : IStripeService
         var options = new Stripe.BillingPortal.SessionCreateOptions
         {
             Customer = user.StripeCustomerId,
-            ReturnUrl = "https://mentalhealthjournal.com/settings/billing",
+            ReturnUrl = "https://inside-journal.app/settings/billing",
         };
 
         var service = new Stripe.BillingPortal.SessionService();
@@ -440,7 +440,7 @@ public async Task<ActionResult> GetCustomerPortal(CancellationToken cancellation
 
 **5. Add Webhook Endpoint**
 
-Create `MentalHealthJournal.Server/Controllers/WebhooksController.cs`:
+Create `Journal.Server/Controllers/WebhooksController.cs`:
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
@@ -491,7 +491,7 @@ builder.Services.AddSingleton<IStripeService, StripeService>();
 
 **1. Install Stripe SDK**
 ```bash
-cd mentalhealthjournal.client
+cd journal.client
 npm install @stripe/stripe-js
 ```
 
@@ -800,7 +800,7 @@ export function UpgradeButton({ userId, token }: Props) {
 
 **Install Required Package:**
 ```bash
-cd MentalHealthJournal.Mobile
+cd Journal.Mobile
 npx expo install expo-web-browser
 ```
 
@@ -811,7 +811,7 @@ npx expo install expo-web-browser
 **Update the success page to detect mobile browsers:**
 
 ```typescript
-// mentalhealthjournal.client/src/pages/PremiumSuccess.tsx
+// journal.client/src/pages/PremiumSuccess.tsx
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
@@ -1021,7 +1021,7 @@ const canShowUpgrade = Platform.OS === 'android' || __DEV__;
 // For iOS users, show a hint to visit website
 {Platform.OS === 'ios' && !isPremium && (
   <Text style={styles.hint}>
-    Want unlimited features? Visit mentalhealthjournal.com
+    Want unlimited features? Visit inside-journal.app
   </Text>
 )}
 ```
@@ -1101,7 +1101,7 @@ stripe listen --print-secret
 1. **In Mobile Simulator/Device:**
 ```bash
 # Run mobile app
-cd MentalHealthJournal.Mobile
+cd Journal.Mobile
 npm start
 ```
 
@@ -1254,7 +1254,7 @@ customEvents
   <View style={styles.infoCard}>
     <Text>Want unlimited features?</Text>
     <Text style={styles.small}>
-      Visit mentalhealthjournal.com on your web browser
+      Visit inside-journal.app on your web browser
     </Text>
   </View>
 )}

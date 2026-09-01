@@ -1,6 +1,16 @@
 #!/bin/bash
 
 ###############################################################################
+# DEPRECATED - Use GitHub Actions for rollback
+# This script was for the old monolithic web app architecture.
+# For rollback, redeploy a previous commit via GitHub Actions.
+###############################################################################
+
+echo "⚠️  DEPRECATED: This script is for the old monolithic architecture"
+echo "For rollback, redeploy a previous commit via GitHub Actions"
+exit 1
+
+###############################################################################
 # Rollback Production Deployment
 # Emergency rollback - swaps production back to development slot
 ###############################################################################

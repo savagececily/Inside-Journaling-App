@@ -102,7 +102,8 @@ User agreement, acceptable use, and service terms.
 
 ## 🎯 Quick Links
 
-- **Live App:** [inside-journaling-app.azurewebsites.net](https://inside-journaling-app.azurewebsites.net)
+- **Backend API:** [inside-journal-api.azurewebsites.net](https://inside-journal-api.azurewebsites.net)
+- **Frontend:** [inside-journal-app (Static Web App)](https://polite-island-0c8b5cb0f.5.azurestaticapps.net)
 - **Dev Slot:** [inside-journaling-app-development.azurewebsites.net](https://inside-journaling-app-development.azurewebsites.net)
 - **Azure Portal:** [InsideJournalingAppRG](https://portal.azure.com/#@/resource/subscriptions/a7c4f882-34af-44dc-9bd7-ccac4f1ec402/resourceGroups/InsideJournalingAppRG/overview)
 
@@ -225,7 +226,7 @@ Includes:
 ## 📂 Documentation Structure
 
 ```
-MentalHealthJournal/
+Journal/
 ├── README.md                       # Project overview & quick start
 ├── DOCS_INDEX.md                   # This file - documentation navigator
 │
@@ -249,7 +250,7 @@ MentalHealthJournal/
 ## 📂 Documentation Structure
 
 ```
-MentalHealthJournal/
+Journal/
 ├── README.md                       # Project overview & quick start
 ├── DOCS_INDEX.md                   # This file - documentation navigator
 │

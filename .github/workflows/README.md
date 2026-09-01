@@ -58,7 +58,7 @@ AZURE_SUBSCRIPTION_ID    # Azure Subscription ID
      --parameters '{
        "name": "github-actions",
        "issuer": "https://token.actions.githubusercontent.com",
-       "subject": "repo:savagececily/MentalHealthJournal:ref:refs/heads/main",
+       "subject": "repo:savagececily/Journal:ref:refs/heads/main",
        "audiences": ["api://AzureADTokenExchange"]
      }'
    ```

@@ -1,17 +1,12 @@
 #!/bin/bash
 
-# update-app-config.sh
-# Update Azure App Configuration with new resource endpoints and managed identities
+# DEPRECATED: This script is for Azure App Configuration which is no longer used
+# Configuration is now managed via Azure App Service Application Settings
+# See README.md for current configuration approach
 
-set -e
-
-echo "=========================================="
-echo "Update App Configuration for New Resources"
-echo "=========================================="
-echo ""
-
-RESOURCE_GROUP="InsideJournalingAppRG"
-APP_CONFIG_NAME="Inside-Journaling-AppConfig"
+echo "⚠️  DEPRECATED: Azure App Configuration is no longer used"
+echo "Configuration is now managed via App Service Application Settings"
+exit 1
 COSMOS_ACCOUNT="inside-journaling-app-cosmosdb"
 STORAGE_ACCOUNT="sainsidejournalingapp"
 AI_HUB_NAME="Inside-Journaling-App-Foundry"

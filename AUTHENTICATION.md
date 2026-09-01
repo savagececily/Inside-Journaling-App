@@ -189,7 +189,7 @@ After registration, you'll see the **Overview** page. Note these values:
 **For Mobile App:**
 1. Click **+ Add a platform**
 2. Select **Mobile and desktop applications**
-3. Add custom redirect URI: `msauth.com.mentalhealthjournal://auth`
+3. Add custom redirect URI: `msauth.com.journal://auth`
 4. Click **Configure**
 
 #### 2.3 Enable Token Configuration
@@ -242,7 +242,7 @@ The backend code is already set up to handle Microsoft authentication. Ensure th
 
 #### 5.1 Update Environment Variables
 
-Create or update `.env` file in `mentalhealthjournal.client`:
+Create or update `.env` file in `journal.client`:
 
 ```env
 VITE_MICROSOFT_CLIENT_ID=YOUR_APPLICATION_CLIENT_ID_HERE
@@ -254,7 +254,7 @@ VITE_MICROSOFT_TENANT_ID=common
 The web app requires the MSAL browser library:
 
 ```bash
-cd mentalhealthjournal.client
+cd journal.client
 npm install @azure/msal-browser
 ```
 
@@ -262,7 +262,7 @@ npm install @azure/msal-browser
 
 #### 6.1 Update Constants
 
-Edit `MentalHealthJournal.Mobile/src/utils/constants.ts`:
+Edit `Journal.Mobile/src/utils/constants.ts`:
 
 ```typescript
 export const MICROSOFT_CLIENT_ID = 'YOUR_APPLICATION_CLIENT_ID_HERE';
@@ -274,13 +274,13 @@ export const MICROSOFT_TENANT_ID = 'common';
 The mobile app requires react-native-app-auth:
 
 ```bash
-cd MentalHealthJournal.Mobile
+cd Journal.Mobile
 npm install react-native-app-auth
 ```
 
 #### 6.3 Configure iOS (if building for iOS)
 
-1. Open `ios/MentalHealthJournal.xcworkspace` in Xcode
+1. Open `ios/Journal.xcworkspace` in Xcode
 2. Add a URL scheme:
    - Select your project in the navigator
    - Select your app target
@@ -288,9 +288,9 @@ npm install react-native-app-auth
    - Expand **URL Types**
    - Click **+** to add a new URL type
    - **Identifier**: `com.microsoft.msauth`
-   - **URL Schemes**: `msauth.com.mentalhealthjournal`
+   - **URL Schemes**: `msauth.com.journal`
 
-3. Update `ios/MentalHealthJournal/AppDelegate.m` (or `.mm` for newer projects):
+3. Update `ios/Journal/AppDelegate.m` (or `.mm` for newer projects):
 
 ```objc
 #import <React/RCTLinkingManager.h>
@@ -317,7 +317,7 @@ npm install react-native-app-auth
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="msauth.com.mentalhealthjournal"/>
+        <data android:scheme="msauth.com.journal"/>
     </intent-filter>
 </activity>
 ```
@@ -326,14 +326,14 @@ npm install react-native-app-auth
 
 #### 7.1 Test Web App
 
-1. Start the web app: `npm run dev` (in `mentalhealthjournal.client`)
+1. Start the web app: `npm run dev` (in `journal.client`)
 2. Click "Sign in with Microsoft"
 3. You should be redirected to Microsoft login
 4. After successful login, you'll be redirected back to the app
 
 #### 7.2 Test Mobile App
 
-1. Start the mobile app: `npm start` (in `MentalHealthJournal.Mobile`)
+1. Start the mobile app: `npm start` (in `Journal.Mobile`)
 2. Test on a device or simulator
 3. Click "Sign in with Microsoft"
 4. You should see the Microsoft login flow
@@ -357,7 +357,7 @@ npm install react-native-app-auth
 - **Solution**: 
   - iOS: Verify URL scheme is configured in Xcode
   - Android: Verify redirect URI intent filter in AndroidManifest.xml
-  - Ensure the redirect URI matches: `msauth.com.mentalhealthjournal://auth`
+  - Ensure the redirect URI matches: `msauth.com.journal://auth`
 
 #### Debugging Tips
 

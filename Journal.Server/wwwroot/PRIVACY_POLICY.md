@@ -213,7 +213,7 @@ If you are a California resident, you have additional rights:
 To exercise any of these rights:
 - Use the in-app features (Account Settings, Data Management)
 - Use the provided API endpoints
-- Contact us at [privacy@mentalhealthjournal.com]
+- Contact us at [privacy@inside-journal.app]
 
 ## 7. Children's Privacy (COPPA Compliance)
 
@@ -224,7 +224,7 @@ To exercise any of these rights:
 
 ### 7.2 Parental Rights
 If you are a parent or guardian and believe your child under 13 has created an account:
-- Contact us immediately at [privacy@mentalhealthjournal.com]
+- Contact us immediately at [privacy@inside-journal.app]
 - We will delete the account and all data promptly
 
 ### 7.3 Data Collection from Minors
@@ -313,9 +313,9 @@ Your continued use of the Service after changes constitutes acceptance of the up
 
 For privacy-related questions, requests, or concerns:
 
-**Email:** [privacy@mentalhealthjournal.com]  
-**Data Protection Contact:** [dpo@mentalhealthjournal.com]  
-**Support:** [support@mentalhealthjournal.com]  
+**Email:** [privacy@inside-journal.app]
+**Data Protection Contact:** [dpo@inside-journal.app]
+**Support:** [support@inside-journal.app]
 **Mailing Address:** [Your Business Address]
 
 ### Response Time

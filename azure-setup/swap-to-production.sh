@@ -1,6 +1,17 @@
 #!/bin/bash
 
 ###############################################################################
+# DEPRECATED - Use GitHub Actions for deployment
+# This script was for the old monolithic web app architecture.
+# New architecture uses separate Backend API + Static Web App.
+# Deploy via: .github/workflows/backend-api-deploy.yml and frontend-static-deploy.yml
+###############################################################################
+
+echo "⚠️  DEPRECATED: This script is for the old monolithic architecture"
+echo "Use GitHub Actions workflows for deployment"
+exit 1
+
+###############################################################################
 # Swap Development Slot to Production
 # Promotes tested code from development slot to production
 ###############################################################################

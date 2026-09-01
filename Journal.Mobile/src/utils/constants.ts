@@ -4,14 +4,14 @@
 // TODO: Replace with your actual backend URL
 // export const API_BASE_URL = __DEV__
 //   ? 'http://localhost:5079/api' // Local development (adjust port if needed)
-//   : 'https://mentalhealthjournal-webapp.azurewebsites.net/api'; // Production URL
+//   : 'https://inside-journal-api.azurewebsites.net/api'; // Production URL
 
-  export const API_BASE_URL = 'https://mentalhealthjournal-webapp.azurewebsites.net/api';
+  export const API_BASE_URL = 'https://inside-journal-api.azurewebsites.net/api';
 
 // Legal document URLs - using API endpoints that don't require authentication
 export const LEGAL_URLS = {
-  TERMS_OF_SERVICE: 'https://mentalhealthjournal-webapp.azurewebsites.net/api/legal/terms',
-  PRIVACY_POLICY: 'https://mentalhealthjournal-webapp.azurewebsites.net/api/legal/privacy',
+  TERMS_OF_SERVICE: 'https://inside-journal-api.azurewebsites.net/api/legal/terms',
+  PRIVACY_POLICY: 'https://inside-journal-api.azurewebsites.net/api/legal/privacy',
 } as const;
 
 // Google OAuth Configuration
@@ -49,12 +49,12 @@ export const GOOGLE_CLIENT_ID_WEB = '765765451806-8552it3usqnh6qa7n457r32mcfv8g9
 // 3. Register your application:
 //    - Name: Mental Health Journal Mobile
 //    - Supported account types: "Accounts in any organizational directory and personal Microsoft accounts"
-//    - Redirect URI: Add a custom redirect URI for mobile (e.g., msauth.com.mentalhealthjournal://auth)
+//    - Redirect URI: Add a custom redirect URI for mobile (e.g., msauth.com.journal://auth)
 // 4. After creation, note the "Application (client) ID" - this is your MICROSOFT_CLIENT_ID
 // 5. Note the "Directory (tenant) ID" - or use "common" for multi-tenant
 // 6. Configure platform settings:
 //    - Add "Mobile and desktop applications" platform
-//    - Add redirect URI: msauth.com.mentalhealthjournal://auth
+//    - Add redirect URI: msauth.com.journal://auth
 // 7. Under "API permissions", ensure these are added:
 //    - Microsoft Graph: openid, profile, email (User.Read)
 //

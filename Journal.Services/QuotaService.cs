@@ -19,7 +19,7 @@ namespace Journal.Services
             _cosmosDbService = cosmosDbService;
             _logger = logger;
             
-            var database = cosmosClient.GetDatabase("MentalHealthJournalDb");
+            var database = cosmosClient.GetDatabase("JournalDb");
             _quotaContainer = database.GetContainer("UserQuotas");
             _tokenUsageContainer = database.GetContainer("TokenUsage");
         }

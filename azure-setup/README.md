@@ -8,7 +8,28 @@ This directory contains scripts for deploying Inside Journaling App to Azure usi
 
 **Resource Group:** `InsideJournalingAppRG`  
 **Subscription:** Visual Studio Enterprise Subscription  
-**Web App:** `inside-journaling-app`
+
+### Azure Resources
+
+**Backend API:**
+- Name: `inside-journal-api`
+- Development: https://inside-journal-api-development.azurewebsites.net
+- Production: https://inside-journal-api.azurewebsites.net
+- Runtime: .NET 8.0 on Windows
+
+**Frontend:**
+- Name: `inside-journal-app` (Static Web App)
+- URL: https://polite-island-0c8b5cb0f.5.azurestaticapps.net
+- Technology: React + Vite + TypeScript
+
+**Data & AI:**
+- Cosmos DB: `inside-journaling-app-cosmosdb` (Database: JournalDb)
+- Storage Account: `sainsidejournalingapp`
+- Azure AI Foundry: `Inside-Journaling-App-Foundry` (gpt-4o-mini, gpt-4o, Speech-to-Text)
+- Managed Identity: `Inside-Journaling-App-DEV-UAMI` (Client ID: 136abc9f-ef3a-4073-a6d2-e6f915ba1f0f)
+
+**Configuration:**
+All configuration is managed via App Service Application Settings (environment variables). Azure App Configuration is no longer used to reduce costs.
 
 ### Completed Phases ✅
 
@@ -17,7 +38,7 @@ This directory contains scripts for deploying Inside Journaling App to Azure usi
 
 ### Current Phase 📍
 
-- **Phase 2:** Configure App Settings (Ready to run)
+- **Phase 2:** Architecture separated - Backend API + Static Web App deployed
 
 ---
 
@@ -87,7 +108,7 @@ After successful testing in development:
 - Production traffic immediately uses new code
 - Old code remains in development slot as instant rollback
 
-**Result:** New code live at `https://inside-journaling-app.azurewebsites.net`
+**Result:** New code live at `https://inside-journal-api.azurewebsites.net` (Production) or `https://inside-journal-api-development.azurewebsites.net` (Development)
 
 ---
 
@@ -115,7 +136,7 @@ If issues occur after production swap:
 ```
 
 **What it does:**
-- Deletes the old **MentalHealthJournal** resource group
+- Deletes the old **Journal** resource group
 - Removes all legacy resources (old App Service, Cosmos DB, Storage, OpenAI, etc.)
 - Stops incurring costs on deprecated infrastructure
 
@@ -137,13 +158,13 @@ If issues occur after production swap:
 - ✅ No active traffic on old resources
 
 **Resources that will be deleted:**
-- Old Web App: `MentalHealthJournal-WebApp`
-- Old Cosmos DB: `mentalhealthjournal-cosmosdb`
-- Old Storage: `samentalhealthjournal`
-- Old OpenAI: `MentalHealthJournal-OpenAI`
-- Old Cognitive Services: `MentalHealthJournal-CogServices`
-- Old App Configuration: `MentalHealthJournal-AppConfig`
-- Old Managed Identity: `MentalHealthJournal-UAMI`
+- Old Web App: `Journal-WebApp`
+- Old Cosmos DB: `journal-cosmosdb`
+- Old Storage: `sajournal`
+- Old OpenAI: `Journal-OpenAI`
+- Old Cognitive Services: `Journal-CogServices`
+- Old App Configuration: `Journal-AppConfig`
+- Old Managed Identity: `Journal-UAMI`
 - Old Application Insights and all related resources
 
 ---
@@ -156,7 +177,7 @@ If issues occur after production swap:
 | `deploy-to-dev.sh` | Build and deploy to development slot | Phase 3 - Every new deployment |
 | `swap-to-production.sh` | Promote development to production | Phase 4 - After testing succeeds |
 | `rollback-production.sh` | Emergency revert to previous version | If production issues occur |
-| `cleanup-old-resources.sh` | Delete old MentalHealthJournal resource group | Phase 5 - After production is stable 24-48hrs |
+| `cleanup-old-resources.sh` | Delete old Journal resource group | Phase 5 - After production is stable 24-48hrs |
 
 ---
 
@@ -183,7 +204,9 @@ If issues occur after production swap:
 - Region: eastus
 
 **App Service:** `inside-journaling-app`
-- Production Slot: `https://inside-journaling-app.azurewebsites.net`
+- Backend API Production: `https://inside-journal-api.azurewebsites.net`
+- Backend API Development: `https://inside-journal-api-development.azurewebsites.net`
+- Frontend: `https://polite-island-0c8b5cb0f.5.azurestaticapps.net`
 - Development Slot: `https://inside-journaling-app-development.azurewebsites.net`
 - Plan: Standard tier (supports slots)
 

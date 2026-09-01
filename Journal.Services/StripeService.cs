@@ -77,7 +77,7 @@ public class StripeService : IStripeService
         var options = new Stripe.BillingPortal.SessionCreateOptions
         {
             Customer = user.StripeCustomerId,
-            ReturnUrl = "https://mentalhealthjournal.com/settings/billing",
+            ReturnUrl = "https://inside-journal.app/settings/billing",
         };
 
         var service = new Stripe.BillingPortal.SessionService();

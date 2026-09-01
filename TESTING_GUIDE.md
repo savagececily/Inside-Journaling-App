@@ -27,7 +27,7 @@ Your Inside Journaling App now includes:
 ### Step 1: Start the Backend
 
 ```bash
-cd /Users/cecilysavage/GitHub/MentalHealthJournal/MentalHealthJournal.Server
+cd /Users/cecilysavage/GitHub/Journal/Journal.Server
 dotnet run
 ```
 
@@ -38,7 +38,7 @@ The backend will start on `https://localhost:7270` (or the port specified in lau
 Open a new terminal:
 
 ```bash
-cd /Users/cecilysavage/GitHub/MentalHealthJournal/mentalhealthjournal.client
+cd /Users/cecilysavage/GitHub/Journal/journal.client
 npm run dev
 ```
 
@@ -148,13 +148,13 @@ Create an entry with specific topics:
 Your app is using Azure App Configuration to load settings. The key services:
 
 ### Azure Cognitive Services (Text Analytics)
-- **Endpoint**: `https://mentalhealthjournal-cogservices.cognitiveservices.azure.com/`
+- **Endpoint**: `https://journal-cogservices.cognitiveservices.azure.com/`
 - **Region**: East US
 - **Used For**: Sentiment analysis, key phrase extraction
 
 ### Azure OpenAI
-- **Endpoint**: `https://mentalhealthjournal-openai.openai.azure.com/`
-- **Deployment**: mentalhealthjournal-gpt-4
+- **Endpoint**: `https://journal-openai.openai.azure.com/`
+- **Deployment**: journal-gpt-4
 - **Used For**: Generating personalized affirmations
 
 ### Azure Cosmos DB

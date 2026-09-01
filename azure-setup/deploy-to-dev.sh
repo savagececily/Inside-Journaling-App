@@ -25,7 +25,7 @@ echo "Resource Group: $RESOURCE_GROUP"
 echo ""
 
 # Check current directory
-if [ ! -f "MentalHealthJournal.sln" ]; then
+if [ ! -f "Journal.sln" ]; then
     echo "❌ Error: Must run from repository root"
     exit 1
 fi
@@ -88,7 +88,7 @@ echo ""
 echo "🧪 Step 3: Running unit tests..."
 echo ""
 
-dotnet test MentalHealthJournal.Tests/MentalHealthJournal.Tests.csproj --configuration Release
+dotnet test Journal.Tests/Journal.Tests.csproj --configuration Release
 
 echo "✅ Tests passed"
 
@@ -102,7 +102,7 @@ echo ""
 
 rm -rf "$OUTPUT_DIR"
 
-dotnet publish "$BACKEND_DIR/MentalHealthJournal.Server.csproj" \
+dotnet publish "$BACKEND_DIR/Journal.Server.csproj" \
     -c Release \
     -o "$OUTPUT_DIR" \
     --no-restore

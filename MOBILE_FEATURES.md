@@ -391,8 +391,8 @@ Comprehensive tactile feedback system for enhanced user experience.
 Complete URL scheme support for navigation and sharing.
 
 ### URL Schemes
-- **App Scheme**: `mentalhealthjournal://`
-- **Universal Links**: `https://mentalhealthjournal.app`
+- **App Scheme**: `journal://`
+- **Universal Links**: `https://journal.app`
 
 ### Supported Paths
 - `journal/new` - Create new entry

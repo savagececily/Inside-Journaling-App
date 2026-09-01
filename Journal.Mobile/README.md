@@ -7,7 +7,7 @@ React Native mobile application built with Expo for iOS and Android.
 ### Run the App
 
 ```bash
-cd MentalHealthJournal.Mobile
+cd Journal.Mobile
 
 # Start the development server
 npm start
@@ -159,14 +159,14 @@ You need **THREE** separate OAuth client IDs:
 1. Go to **Credentials** → **Create Credentials** → **OAuth 2.0 Client ID**
 2. Application type: **Web application**
 3. Add authorized redirect URIs:
-   - `https://auth.expo.io/@YOUR_EXPO_USERNAME/mentalhealthjournal-mobile`
+   - `https://auth.expo.io/@YOUR_EXPO_USERNAME/journal-mobile`
    - `http://localhost:19006` (for web testing)
 4. Click **Create** and copy the **Client ID**
 
 **B. iOS Client ID** (for production iOS builds)
 1. Create new OAuth 2.0 Client ID
 2. Application type: **iOS**
-3. Bundle ID: Get from `app.json` (e.g., `com.yourcompany.mentalhealthjournal`)
+3. Bundle ID: Get from `app.json` (e.g., `com.yourcompany.journal`)
 4. Click **Create** and copy the **Client ID**
 
 **C. Android Client ID** (for production Android builds)
@@ -222,7 +222,7 @@ npx expo whoami
 
 Update the redirect URI in Google Cloud Console to:
 ```
-https://auth.expo.io/@YOUR_ACTUAL_USERNAME/mentalhealthjournal-mobile
+https://auth.expo.io/@YOUR_ACTUAL_USERNAME/journal-mobile
 ```
 
 #### 6. Test OAuth Flow
@@ -313,8 +313,8 @@ npm run android
 ## 🔗 Related Files
 
 - **Phase 2 Plan:** `../PHASE_2_PLAN.md` - Complete roadmap
-- **Backend:** `../MentalHealthJournal.Server/` - .NET API
-- **Web App:** `../mentalhealthjournal.client/` - React web app
+- **Backend:** `../Journal.Server/` - .NET API
+- **Web App:** `../journal.client/` - React web app
 
 ## 📚 Resources
 

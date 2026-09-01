@@ -27,7 +27,7 @@ export function useMicrosoftAuth() {
   const config: AuthConfiguration = {
     issuer: `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}/v2.0`,
     clientId: MICROSOFT_CLIENT_ID,
-    redirectUrl: 'msauth.com.mentalhealthjournal://auth',
+    redirectUrl: 'msauth.com.journal://auth',
     scopes: ['openid', 'profile', 'email'],
     serviceConfiguration: {
       authorizationEndpoint: `https://login.microsoftonline.com/${MICROSOFT_TENANT_ID}/oauth2/v2.0/authorize`,

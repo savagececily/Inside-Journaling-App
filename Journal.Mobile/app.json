@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "mentalhealthjournal",
+    "scheme": "journal",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -19,14 +19,14 @@
         "ITSAppUsesNonExemptEncryption": false
       },
       "supportsTablet": true,
-      "bundleIdentifier": "com.mentalhealthjournal.app",
+      "bundleIdentifier": "com.journal.app",
       "associatedDomains": [
-        "applinks:mentalhealthjournal.app",
-        "applinks:mentalhealthjournal.app"
+        "applinks:inside-journal.app",
+        "applinks:inside-journal.app"
       ]
     },
     "android": {
-      "package": "com.mentalhealthjournal.app",
+      "package": "com.journal.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -49,10 +49,10 @@
           "data": [
             {
               "scheme": "https",
-              "host": "mentalhealthjournal.app"
+              "host": "inside-journal.app"
             },
             {
-              "scheme": "mentalhealthjournal"
+              "scheme": "journal"
             }
           ],
           "category": [

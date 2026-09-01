@@ -21,7 +21,7 @@ All required PWA icons have been generated from your logo files and are committe
 If you update your logo files, regenerate the PWA icons:
 
 ```bash
-cd mentalhealthjournal.client
+cd journal.client
 npx @vite-pwa/assets-generator --preset minimal public/logo-light.png
 ```
 

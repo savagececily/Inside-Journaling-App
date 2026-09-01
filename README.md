@@ -92,7 +92,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd MentalHealthJournal
+   cd Journal
    ```
 
 2. **Configure Azure Services**
@@ -102,7 +102,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 3. **Backend Setup**
    ```bash
-   cd MentalHealthJournal.Server
+   cd Journal.Server
    dotnet restore
    dotnet build
    dotnet run
@@ -110,7 +110,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 4. **Frontend Setup**
    ```bash
-   cd mentalhealthjournal.client
+   cd journal.client
    npm install
    npm run dev
    ```
@@ -122,26 +122,27 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 ## 🔧 Configuration
 
 ### Backend Configuration (`appsettings.json`)
-```json
-{
-  "AzureAppConfiguration": "https://your-app-config.azconfig.io",
-  "ApplicationInsights": {
-    "ConnectionString": "your-connection-string"
-  }
-}
-```
+
+Configuration is loaded from `appsettings.json` and can be overridden by environment variables in Azure App Service.
+
+**Key Settings:**
+- `CosmosDb:Endpoint`: https://inside-journaling-app-cosmosdb.documents.azure.com:443/
+- `CosmosDb:DatabaseName`: JournalDb
+- `AzureOpenAI:Endpoint`: https://inside-journaling-app-foundry.cognitiveservices.azure.com/
+- `AzureOpenAI:AffirmationDeploymentName`: gpt-4o-mini (for affirmations)
+- `AzureOpenAI:CrisisDeploymentName`: gpt-4o (for crisis detection)
 
 ### Environment Variables
-- `AzureAppConfiguration`: Azure App Configuration endpoint
-- `ManagedIdentityClientId`: Managed identity client ID (for Azure deployment)
+- `ManagedIdentityClientId`: Managed identity client ID (136abc9f-ef3a-4073-a6d2-e6f915ba1f0f)
+- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Application Insights connection string
 
-See [appsettings.Example.json](MentalHealthJournal.Server/appsettings.Example.json) for a complete configuration template.
+See [appsettings.Example.json](Journal.Server/appsettings.Example.json) for a complete configuration template.
 
 ## 📦 Project Structure
 
 ```
-MentalHealthJournal/
-├── mentalhealthjournal.client/     # React frontend (Web)
+Journal/
+├── journal.client/     # React frontend (Web)
 │   ├── src/
 │   │   ├── components/             # React components
 │   │   ├── services/               # API and utility services
@@ -149,7 +150,7 @@ MentalHealthJournal/
 │   │   ├── hooks/                  # Custom React hooks
 │   │   └── types/                  # TypeScript type definitions
 │   └── public/                     # Static assets
-├── MentalHealthJournal.Mobile/     # React Native app (iOS/Android) 📱
+├── Journal.Mobile/     # React Native app (iOS/Android) 📱
 │   ├── src/
 │   │   ├── components/             # UI components
 │   │   ├── screens/                # App screens
@@ -158,24 +159,24 @@ MentalHealthJournal/
 │   │   ├── hooks/                  # Custom hooks
 │   │   └── navigation/             # React Navigation setup
 │   └── app.json                    # Expo configuration
-├── MentalHealthJournal.Server/     # .NET Web API
+├── Journal.Server/     # .NET Web API
 │   ├── Controllers/                # API controllers
 │   └── Properties/                 # Server configuration
-├── MentalHealthJournal.Services/   # Business logic layer
+├── Journal.Services/   # Business logic layer
 │   ├── CosmosDbService.cs          # Database operations
 │   ├── BlobStorageService.cs       # File storage
 │   ├── JournalAnalysisService.cs   # AI analysis
 │   ├── SpeechToTextService.cs      # Voice transcription
 │   └── UserService.cs              # User management
-├── MentalHealthJournal.Models/     # Shared data models
-└── MentalHealthJournal.Tests/      # Unit tests
+├── Journal.Models/     # Shared data models
+└── Journal.Tests/      # Unit tests
 ```
 
 ## 🧪 Testing
 
 ### Run Backend Tests
 ```bash
-cd MentalHealthJournal.Tests
+cd Journal.Tests
 dotnet test
 ```
 

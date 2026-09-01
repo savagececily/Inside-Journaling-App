@@ -3,8 +3,8 @@ import * as Linking from 'expo-linking';
 import { NavigationContainerRef } from '@react-navigation/native';
 
 // Define deep link URL structure
-export const DEEP_LINK_PREFIX = 'mentalhealthjournal://';
-export const DEEP_LINK_HTTPS_PREFIX = 'https://mentalhealthjournal.app';
+export const DEEP_LINK_PREFIX = 'journal://';
+export const DEEP_LINK_HTTPS_PREFIX = 'https://inside-journal.app';
 
 // Deep link paths
 export const DeepLinkPaths = {

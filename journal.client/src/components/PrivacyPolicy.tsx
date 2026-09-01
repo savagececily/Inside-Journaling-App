@@ -202,8 +202,8 @@ export default function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
             <p>
                 <strong>Contact Information:</strong><br />
                 <strong>Email:</strong> [savagececily@gmail.com]<br />
-                <strong>GitHub:</strong> <a href="https://github.com/savagececily/MentalHealthJournal" target="_blank" rel="noopener noreferrer">
-                    github.com/savagececily/MentalHealthJournal
+                <strong>GitHub:</strong> <a href="https://github.com/savagececily/Journal" target="_blank" rel="noopener noreferrer">
+                    github.com/savagececily/Journal
                 </a>
             </p>
 

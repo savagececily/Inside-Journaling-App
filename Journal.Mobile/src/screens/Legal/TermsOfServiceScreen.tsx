@@ -7,7 +7,7 @@ import { colors, spacing, typography } from '../../theme';
 type Props = AuthStackScreenProps<'TermsOfService'>;
 
 export default function TermsOfServiceScreen({ navigation }: Props) {
-  const termsUrl = 'https://mentalhealthjournal-webapp.azurewebsites.net/TERMS_OF_SERVICE.md';
+  const termsUrl = 'https://inside-journal-api.azurewebsites.net/TERMS_OF_SERVICE.md';
 
   useEffect(() => {
     // Open in system browser to comply with Google's secure browser policy

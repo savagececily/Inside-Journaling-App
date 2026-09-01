@@ -101,7 +101,7 @@ namespace Journal.Tests.Helpers
                 CosmosDb = new CosmosDbSettings
                 {
                     Endpoint = "https://test-cosmos.documents.azure.com:443/",
-                    DatabaseName = "TestMentalHealthJournal",
+                    DatabaseName = "TestJournal",
                     JournalEntryContainer = "TestJournalEntries"
                 }
             };

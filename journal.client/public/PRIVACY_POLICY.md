@@ -313,9 +313,9 @@ Your continued use of the Service after changes constitutes acceptance of the up
 
 For privacy-related questions, requests, or concerns:
 
-**Email:** [privacy@mentalhealthjournal.com]  
-**Data Protection Contact:** [dpo@mentalhealthjournal.com]  
-**Support:** [support@mentalhealthjournal.com]  
+**Email:** [privacy@inside-journal.app]
+**Data Protection Contact:** [dpo@inside-journal.app]
+**Support:** [support@inside-journal.app]
 **Mailing Address:** [Your Business Address]
 
 ### Response Time

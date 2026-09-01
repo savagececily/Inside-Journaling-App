@@ -57,10 +57,10 @@ Voice recording functionality allows users to create journal entries by recordin
 - Audio playback available in entry details
 
 **Key Files:**
-- `mentalhealthjournal.client/src/services/audioRecordingService.ts`
-- `mentalhealthjournal.client/src/components/VoiceRecorder.tsx`
-- `MentalHealthJournal.Server/Controllers/JournalController.cs`
-- `MentalHealthJournal.Services/SpeechToTextService.cs`
+- `journal.client/src/services/audioRecordingService.ts`
+- `journal.client/src/components/VoiceRecorder.tsx`
+- `Journal.Server/Controllers/JournalController.cs`
+- `Journal.Services/SpeechToTextService.cs`
 
 ---
 
@@ -124,9 +124,9 @@ Comprehensive AI analysis of journal entries using Azure Cognitive Services and 
 - `POST /api/journal/detect-crisis` - Crisis content analysis
 
 **Key Files:**
-- `MentalHealthJournal.Services/JournalAnalysisService.cs`
-- `MentalHealthJournal.Server/Controllers/JournalController.cs`
-- `mentalhealthjournal.client/src/services/journalService.ts`
+- `Journal.Services/JournalAnalysisService.cs`
+- `Journal.Server/Controllers/JournalController.cs`
+- `journal.client/src/services/journalService.ts`
 
 ---
 
@@ -185,9 +185,9 @@ Interactive charts and visualizations for mental wellness insights.
 - Entries this week/month
 
 **Key Files:**
-- `mentalhealthjournal.client/src/components/SentimentTimeline.tsx`
-- `mentalhealthjournal.client/src/components/KeyPhrasesCloud.tsx`
-- `mentalhealthjournal.client/src/components/Dashboard.tsx`
+- `journal.client/src/components/SentimentTimeline.tsx`
+- `journal.client/src/components/KeyPhrasesCloud.tsx`
+- `journal.client/src/components/Dashboard.tsx`
 
 ---
 
@@ -258,9 +258,9 @@ When concerning content detected:
 - Fallback to manual review if needed
 
 **Key Files:**
-- `mentalhealthjournal.client/src/components/CrisisResourcesModal.tsx`
-- `mentalhealthjournal.client/src/components/Header.tsx`
-- `MentalHealthJournal.Server/Controllers/JournalController.cs`
+- `journal.client/src/components/CrisisResourcesModal.tsx`
+- `journal.client/src/components/Header.tsx`
+- `Journal.Server/Controllers/JournalController.cs`
 
 ---
 
@@ -289,9 +289,9 @@ When concerning content detected:
 - Privacy consent tracking
 
 **Key Files:**
-- `MentalHealthJournal.Server/Controllers/AuthController.cs`
-- `MentalHealthJournal.Services/UserService.cs`
-- `mentalhealthjournal.client/src/contexts/AuthContext.tsx`
+- `Journal.Server/Controllers/AuthController.cs`
+- `Journal.Services/UserService.cs`
+- `journal.client/src/contexts/AuthContext.tsx`
 
 ---
 
@@ -320,8 +320,8 @@ When concerning content detected:
 - **Result**: 50-70% reduction in query costs after optimization
 
 **Key Files:**
-- `MentalHealthJournal.Services/CosmosDbService.cs`
-- `MentalHealthJournal.Services/BlobStorageService.cs`
+- `Journal.Services/CosmosDbService.cs`
+- `Journal.Services/BlobStorageService.cs`
 
 ---
 
@@ -368,9 +368,9 @@ When concerning content detected:
 - User session analytics
 
 **Key Files:**
-- `MentalHealthJournal.Services/ResiliencePolicies.cs`
-- `MentalHealthJournal.Server/Program.cs`
-- `mentalhealthjournal.client/src/hooks/useInfiniteScroll.ts`
+- `Journal.Services/ResiliencePolicies.cs`
+- `Journal.Server/Program.cs`
+- `journal.client/src/hooks/useInfiniteScroll.ts`
 
 ---
 
@@ -411,9 +411,9 @@ When concerning content detected:
 - Azurite for local blob storage
 
 **Key Files:**
-- `MentalHealthJournal.Tests/` directory
-- `MentalHealthJournal.Tests/Controllers/`
-- `MentalHealthJournal.Tests/Services/`
+- `Journal.Tests/` directory
+- `Journal.Tests/Controllers/`
+- `Journal.Tests/Services/`
 
 ---
 
@@ -506,8 +506,8 @@ When concerning content detected:
 **Key Files:**
 - `PRIVACY_POLICY.md`
 - `TERMS_OF_SERVICE.md`
-- `MentalHealthJournal.Services/UserConsentService.cs`
-- `MentalHealthJournal.Services/AuditLogService.cs`
+- `Journal.Services/UserConsentService.cs`
+- `Journal.Services/AuditLogService.cs`
 
 ---
 

@@ -3,7 +3,6 @@ namespace Journal.Models
 {
     public class AppSettings
     {
-        public string AzureAppConfiguration { get; set; } = string.Empty;
         public string ManagedIdentityClientId { get; set; } = string.Empty;
         public AzureCognitiveServicesSettings AzureCognitiveServices { get; set; } = new();
         public AzureOpenAISettings AzureOpenAI { get; set; } = new();

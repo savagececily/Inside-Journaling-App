@@ -161,8 +161,8 @@ az webapp config appsettings set \
         "AzureBlobStorage__ContainerName=journalaudio" \
         "AzureCognitiveServices__Region=eastus" \
         "Jwt__Key=$JWT_KEY" \
-        "Jwt__Issuer=https://inside-journaling-app.azurewebsites.net" \
-        "Jwt__Audience=https://inside-journaling-app.azurewebsites.net" \
+        "Jwt__Issuer=Journal" \
+        "Jwt__Audience=JournalApp" \
         "GoogleOAuth__ClientId=$GOOGLE_CLIENT_ID" \
         "GoogleOAuth__ClientSecret=$GOOGLE_CLIENT_SECRET" \
         "MicrosoftOAuth__ClientId=$MICROSOFT_CLIENT_ID" \

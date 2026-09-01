@@ -7,7 +7,7 @@ import { colors, spacing, typography } from '../../theme';
 type Props = AuthStackScreenProps<'PrivacyPolicy'>;
 
 export default function PrivacyPolicyScreen({ navigation }: Props) {
-  const privacyUrl = 'https://mentalhealthjournal-webapp.azurewebsites.net/PRIVACY_POLICY.md';
+  const privacyUrl = 'https://inside-journal-api.azurewebsites.net/PRIVACY_POLICY.md';
 
   useEffect(() => {
     // Open in system browser to comply with Google's secure browser policy

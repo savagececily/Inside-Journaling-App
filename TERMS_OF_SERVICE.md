@@ -263,7 +263,7 @@ You may not assign these Terms without our consent. We may assign these Terms to
 
 ### 17.5 Contact Information
 For questions about these Terms, contact us at:
-- Email: [support@mentalhealthjournal.com]
+- Email: [support@inside-journal.app]
 - Mailing Address: [Your Business Address]
 
 ## 18. Consent and Acknowledgment

@@ -9,7 +9,6 @@ using Azure.AI.TextAnalytics;
 using OpenAI;
 using Azure.AI.OpenAI;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -33,27 +32,8 @@ namespace Journal.Server
                 ManagedIdentityClientId = Environment.GetEnvironmentVariable("ManagedIdentityClientId")
             });
 
-            // Load configuration from Azure App Configuration
-            var configurationUri = Environment.GetEnvironmentVariable("AzureAppConfiguration");
-            if (!string.IsNullOrEmpty(configurationUri))
-            {
-                var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-                var label = environment == "Development" ? "development" : null;
-                
-                builder.Configuration.AddAzureAppConfiguration(options =>
-                {
-                    options.Connect(new Uri(configurationUri), defaultCredential)
-                        // Load all keys without label (production/shared values)
-                        .Select("*", LabelFilter.Null)
-                        // Load environment-specific values if label is set
-                        .Select("*", label);
-                });
-            }
-            else
-            {
-                Console.WriteLine("WARNING: AzureAppConfiguration environment variable not set. Using local configuration only.");
-            }
-
+            // Configuration is loaded from appsettings.json and environment variables
+            // Environment variables in Azure App Service override appsettings.json values
             var config = builder.Configuration;
 
             // Add Application Insights telemetry with explicit connection string
@@ -149,8 +129,8 @@ namespace Journal.Server
 
             // === JWT Authentication ===
             var jwtKey = config["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key is not configured");
-            var jwtIssuer = config["Jwt:Issuer"] ?? "MentalHealthJournal";
-            var jwtAudience = config["Jwt:Audience"] ?? "MentalHealthJournalApp";
+            var jwtIssuer = config["Jwt:Issuer"] ?? "Journal";
+            var jwtAudience = config["Jwt:Audience"] ?? "JournalApp";
 
             // Validate JWT key length for security (minimum 256 bits/32 bytes for HS256)
             var jwtKeyBytes = Encoding.UTF8.GetBytes(jwtKey);
@@ -209,7 +189,7 @@ namespace Journal.Server
                         "http://localhost:5173",
                         "https://localhost:54551",
                         "https://localhost:5173",
-                        "https://mentalhealthjournal-webapp.azurewebsites.net"
+                        "https://polite-island-0c8b5cb0f.5.azurestaticapps.net"
                     )
                     .AllowAnyMethod()
                     .AllowAnyHeader()
