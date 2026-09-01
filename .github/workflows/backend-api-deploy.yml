@@ -1,0 +1,135 @@
+name: Deploy Backend API to Azure
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Journal.Server/**'
+      - 'Journal.Models/**'
+      - 'Journal.Services/**'
+      - '.github/workflows/backend-api-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - production
+
+env:
+  DOTNET_VERSION: '8.x'
+  AZURE_WEBAPP_NAME: inside-journal-api
+  RESOURCE_GROUP: InsideJournalingAppRG
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore .NET dependencies
+        run: dotnet restore Journal.Server/Journal.Server.csproj
+
+      - name: Build backend
+        run: dotnet build Journal.Server/Journal.Server.csproj --configuration Release --no-restore
+
+      - name: Run .NET tests
+        run: dotnet test Journal.Tests/Journal.Tests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Publish ASP.NET Core API
+        run: dotnet publish Journal.Server/Journal.Server.csproj -c Release -o ${{ env.DOTNET_ROOT }}/api
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-api
+          path: ${{ env.DOTNET_ROOT }}/api
+
+  deploy-to-development:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'development')
+    environment:
+      name: Development
+      url: https://inside-journal-api-development.azurewebsites.net
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-api
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Development Slot
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: development
+          package: .
+
+      - name: Deployment summary
+        run: |
+          echo "### 🚀 Backend API Deployed to Development" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://inside-journal-api-development.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production'
+    environment:
+      name: Production
+      url: https://inside-journal-api.azurewebsites.net
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-api
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy to Production Slot
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          slot-name: production
+          package: .
+
+      - name: Deployment summary
+        run: |
+          echo "### 🚀 Backend API Deployed to Production" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://inside-journal-api.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

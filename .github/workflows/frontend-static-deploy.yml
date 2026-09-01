@@ -1,0 +1,86 @@
+name: Deploy Frontend to Azure Static Web Apps
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'mentalhealthjournal.client/**'
+      - '.github/workflows/frontend-static-deploy.yml'
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [ main ]
+    paths:
+      - 'mentalhealthjournal.client/**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '22.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+    name: Build and Deploy Frontend
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: journal.client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: journal.client
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: journal.client
+        run: npm run build
+        env:
+          # Production API endpoint - points to the backend API App Service
+          VITE_API_URL: https://inside-journal-api-development.azurewebsites.net/api
+          VITE_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING }}
+
+      - name: Deploy to Azure Static Web Apps
+        id: deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "journal.client/dist"
+          skip_app_build: true
+          skip_api_build: true
+
+      - name: Deployment summary
+        if: github.event_name != 'pull_request'
+        run: |
+          echo "### 🚀 Frontend Deployed to Azure Static Web Apps" >> $GITHUB_STEP_SUMMARY
+          echo "**URL:** https://polite-island-0c8b5cb0f.5.azurestaticapps.net" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  close-pull-request:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request
+    permissions:
+      contents: read
+
+    steps:
+      - name: Close Pull Request
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"
