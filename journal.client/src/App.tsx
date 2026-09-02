@@ -12,6 +12,7 @@ import { EditEntryModal } from './components/EditEntryModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import CrisisAlert from './components/CrisisAlert';
+import { AccountSettings } from './components/AccountSettings';
 import { journalService } from './services/journalService';
 import { API_BASE_URL } from './config/api';
 import './App.css';
@@ -86,6 +87,7 @@ function App() {
     const [crisisData, setCrisisData] = useState<{ reason?: string; resources: CrisisResource[] }>({ resources: [] });
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showTermsOfService, setShowTermsOfService] = useState(false);
+    const [showAccountSettings, setShowAccountSettings] = useState(false);
 
     // Clean up blob URL when audioBlob changes or component unmounts
     useEffect(() => {
@@ -512,6 +514,9 @@ function App() {
                         <button className="about-button" onClick={() => setShowAbout(true)} aria-label="Open about information">
                             About
                         </button>
+                        <button className="about-button" onClick={() => setShowAccountSettings(true)} aria-label="Open account settings">
+                            Account
+                        </button>
                         <button className="logout-button" onClick={logout} aria-label="Log out of your account">
                             Logout
                         </button>
@@ -909,6 +914,11 @@ function App() {
 
             {showAbout && <About onClose={() => setShowAbout(false)} />}
             {showUsernameSetup && <UsernameSetup onComplete={() => setShowUsernameSetup(false)} />}
+            <AccountSettings
+                isOpen={showAccountSettings}
+                onClose={() => setShowAccountSettings(false)}
+                onDeleted={logout}
+            />
             {editingEntry && (
                 <EditEntryModal
                     entryId={editingEntry.id}

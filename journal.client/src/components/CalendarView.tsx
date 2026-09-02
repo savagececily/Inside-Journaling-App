@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { API_BASE_URL } from '../config/api';
 import './CalendarView.css';
 
 interface CalendarEntry {
@@ -34,7 +35,7 @@ export function CalendarView({ token }: CalendarViewProps) {
             const endDate = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59));
 
             const response = await fetch(
-                `/api/journal/calendar?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
+                `${API_BASE_URL}/journal/calendar?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
