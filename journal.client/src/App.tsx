@@ -26,6 +26,7 @@ const StreakCounter = lazy(() => import('./components/StreakCounter').then(modul
 const SentimentTimeline = lazy(() => import('./components/SentimentTimeline').then(module => ({ default: module.SentimentTimeline })));
 const KeyPhrasesCloud = lazy(() => import('./components/KeyPhrasesCloud').then(module => ({ default: module.KeyPhrasesCloud })));
 const TimePatterns = lazy(() => import('./components/TimePatterns').then(module => ({ default: module.TimePatterns })));
+const VirtualSupport = lazy(() => import('./components/VirtualSupport').then(module => ({ default: module.VirtualSupport })));
 
 interface CrisisResource {
     name: string;
@@ -74,7 +75,7 @@ function App() {
     const [loadingError, setLoadingError] = useState<string | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
-    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'insights' | 'calendar' | 'export'>('new');
+    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'chat' | 'insights' | 'calendar' | 'export'>('new');
     const [trends, setTrends] = useState<TrendData | null>(null);
     const [latestEntry, setLatestEntry] = useState<JournalEntry | null>(null);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -545,6 +546,15 @@ function App() {
                         📚 Past Entries
                     </button>
                     <button 
+                        className={`tab ${activeTab === 'chat' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('chat')}
+                        role="tab"
+                        aria-selected={activeTab === 'chat'}
+                        aria-controls="chat-panel"
+                    >
+                        Virtual Support
+                    </button>
+                    <button 
                         className={`tab ${activeTab === 'insights' ? 'active' : ''}`}
                         onClick={() => setActiveTab('insights')}
                         role="tab"
@@ -888,6 +898,14 @@ function App() {
                                 </div>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {activeTab === 'chat' && token && (
+                    <div className="chat-tab" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+                        <Suspense fallback={<div className="loading-placeholder">Loading Virtual Support...</div>}>
+                            <VirtualSupport token={token} />
+                        </Suspense>
                     </div>
                 )}
 

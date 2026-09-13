@@ -18,16 +18,36 @@ namespace Journal.Services
         /// Check if user can create a voice entry
         /// </summary>
         Task<(bool CanCreate, string? Reason)> CanCreateVoiceEntryAsync(string userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Check if user can send a Virtual Support chat message
+        /// </summary>
+        Task<(bool CanSend, string? Reason)> CanSendChatMessageAsync(string userId, CancellationToken cancellationToken = default);
         
         /// <summary>
         /// Increment entry count for user
         /// </summary>
         Task IncrementEntryCountAsync(string userId, bool isVoice, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Increment chat message count for user
+        /// </summary>
+        Task IncrementChatCountAsync(string userId, CancellationToken cancellationToken = default);
         
         /// <summary>
-        /// Upgrade user to premium tier
+        /// Upgrade user to premium tier ($4.99/mo)
         /// </summary>
         Task UpgradeToPremiumAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Upgrade user to pro tier ($9.99/mo)
+        /// </summary>
+        Task UpgradeToProAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Upgrade user to specified tier
+        /// </summary>
+        Task UpgradeToTierAsync(string userId, UserTier tier, DateTime? expiresAt = null, CancellationToken cancellationToken = default);
         
         /// <summary>
         /// Downgrade user to free tier

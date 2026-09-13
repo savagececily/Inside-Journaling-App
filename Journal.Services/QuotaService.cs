@@ -107,6 +107,32 @@ namespace Journal.Services
             return (true, null);
         }
 
+        public async Task<(bool CanSend, string? Reason)> CanSendChatMessageAsync(string userId, CancellationToken cancellationToken = default)
+        {
+            var quota = await GetUserQuotaAsync(userId, cancellationToken);
+
+            if (quota.IsProActive)
+            {
+                return (true, null); // Pro has unlimited chat messages
+            }
+
+            if (quota.IsPremiumActive)
+            {
+                if (quota.HasExceededChatQuota)
+                {
+                    return (false, $"You've reached your monthly Premium limit of {quota.ChatQuotaLimit} chat messages. Upgrade to Pro for unlimited companion messages.");
+                }
+                return (true, null);
+            }
+
+            if (quota.HasExceededChatQuota)
+            {
+                return (false, $"You've reached your free tier limit of {quota.ChatQuotaLimit} chat messages this month. Upgrade to Premium or Pro for higher limits.");
+            }
+
+            return (true, null);
+        }
+
         public async Task IncrementEntryCountAsync(string userId, bool isVoice, CancellationToken cancellationToken = default)
         {
             var quota = await GetUserQuotaAsync(userId, cancellationToken);
@@ -126,16 +152,40 @@ namespace Journal.Services
             );
         }
 
-        public async Task UpgradeToPremiumAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default)
+        public async Task IncrementChatCountAsync(string userId, CancellationToken cancellationToken = default)
         {
             var quota = await GetUserQuotaAsync(userId, cancellationToken);
-            
-            quota.Tier = UserTier.Premium;
-            quota.PremiumExpiresAt = expiresAt;
-            
+
+            quota.ChatMessagesThisMonth++;
+
             await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
-            
-            _logger.LogInformation("Upgraded user {UserId} to Premium (expires: {Expires})", userId, expiresAt?.ToString() ?? "never");
+
+            _logger.LogInformation(
+                "Incremented chat usage for user {UserId}: ChatMessages={Chat}/{Limit}",
+                userId, quota.ChatMessagesThisMonth, quota.ChatQuotaLimit
+            );
+        }
+
+        public async Task UpgradeToPremiumAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default)
+        {
+            await UpgradeToTierAsync(userId, UserTier.Premium, expiresAt, cancellationToken);
+        }
+
+        public async Task UpgradeToProAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default)
+        {
+            await UpgradeToTierAsync(userId, UserTier.Pro, expiresAt, cancellationToken);
+        }
+
+        public async Task UpgradeToTierAsync(string userId, UserTier tier, DateTime? expiresAt = null, CancellationToken cancellationToken = default)
+        {
+            var quota = await GetUserQuotaAsync(userId, cancellationToken);
+
+            quota.Tier = tier;
+            quota.PremiumExpiresAt = expiresAt;
+
+            await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Upgraded user {UserId} to {Tier} (expires: {Expires})", userId, tier, expiresAt?.ToString() ?? "never");
         }
 
         public async Task DowngradeToFreeAsync(string userId, CancellationToken cancellationToken = default)

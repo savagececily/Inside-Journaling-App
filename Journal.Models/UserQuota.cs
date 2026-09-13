@@ -10,6 +10,7 @@ namespace Journal.Models
         public UserTier Tier { get; set; } = UserTier.Free;
         public int EntriesThisMonth { get; set; } = 0;
         public int VoiceEntriesThisMonth { get; set; } = 0;
+        public int ChatMessagesThisMonth { get; set; } = 0;
         public DateTime LastReset { get; set; } = DateTime.UtcNow;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? PremiumExpiresAt { get; set; }
@@ -33,6 +34,17 @@ namespace Journal.Models
             UserTier.Premium => int.MaxValue,
             _ => 10
         };
+
+        /// <summary>
+        /// Get the Virtual Support chat message quota limit based on user tier
+        /// </summary>
+        public int ChatQuotaLimit => Tier switch
+        {
+            UserTier.Free => 15,
+            UserTier.Premium => 250,
+            UserTier.Pro => int.MaxValue,
+            _ => 15
+        };
         
         /// <summary>
         /// Check if user has exceeded their AI analysis quota
@@ -43,12 +55,23 @@ namespace Journal.Models
         /// Check if user has exceeded their voice quota
         /// </summary>
         public bool HasExceededVoiceQuota => VoiceEntriesThisMonth >= VoiceQuotaLimit;
+
+        /// <summary>
+        /// Check if user has exceeded their chat message quota
+        /// </summary>
+        public bool HasExceededChatQuota => ChatMessagesThisMonth >= ChatQuotaLimit;
         
         /// <summary>
-        /// Check if this is a premium user with active subscription
+        /// Check if this is a active paid subscription user (Premium or Pro)
         /// </summary>
-        public bool IsPremiumActive => Tier == UserTier.Premium && 
+        public bool IsPremiumActive => (Tier == UserTier.Premium || Tier == UserTier.Pro) && 
                                        (!PremiumExpiresAt.HasValue || PremiumExpiresAt.Value > DateTime.UtcNow);
+
+        /// <summary>
+        /// Check if this is an active Pro tier user
+        /// </summary>
+        public bool IsProActive => Tier == UserTier.Pro && 
+                                   (!PremiumExpiresAt.HasValue || PremiumExpiresAt.Value > DateTime.UtcNow);
         
         /// <summary>
         /// Check if quota should be reset (new month)
@@ -66,6 +89,7 @@ namespace Journal.Models
         {
             EntriesThisMonth = 0;
             VoiceEntriesThisMonth = 0;
+            ChatMessagesThisMonth = 0;
             LastReset = DateTime.UtcNow;
         }
     }
@@ -76,6 +100,7 @@ namespace Journal.Models
     public enum UserTier
     {
         Free = 0,
-        Premium = 1
+        Premium = 1,
+        Pro = 2
     }
 }
