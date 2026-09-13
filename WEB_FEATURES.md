@@ -428,7 +428,7 @@ When concerning content detected:
 - Application Insights (monitoring)
 
 ### Backend (.NET)
-- .NET 8.0
+- .NET 10.0
 - ASP.NET Core Web API
 - Entity Framework Core patterns
 - Azure SDK libraries
@@ -450,7 +450,7 @@ When concerning content detected:
 ## Deployment
 
 ### Azure App Service
-- .NET 8 runtime
+- .NET 10 runtime
 - Linux or Windows hosting
 - Auto-scaling enabled
 - SSL/TLS certificates

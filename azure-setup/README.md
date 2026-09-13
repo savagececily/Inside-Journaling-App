@@ -8,7 +8,7 @@ The backend and frontend are deployed independently.
 
 | Component | Azure resource | Notes |
 | --- | --- | --- |
-| Backend API | App Service `inside-journal-api` | .NET 8 on Windows, with a `development` slot |
+| Backend API | App Service `inside-journal-api` | .NET 10 on Windows, with a `development` slot |
 | Frontend (production) | Static Web App `inside-journal-app` | React and Vite build output |
 | Frontend (development) | Static Web App `inside-journal-app-dev` | Points at the API development slot |
 | Mobile | Expo / React Native | Consumes the same API |

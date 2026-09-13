@@ -28,7 +28,7 @@ Quick reference to all Inside Journaling App documentation.
 
 The application is split into two independently deployed pieces:
 
-- **Backend API** - ASP.NET Core 8 on Azure App Service (`inside-journal-api`), with a `development` slot
+- **Backend API** - ASP.NET Core 10 on Azure App Service (`inside-journal-api`), with a `development` slot
 - **Frontend** - React and Vite on Azure Static Web Apps (`inside-journal-app`)
 - **Mobile** - React Native and Expo, consuming the same API
 

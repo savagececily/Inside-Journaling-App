@@ -20,7 +20,7 @@ on:
           - production
 
 env:
-  DOTNET_VERSION: '8.x'
+  DOTNET_VERSION: '10.x'
   AZURE_WEBAPP_NAME: inside-journal-api
   RESOURCE_GROUP: InsideJournalingAppRG
 
