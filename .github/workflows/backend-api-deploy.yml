@@ -90,7 +90,7 @@ jobs:
 
       - name: Deployment summary
         run: |
-          echo "### 🚀 Backend API Deployed to Development" >> $GITHUB_STEP_SUMMARY
+          echo "### Backend API Deployed to Development" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** https://inside-journal-api-development.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
@@ -119,17 +119,16 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy to Production Slot
+      - name: Deploy to Production
         id: deploy
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: production
           package: .
 
       - name: Deployment summary
         run: |
-          echo "### 🚀 Backend API Deployed to Production" >> $GITHUB_STEP_SUMMARY
+          echo "### Backend API Deployed to Production" >> $GITHUB_STEP_SUMMARY
           echo "**URL:** https://inside-journal-api.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
