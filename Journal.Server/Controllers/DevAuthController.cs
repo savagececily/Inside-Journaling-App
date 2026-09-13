@@ -21,6 +21,7 @@ public class DevAuthController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IJwtTokenService _tokenService;
+    private readonly IQuotaService? _quotaService;
     private readonly DevAuthSettings _settings;
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<DevAuthController> _logger;
@@ -30,10 +31,12 @@ public class DevAuthController : ControllerBase
         IJwtTokenService tokenService,
         IOptions<DevAuthSettings> settings,
         IWebHostEnvironment environment,
-        ILogger<DevAuthController> logger)
+        ILogger<DevAuthController> logger,
+        IQuotaService? quotaService = null)
     {
         _userService = userService;
         _tokenService = tokenService;
+        _quotaService = quotaService;
         _settings = settings.Value;
         _environment = environment;
         _logger = logger;
@@ -107,6 +110,22 @@ public class DevAuthController : ControllerBase
         }
 
         user = await _userService.CreateOrUpdateUserAsync(user);
+
+        if (_quotaService != null)
+        {
+            if (string.Equals(testUser.Id, "pro", StringComparison.OrdinalIgnoreCase))
+            {
+                await _quotaService.UpgradeToProAsync(user.userId, cancellationToken: cancellationToken);
+            }
+            else if (string.Equals(testUser.Id, "premium", StringComparison.OrdinalIgnoreCase))
+            {
+                await _quotaService.UpgradeToPremiumAsync(user.userId, cancellationToken: cancellationToken);
+            }
+            else if (string.Equals(testUser.Id, "free", StringComparison.OrdinalIgnoreCase))
+            {
+                await _quotaService.DowngradeToFreeAsync(user.userId, cancellationToken: cancellationToken);
+            }
+        }
 
         return Ok(new AuthResponse
         {

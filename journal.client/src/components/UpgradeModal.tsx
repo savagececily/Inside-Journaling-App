@@ -5,9 +5,10 @@ import './UpgradeModal.css';
 interface UpgradeModalProps {
   isOpen: boolean;
   onClose: () => void;
+  token?: string | null;
 }
 
-export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
+export default function UpgradeModal({ isOpen, onClose, token }: UpgradeModalProps) {
   const [loadingTier, setLoadingTier] = useState<'premium' | 'pro' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,10 +17,12 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
       setLoadingTier(tier);
       setError(null);
 
+      const authToken = token || localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+
       const response = await fetch(`${API_BASE_URL}/user/upgrade`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Authorization': authToken ? `Bearer ${authToken}` : '',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ tier })
@@ -44,7 +47,7 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="upgrade-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>×</button>
+        <button className="modal-close" onClick={onClose}>x</button>
         
         <div className="upgrade-modal-header">
           <h2>Upgrade Your Subscription</h2>
@@ -59,11 +62,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             <div className="price">$4.99<span>/month</span></div>
             
             <ul>
-              <li>✅ Unlimited AI entry analysis</li>
-              <li>✅ Unlimited voice-to-text</li>
-              <li>✅ 250 Virtual Support messages/mo</li>
-              <li>✅ Advanced analytics & insights</li>
-              <li>✅ Export your journal data</li>
+              <li>Unlimited AI entry analysis</li>
+              <li>Unlimited voice-to-text</li>
+              <li>250 Virtual Support messages/mo</li>
+              <li>Advanced analytics & insights</li>
+              <li>Export your journal data</li>
             </ul>
 
             <button 
@@ -81,11 +84,11 @@ export default function UpgradeModal({ isOpen, onClose }: UpgradeModalProps) {
             <div className="price">$9.99<span>/month</span></div>
             
             <ul>
-              <li>✅ Everything in Premium</li>
-              <li>✅ Unlimited Virtual Support messages</li>
-              <li>✅ Priority AI processing</li>
-              <li>✅ Dedicated customer support</li>
-              <li>✅ Early access to new companion capabilities</li>
+              <li>Everything in Premium</li>
+              <li>Unlimited Virtual Support messages</li>
+              <li>Priority AI processing</li>
+              <li>Dedicated customer support</li>
+              <li>Early access to new companion capabilities</li>
             </ul>
 
             <button 

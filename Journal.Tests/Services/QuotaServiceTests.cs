@@ -109,7 +109,7 @@ namespace Journal.Tests.Services
         }
 
         [Fact]
-        public async Task IncrementChatCountAsync_IncrementsCounterAndUpserts()
+        public async Task IncrementChatCountAsync_IncrementsCounterWithPatch()
         {
             var service = CreateService();
             var quota = new UserQuota
@@ -117,25 +117,27 @@ namespace Journal.Tests.Services
                 Id = TestUserId,
                 UserId = TestUserId,
                 Tier = UserTier.Free,
-                ChatMessagesThisMonth = 3
+                ChatMessagesThisMonth = 4
             };
 
             var itemResponseMock = new Mock<ItemResponse<UserQuota>>();
             itemResponseMock.Setup(r => r.Resource).Returns(quota);
 
-            _quotaContainerMock.Setup(c => c.ReadItemAsync<UserQuota>(
+            _quotaContainerMock.Setup(c => c.PatchItemAsync<UserQuota>(
                 TestUserId,
                 new PartitionKey(TestUserId),
-                It.IsAny<ItemRequestOptions>(),
+                It.IsAny<IReadOnlyList<PatchOperation>>(),
+                It.IsAny<PatchItemRequestOptions>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(itemResponseMock.Object);
 
             await service.IncrementChatCountAsync(TestUserId);
 
-            _quotaContainerMock.Verify(c => c.UpsertItemAsync(
-                It.Is<UserQuota>(q => q.ChatMessagesThisMonth == 4),
-                It.IsAny<PartitionKey>(),
-                It.IsAny<ItemRequestOptions>(),
+            _quotaContainerMock.Verify(c => c.PatchItemAsync<UserQuota>(
+                TestUserId,
+                new PartitionKey(TestUserId),
+                It.IsAny<IReadOnlyList<PatchOperation>>(),
+                It.IsAny<PatchItemRequestOptions>(),
                 It.IsAny<CancellationToken>()), Times.Once);
         }
     }

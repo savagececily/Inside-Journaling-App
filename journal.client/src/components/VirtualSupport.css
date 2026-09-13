@@ -78,9 +78,16 @@
     background: #eef2ff;
 }
 
-.session-content {
+.session-content,
+.session-button {
     flex: 1;
     min-width: 0;
+    background: none;
+    border: none;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .session-title {

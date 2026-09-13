@@ -135,35 +135,69 @@ namespace Journal.Services
 
         public async Task IncrementEntryCountAsync(string userId, bool isVoice, CancellationToken cancellationToken = default)
         {
-            var quota = await GetUserQuotaAsync(userId, cancellationToken);
-            
-            quota.EntriesThisMonth++;
+            var patchOperations = new List<PatchOperation>
+            {
+                PatchOperation.Increment("/entriesThisMonth", 1)
+            };
             if (isVoice)
             {
-                quota.VoiceEntriesThisMonth++;
+                patchOperations.Add(PatchOperation.Increment("/voiceEntriesThisMonth", 1));
             }
-            
-            await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
-            
-            _logger.LogInformation(
-                "Incremented usage for user {UserId}: Entries={Entries}/{Limit}, Voice={Voice}/{VoiceLimit}",
-                userId, quota.EntriesThisMonth, quota.AIAnalysisQuotaLimit, 
-                quota.VoiceEntriesThisMonth, quota.VoiceQuotaLimit
-            );
+
+            try
+            {
+                var response = await _quotaContainer.PatchItemAsync<UserQuota>(
+                    userId,
+                    new PartitionKey(userId),
+                    patchOperations,
+                    cancellationToken: cancellationToken
+                );
+
+                _logger.LogInformation(
+                    "Incremented usage for user {UserId}: Entries={Entries}/{Limit}, Voice={Voice}/{VoiceLimit}",
+                    userId, response.Resource.EntriesThisMonth, response.Resource.AIAnalysisQuotaLimit,
+                    response.Resource.VoiceEntriesThisMonth, response.Resource.VoiceQuotaLimit
+                );
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                var quota = await GetUserQuotaAsync(userId, cancellationToken);
+                quota.EntriesThisMonth++;
+                if (isVoice)
+                {
+                    quota.VoiceEntriesThisMonth++;
+                }
+                await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
+            }
         }
 
         public async Task IncrementChatCountAsync(string userId, CancellationToken cancellationToken = default)
         {
-            var quota = await GetUserQuotaAsync(userId, cancellationToken);
+            var patchOperations = new[]
+            {
+                PatchOperation.Increment("/chatMessagesThisMonth", 1)
+            };
 
-            quota.ChatMessagesThisMonth++;
+            try
+            {
+                var response = await _quotaContainer.PatchItemAsync<UserQuota>(
+                    userId,
+                    new PartitionKey(userId),
+                    patchOperations,
+                    cancellationToken: cancellationToken
+                );
 
-            await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
-
-            _logger.LogInformation(
-                "Incremented chat usage for user {UserId}: ChatMessages={Chat}/{Limit}",
-                userId, quota.ChatMessagesThisMonth, quota.ChatQuotaLimit
-            );
+                _logger.LogInformation(
+                    "Incremented chat usage for user {UserId}: ChatMessages={Chat}/{Limit}",
+                    userId, response.Resource.ChatMessagesThisMonth, response.Resource.ChatQuotaLimit
+                );
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                var quota = await GetUserQuotaAsync(userId, cancellationToken);
+                quota.ChatMessagesThisMonth++;
+                await _quotaContainer.UpsertItemAsync(quota, new PartitionKey(userId), cancellationToken: cancellationToken);
+            }
         }
 
         public async Task UpgradeToPremiumAsync(string userId, DateTime? expiresAt = null, CancellationToken cancellationToken = default)

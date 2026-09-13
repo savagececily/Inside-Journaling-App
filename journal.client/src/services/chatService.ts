@@ -44,7 +44,7 @@ const getAuthHeaders = (token?: string) => {
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
     };
-    if (authToken) {
+    if (authToken && authToken !== 'easyauth') {
         headers['Authorization'] = `Bearer ${authToken}`;
     }
     return headers;
@@ -55,6 +55,7 @@ export const chatService = {
         const response = await fetch(`${API_BASE_URL}/chat/message`, {
             method: 'POST',
             headers: getAuthHeaders(token),
+            credentials: 'include',
             body: JSON.stringify(request),
         });
 
@@ -69,6 +70,7 @@ export const chatService = {
     async getSession(token: string, sessionId: string): Promise<ChatSession> {
         const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
             headers: getAuthHeaders(token),
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -82,6 +84,7 @@ export const chatService = {
     async getSessions(token: string): Promise<ChatSession[]> {
         const response = await fetch(`${API_BASE_URL}/chat/sessions`, {
             headers: getAuthHeaders(token),
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -96,6 +99,7 @@ export const chatService = {
         const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
             method: 'DELETE',
             headers: getAuthHeaders(token),
+            credentials: 'include',
         });
 
         if (!response.ok) {

@@ -10,15 +10,18 @@ namespace Journal.Services
         private readonly ILogger<DataExportService> _logger;
         private readonly ICosmosDbService _cosmosService;
         private readonly IUserService _userService;
+        private readonly IChatService? _chatService;
 
         public DataExportService(
             ILogger<DataExportService> logger,
             ICosmosDbService cosmosService,
-            IUserService userService)
+            IUserService userService,
+            IChatService? chatService = null)
         {
             _logger = logger;
             _cosmosService = cosmosService;
             _userService = userService;
+            _chatService = chatService;
         }
 
         public async Task<string> ExportToJsonAsync(string userId, CancellationToken cancellationToken = default)
@@ -30,6 +33,32 @@ namespace Journal.Services
                 // Get user data
                 var user = await _userService.GetUserByIdAsync(userId);
                 var entries = await _cosmosService.GetEntriesForUserAsync(userId, cancellationToken);
+
+                var chatExport = new List<object>();
+                if (_chatService != null)
+                {
+                    var summaries = await _chatService.GetUserSessionsAsync(userId);
+                    foreach (var s in summaries)
+                    {
+                        var fullSession = await _chatService.GetSessionAsync(userId, s.id);
+                        if (fullSession != null)
+                        {
+                            chatExport.Add(new
+                            {
+                                id = fullSession.id,
+                                title = fullSession.Title,
+                                createdAt = fullSession.CreatedAt,
+                                lastMessageAt = fullSession.LastMessageAt,
+                                messages = fullSession.Messages.Select(m => new
+                                {
+                                    role = m.Role,
+                                    content = m.Content,
+                                    timestamp = m.Timestamp
+                                }).ToList()
+                            });
+                        }
+                    }
+                }
 
                 // Create export object
                 var exportData = new
@@ -43,6 +72,7 @@ namespace Journal.Services
                         Email = user?.Email
                     },
                     TotalEntries = entries.Count,
+                    TotalChatSessions = chatExport.Count,
                     Entries = entries.Select(e => new
                     {
                         e.id,
@@ -55,7 +85,8 @@ namespace Journal.Services
                         e.KeyPhrases,
                         e.Summary,
                         e.Affirmation
-                    }).ToList()
+                    }).ToList(),
+                    ChatSessions = chatExport
                 };
 
                 var options = new JsonSerializerOptions

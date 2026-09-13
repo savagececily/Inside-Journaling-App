@@ -13,6 +13,7 @@ namespace Journal.Tests.Controllers
     public class ChatControllerTests
     {
         private readonly Mock<IChatService> _chatServiceMock;
+        private readonly Mock<IQuotaService> _quotaServiceMock;
         private readonly Mock<ILogger<ChatController>> _loggerMock;
         private readonly ChatController _controller;
         private const string TestUserId = "user-123";
@@ -20,8 +21,13 @@ namespace Journal.Tests.Controllers
         public ChatControllerTests()
         {
             _chatServiceMock = new Mock<IChatService>();
+            _quotaServiceMock = new Mock<IQuotaService>();
             _loggerMock = new Mock<ILogger<ChatController>>();
-            _controller = new ChatController(_chatServiceMock.Object, _loggerMock.Object);
+
+            _quotaServiceMock.Setup(q => q.CanSendChatMessageAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, null));
+
+            _controller = new ChatController(_chatServiceMock.Object, _quotaServiceMock.Object, _loggerMock.Object);
 
             SetupControllerContext(TestUserId);
         }

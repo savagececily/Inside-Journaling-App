@@ -97,29 +97,46 @@ export const VirtualSupport = ({ token }: VirtualSupportProps) => {
         setLoading(true);
         setError(null);
 
+        let response: import('../services/chatService').ChatResponse;
         try {
-            const response = await chatService.sendMessage(token, {
+            response = await chatService.sendMessage(token, {
                 message: userMsgText,
                 sessionId: previousSession?.id && !previousSession.id.startsWith('temp-') ? previousSession.id : undefined
             });
-
-            if (response.isCrisisDetected) {
-                setCrisisData({
-                    isVisible: true,
-                    reason: response.crisisReason || undefined,
-                    resources: response.crisisResources || []
-                });
-            }
-
-            const updatedSession = await chatService.getSession(token, response.sessionId);
-            setCurrentSession(updatedSession);
-
-            await loadSessions();
         } catch (err) {
             console.error('Error sending message:', err);
-            setError('Failed to send message. Please try again.');
+            setError(err instanceof Error ? err.message : 'Failed to send message. Please try again.');
             setCurrentSession(previousSession);
             setMessage(userMsgText);
+            setLoading(false);
+            return;
+        }
+
+        if (response.isCrisisDetected) {
+            setCrisisData({
+                isVisible: true,
+                reason: response.crisisReason || undefined,
+                resources: response.crisisResources || []
+            });
+        }
+
+        try {
+            const updatedSession = await chatService.getSession(token, response.sessionId);
+            setCurrentSession(updatedSession);
+            await loadSessions();
+        } catch (refreshErr) {
+            console.error('Error refreshing session after message sent:', refreshErr);
+            const assistantMsg: ChatMessage = {
+                role: 'assistant',
+                content: response.message,
+                timestamp: response.timestamp || new Date().toISOString()
+            };
+            setCurrentSession(prev => prev ? {
+                ...prev,
+                id: response.sessionId,
+                messages: [...prev.messages, assistantMsg],
+                lastMessageAt: assistantMsg.timestamp
+            } : null);
         } finally {
             setLoading(false);
         }
@@ -185,15 +202,16 @@ export const VirtualSupport = ({ token }: VirtualSupportProps) => {
                                 key={session.id}
                                 className={`session-item ${currentSession?.id === session.id ? 'active' : ''}`}
                             >
-                                <div
-                                    className="session-content"
+                                <button
+                                    className="session-button"
                                     onClick={() => loadSession(session.id)}
+                                    aria-label={`Open conversation: ${session.title}`}
                                 >
                                     <div className="session-title">{session.title}</div>
                                     <div className="session-date">
                                         {formatDate(session.lastMessageAt)}
                                     </div>
-                                </div>
+                                </button>
                                 <button
                                     className="delete-session-btn"
                                     onClick={(e) => {

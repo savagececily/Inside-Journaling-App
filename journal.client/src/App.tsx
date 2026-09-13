@@ -13,6 +13,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import CrisisAlert from './components/CrisisAlert';
 import { AccountSettings } from './components/AccountSettings';
+import UpgradeModal from './components/UpgradeModal';
 import { journalService } from './services/journalService';
 import { API_BASE_URL } from './config/api';
 import './App.css';
@@ -89,6 +90,7 @@ function App() {
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showTermsOfService, setShowTermsOfService] = useState(false);
     const [showAccountSettings, setShowAccountSettings] = useState(false);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     // Clean up blob URL when audioBlob changes or component unmounts
     useEffect(() => {
@@ -515,6 +517,9 @@ function App() {
                         <button className="about-button" onClick={() => setShowAbout(true)} aria-label="Open about information">
                             About
                         </button>
+                        <button className="about-button" onClick={() => setShowUpgradeModal(true)} aria-label="Open upgrade subscription options">
+                            Upgrade
+                        </button>
                         <button className="about-button" onClick={() => setShowAccountSettings(true)} aria-label="Open account settings">
                             Account
                         </button>
@@ -546,6 +551,7 @@ function App() {
                         📚 Past Entries
                     </button>
                     <button 
+                        id="chat-tab"
                         className={`tab ${activeTab === 'chat' ? 'active' : ''}`}
                         onClick={() => setActiveTab('chat')}
                         role="tab"
@@ -936,6 +942,11 @@ function App() {
                 isOpen={showAccountSettings}
                 onClose={() => setShowAccountSettings(false)}
                 onDeleted={logout}
+            />
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                token={token}
             />
             {editingEntry && (
                 <EditEntryModal

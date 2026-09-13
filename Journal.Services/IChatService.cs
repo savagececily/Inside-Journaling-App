@@ -8,5 +8,6 @@ namespace Journal.Services
         Task<ChatSession?> GetSessionAsync(string userId, string sessionId);
         Task<List<ChatSession>> GetUserSessionsAsync(string userId);
         Task DeleteSessionAsync(string userId, string sessionId);
+        Task DeleteAllUserSessionsAsync(string userId);
     }
 }

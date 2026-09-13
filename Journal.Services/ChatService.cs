@@ -53,7 +53,7 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
 
             var databaseName = !string.IsNullOrEmpty(appSettings.CosmosDb?.DatabaseName)
                 ? appSettings.CosmosDb.DatabaseName
-                : (configuration?["CosmosDb:DatabaseName"] ?? "inside-journaling-app");
+                : (configuration?["CosmosDb:DatabaseName"] ?? throw new InvalidOperationException("CosmosDb:DatabaseName is not configured"));
 
             var containerName = !string.IsNullOrEmpty(appSettings.CosmosDb?.ChatSessionContainer)
                 ? appSettings.CosmosDb.ChatSessionContainer
@@ -181,7 +181,7 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
                     new PartitionKey(userId)
                 );
 
-                if (response.Resource.UserId != userId)
+                if (response.Resource.UserId != userId || !response.Resource.IsActive)
                 {
                     return null;
                 }
@@ -199,7 +199,7 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
             try
             {
                 var query = new QueryDefinition(
-                    "SELECT * FROM c WHERE c.userId = @userId AND c.isActive = true ORDER BY c.lastMessageAt DESC"
+                    "SELECT c.id, c.chatSessionId, c.userId, c.title, c.createdAt, c.lastMessageAt, c.isActive FROM c WHERE c.userId = @userId AND c.isActive = true ORDER BY c.lastMessageAt DESC"
                 ).WithParameter("@userId", userId);
 
                 var queryOptions = new QueryRequestOptions
@@ -242,6 +242,41 @@ Remember: Your goal is to provide support and encouragement, not to diagnose or 
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting chat session {SessionId} for user {UserId}", sessionId, userId);
+                throw;
+            }
+        }
+
+        public async Task DeleteAllUserSessionsAsync(string userId)
+        {
+            try
+            {
+                var query = new QueryDefinition(
+                    "SELECT c.id FROM c WHERE c.userId = @userId"
+                ).WithParameter("@userId", userId);
+
+                var queryOptions = new QueryRequestOptions
+                {
+                    PartitionKey = new PartitionKey(userId)
+                };
+
+                using var iterator = _chatContainer.GetItemQueryIterator<ChatSession>(query, requestOptions: queryOptions);
+                while (iterator.HasMoreResults)
+                {
+                    var response = await iterator.ReadNextAsync();
+                    foreach (var session in response)
+                    {
+                        await _chatContainer.DeleteItemAsync<ChatSession>(
+                            session.id,
+                            new PartitionKey(userId)
+                        );
+                    }
+                }
+
+                _logger.LogInformation("Deleted all chat sessions for user {UserId}", userId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting all chat sessions for user {UserId}", userId);
                 throw;
             }
         }

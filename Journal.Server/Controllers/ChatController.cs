@@ -12,15 +12,17 @@ namespace Journal.Server.Controllers
     [Route("api/[controller]")]
     public class ChatController : ControllerBase
     {
+        private const int MaxMessageLength = 10000;
+
         private readonly IChatService _chatService;
-        private readonly IQuotaService? _quotaService;
+        private readonly IQuotaService _quotaService;
         private readonly ILogger<ChatController> _logger;
 
-        public ChatController(IChatService chatService, ILogger<ChatController> logger, IQuotaService? quotaService = null)
+        public ChatController(IChatService chatService, IQuotaService quotaService, ILogger<ChatController> logger)
         {
-            _chatService = chatService;
-            _logger = logger;
-            _quotaService = quotaService;
+            _chatService = chatService ?? throw new ArgumentNullException(nameof(chatService));
+            _quotaService = quotaService ?? throw new ArgumentNullException(nameof(quotaService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -36,34 +38,60 @@ namespace Journal.Server.Controllers
                 return Unauthorized();
             }
 
+            if (string.IsNullOrWhiteSpace(request?.Message))
+            {
+                return BadRequest("Message cannot be empty");
+            }
+
+            if (request.Message.Length > MaxMessageLength)
+            {
+                return BadRequest($"Message exceeds maximum length of {MaxMessageLength:N0} characters.");
+            }
+
+            bool isCrisis = CrisisKeywords.ContainsCrisisKeyword(request.Message);
+
             try
             {
-                if (string.IsNullOrWhiteSpace(request?.Message))
+                var (canSend, reason) = await _quotaService.CanSendChatMessageAsync(userId);
+                if (!canSend)
                 {
-                    return BadRequest("Message cannot be empty");
-                }
-
-                if (_quotaService != null)
-                {
-                    var (canSend, reason) = await _quotaService.CanSendChatMessageAsync(userId);
-                    if (!canSend)
+                    if (isCrisis)
                     {
-                        return StatusCode(StatusCodes.Status403Forbidden, new { message = reason });
+                        return StatusCode(StatusCodes.Status429TooManyRequests, new ChatResponse
+                        {
+                            Message = reason ?? "Quota limit reached.",
+                            IsCrisisDetected = true,
+                            CrisisReason = "Message contains phrases associated with crisis or distress.",
+                            CrisisResources = CrisisResources.GetDefaultResources()
+                        });
                     }
+
+                    return StatusCode(StatusCodes.Status429TooManyRequests, new { error = "Quota limit reached", message = reason });
                 }
 
                 var response = await _chatService.SendMessageAsync(userId, request);
 
-                if (_quotaService != null)
-                {
-                    await _quotaService.IncrementChatCountAsync(userId);
-                }
+                await _quotaService.IncrementChatCountAsync(userId);
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error sending chat message");
+                _logger.LogError(ex, "Error sending chat message for user {UserId}", userId);
+
+                if (isCrisis)
+                {
+                    return Ok(new ChatResponse
+                    {
+                        SessionId = request.SessionId ?? Guid.NewGuid().ToString(),
+                        Message = "An error occurred while processing your message, but support is available.",
+                        Timestamp = DateTime.UtcNow,
+                        IsCrisisDetected = true,
+                        CrisisReason = "Message contains phrases associated with crisis or distress.",
+                        CrisisResources = CrisisResources.GetDefaultResources()
+                    });
+                }
+
                 return StatusCode(500, "An error occurred while processing your message");
             }
         }

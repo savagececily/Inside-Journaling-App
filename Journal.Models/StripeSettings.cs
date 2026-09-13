@@ -15,9 +15,9 @@ public class StripeSettings
     {
         return tier switch
         {
-            UserTier.Pro => !string.IsNullOrEmpty(ProPriceId) ? ProPriceId : PriceId,
-            UserTier.Premium => !string.IsNullOrEmpty(PremiumPriceId) ? PremiumPriceId : PriceId,
-            _ => !string.IsNullOrEmpty(PremiumPriceId) ? PremiumPriceId : PriceId
+            UserTier.Pro => !string.IsNullOrEmpty(ProPriceId) ? ProPriceId : throw new InvalidOperationException("Stripe ProPriceId is not configured."),
+            UserTier.Premium => !string.IsNullOrEmpty(PremiumPriceId) ? PremiumPriceId : (!string.IsNullOrEmpty(PriceId) ? PriceId : throw new InvalidOperationException("Stripe PriceId is not configured.")),
+            _ => throw new ArgumentException($"Invalid subscription tier '{tier}'. Only Premium and Pro are supported.")
         };
     }
 }

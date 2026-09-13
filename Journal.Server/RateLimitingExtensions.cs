@@ -33,12 +33,19 @@ namespace Journal.Server
                     options.QueueLimit = 0;
                 });
 
-                // Limit for AI chat messages (cost protection)
-                limiterOptions.AddFixedWindowLimiter(policyName: "chat", configureOptions: options =>
+                // Limit for AI chat messages (cost protection, partitioned per user)
+                limiterOptions.AddPolicy(policyName: "chat", partitioner: httpContext =>
                 {
-                    options.Window = TimeSpan.FromMinutes(1);
-                    options.PermitLimit = 10; // Max 10 messages per minute
-                    options.QueueLimit = 0;
+                    var userId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.Connection.RemoteIpAddress?.ToString()
+                        ?? "anonymous";
+
+                    return RateLimitPartition.GetFixedWindowLimiter(userId, _ => new FixedWindowRateLimiterOptions
+                    {
+                        Window = TimeSpan.FromMinutes(1),
+                        PermitLimit = 10, // Max 10 messages per minute per user
+                        QueueLimit = 0
+                    });
                 });
 
                 limiterOptions.OnRejected = async (context, token) =>
