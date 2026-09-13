@@ -13,6 +13,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import CrisisAlert from './components/CrisisAlert';
 import { AccountSettings } from './components/AccountSettings';
+import UpgradeModal from './components/UpgradeModal';
 import { journalService } from './services/journalService';
 import { API_BASE_URL } from './config/api';
 import './App.css';
@@ -26,6 +27,7 @@ const StreakCounter = lazy(() => import('./components/StreakCounter').then(modul
 const SentimentTimeline = lazy(() => import('./components/SentimentTimeline').then(module => ({ default: module.SentimentTimeline })));
 const KeyPhrasesCloud = lazy(() => import('./components/KeyPhrasesCloud').then(module => ({ default: module.KeyPhrasesCloud })));
 const TimePatterns = lazy(() => import('./components/TimePatterns').then(module => ({ default: module.TimePatterns })));
+const VirtualSupport = lazy(() => import('./components/VirtualSupport').then(module => ({ default: module.VirtualSupport })));
 
 interface CrisisResource {
     name: string;
@@ -74,7 +76,7 @@ function App() {
     const [loadingError, setLoadingError] = useState<string | null>(null);
     const [analyzing, setAnalyzing] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
-    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'insights' | 'calendar' | 'export'>('new');
+    const [activeTab, setActiveTab] = useState<'new' | 'past' | 'chat' | 'insights' | 'calendar' | 'export'>('new');
     const [trends, setTrends] = useState<TrendData | null>(null);
     const [latestEntry, setLatestEntry] = useState<JournalEntry | null>(null);
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -88,6 +90,7 @@ function App() {
     const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
     const [showTermsOfService, setShowTermsOfService] = useState(false);
     const [showAccountSettings, setShowAccountSettings] = useState(false);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
     // Clean up blob URL when audioBlob changes or component unmounts
     useEffect(() => {
@@ -514,6 +517,9 @@ function App() {
                         <button className="about-button" onClick={() => setShowAbout(true)} aria-label="Open about information">
                             About
                         </button>
+                        <button className="about-button" onClick={() => setShowUpgradeModal(true)} aria-label="Open upgrade subscription options">
+                            Upgrade
+                        </button>
                         <button className="about-button" onClick={() => setShowAccountSettings(true)} aria-label="Open account settings">
                             Account
                         </button>
@@ -543,6 +549,16 @@ function App() {
                         aria-controls="past-entries-panel"
                     >
                         📚 Past Entries
+                    </button>
+                    <button 
+                        id="chat-tab"
+                        className={`tab ${activeTab === 'chat' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('chat')}
+                        role="tab"
+                        aria-selected={activeTab === 'chat'}
+                        aria-controls="chat-panel"
+                    >
+                        Virtual Support
                     </button>
                     <button 
                         className={`tab ${activeTab === 'insights' ? 'active' : ''}`}
@@ -891,6 +907,14 @@ function App() {
                     </div>
                 )}
 
+                {activeTab === 'chat' && token && (
+                    <div className="chat-tab" role="tabpanel" id="chat-panel" aria-labelledby="chat-tab">
+                        <Suspense fallback={<div className="loading-placeholder">Loading Virtual Support...</div>}>
+                            <VirtualSupport token={token} />
+                        </Suspense>
+                    </div>
+                )}
+
                 {activeTab === 'calendar' && token && (
                     <div className="calendar-tab" role="tabpanel" id="calendar-panel" aria-labelledby="calendar-tab">
                         <h2>📅 Journal Calendar & Streak</h2>
@@ -918,6 +942,11 @@ function App() {
                 isOpen={showAccountSettings}
                 onClose={() => setShowAccountSettings(false)}
                 onDeleted={logout}
+            />
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+                token={token}
             />
             {editingEntry && (
                 <EditEntryModal

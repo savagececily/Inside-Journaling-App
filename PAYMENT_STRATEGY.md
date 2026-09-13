@@ -1,100 +1,58 @@
 # Payment Strategy
 
-**Last Updated:** April 30, 2026  
-**Status:** Planning Phase
+**Last Updated:** September 13, 2026  
+**Status:** Implemented
 
 ## Overview
 
-This document outlines the payment and subscription strategy for the Inside Journaling App freemium model, including provider selection, implementation approach, and platform-specific considerations.
+This document outlines the payment and subscription strategy for the Inside Journaling App freemium model, including tier structures, Stripe integration details, and platform-specific considerations.
 
 ---
 
-## Pricing Model
+## Pricing Tiers
 
-### Premium Tier: $4.99/month
+```
+┌────────────────────────┐   ┌────────────────────────┐   ┌────────────────────────┐
+│      Free ($0/mo)      │   │   Premium ($4.99/mo)   │   │     Pro ($9.99/mo)     │
+├────────────────────────┤   ├────────────────────────┤   ├────────────────────────┤
+│ 50 AI Entries/mo       │   │ Unlimited AI Entries   │   │ Everything in Premium  │
+│ 10 Voice Entries/mo    │   │ Unlimited Voice        │   │ Unlimited Support Chat │
+│ 15 Chat Messages/mo    │   │ 250 Chat Messages/mo   │   │ Priority AI Processing │
+│ Basic Analytics        │   │ Advanced Analytics     │   │ Priority Support       │
+└────────────────────────┘   └────────────────────────┘   └────────────────────────┘
+```
 
-**Includes:**
-- Unlimited AI-analyzed journal entries
-- Unlimited voice transcriptions
-- Advanced analytics and insights
-- Priority support
-- Ad-free experience
+### Free Tier ($0/month)
+- 50 AI-analyzed journal entries / month
+- 10 voice transcriptions / month
+- 15 Virtual Support Companion chat messages / month
+- Basic sentiment trends and calendar views
 
-**Free Tier (No Payment Required):**
-- 50 AI entries/month
-- 10 voice transcriptions/month
-- Basic features and analytics
+### Premium Tier ($4.99/month)
+- **Unlimited** AI-analyzed journal entries
+- **Unlimited** voice transcriptions
+- **250** Virtual Support Companion chat messages / month
+- Advanced analytics, time patterns, and key phrase clouds
+- Data export capabilities
+
+### Pro Tier ($9.99/month)
+- **Everything in Premium**
+- **Unlimited** Virtual Support Companion chat messages
+- Priority AI processing & dedicated support
+- Early access to new companion capabilities and features
 
 ---
 
-## Payment Provider Comparison
+## Payment Provider: Stripe (Implemented)
 
-### Recommended: Stripe
+Inside Journaling App uses **Stripe** for web checkout and subscription management.
 
-** Pros:**
-- Industry-standard, trusted by millions
-- Excellent developer experience with comprehensive APIs
-- Built-in subscription management
-- Automatic invoice generation
+**Key Features Implemented:**
+- Industry-standard, PCI DSS Level 1 compliant payment processing
+- Built-in subscription lifecycle management (activations, renewals, cancellations)
 - SCA (Strong Customer Authentication) compliance
-- Multi-currency support (58+ countries)
-- Low transaction fees: 2.9% + $0.30 per transaction
-- Extensive fraud protection (Radar)
-- Webhooks for real-time payment events
-- No monthly fees (pay-as-you-go)
-- PCI DSS Level 1 compliant (handles card data security)
-- React/TypeScript SDK available
-
-** Cons:**
-- Requires business verification for payouts
-- 7-day rolling payout schedule initially
-
-**Implementation Effort:** Medium (3-5 days for web, 2-3 days for mobile)
-
----
-
-### Alternative: PayPal
-
-** Pros:**
-- Widely recognized and trusted
-- No setup fees
-- Quick integration
-- Users can pay without credit cards (PayPal balance)
-
-** Cons:**
-- Higher fees: 3.49% + $0.49 per transaction
-- Less developer-friendly API
-- Limited subscription customization
-- Webhooks less reliable than Stripe
-
-**Implementation Effort:** Medium (3-4 days)
-
----
-
-### Alternative: Square
-
-** Pros:**
-- Simple pricing: 2.9% + $0.30
-- Great for small businesses
-- In-person payment options (if needed later)
-
-** Cons:**
-- Less international support
-- Fewer subscription features than Stripe
-- Limited webhooks
-
-**Implementation Effort:** Medium (3-4 days)
-
----
-
-## Recommended Approach: **Stripe**
-
-**Reasoning:**
-1. Best developer experience and documentation
-2. Comprehensive subscription management
-3. Industry standard for SaaS applications
-4. Excellent security and fraud protection
-5. Future-proof (easy to add features like annual plans, trials, etc.)
+- Secure Webhook processing for real-time `UserQuota` activations
+- React/TypeScript integration for Stripe Checkout redirection
 
 ---
 
@@ -150,6 +108,8 @@ dotnet add package Stripe.net
     "PublishableKey": "pk_test_...",
     "WebhookSecret": "whsec_...",
     "PriceId": "price_...",
+    "PremiumPriceId": "price_...",
+    "ProPriceId": "price_...",
     "SuccessUrl": "https://inside-journal.app/premium/success",
     "CancelUrl": "https://inside-journal.app/premium/cancel"
   }
@@ -162,6 +122,7 @@ Create `Journal.Services/IStripeService.cs`:
 ```csharp
 public interface IStripeService
 {
+    Task<string> CreateCheckoutSessionAsync(string userId, string email, UserTier tier, CancellationToken cancellationToken);
     Task<string> CreateCheckoutSessionAsync(string userId, string email, CancellationToken cancellationToken);
     Task<string> CreateCustomerPortalSessionAsync(string userId, CancellationToken cancellationToken);
     Task HandleWebhookEventAsync(string payload, string signature, CancellationToken cancellationToken);

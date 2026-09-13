@@ -14,16 +14,6 @@ namespace Journal.Services
 {
     public class JournalAnalysisService : IJournalAnalysisService
     {
-        // Crisis keywords for pre-screening (cost optimization)
-        private static readonly HashSet<string> CrisisKeywords = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "suicide", "suicidal", "kill myself", "end it all", "end my life",
-            "no reason to live", "better off dead", "want to die",
-            "self-harm", "self harm", "hurt myself", "cut myself",
-            "don't want to exist", "wish I was dead", "plan to die",
-            "overdose", "jump off", "hang myself"
-        };
-
         private readonly ILogger<JournalAnalysisService> _logger;
         private readonly TextAnalyticsClient _textClient;
         private readonly AzureOpenAIClient _openAIClient;
@@ -144,7 +134,7 @@ Keep it concise (1-2 sentences) and speak directly to them using 'you'.
 
 Journal entry: ""{journalText}""";
 
-                List<ChatMessage> chatMessages = new List<ChatMessage>()
+                List<OpenAI.Chat.ChatMessage> chatMessages = new List<OpenAI.Chat.ChatMessage>()
                 {
                     new SystemChatMessage("You are a compassionate mental health assistant who provides supportive and encouraging affirmations. Your responses should be warm, validating, and help the user feel understood and supported."),
                     new UserChatMessage(prompt),
@@ -187,8 +177,7 @@ Journal entry: ""{journalText}""";
             try
             {
                 // COST OPTIMIZATION: Pre-screen for crisis keywords before calling expensive GPT-4 API
-                bool hasCrisisKeywords = CrisisKeywords.Any(keyword => 
-                    journalText.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+                bool hasCrisisKeywords = CrisisKeywords.ContainsCrisisKeyword(journalText);
                 
                 if (!hasCrisisKeywords)
                 {
@@ -216,7 +205,7 @@ Respond in JSON format:
 
 Journal entry: ""{journalText}""";
 
-                List<ChatMessage> chatMessages = new List<ChatMessage>()
+                List<OpenAI.Chat.ChatMessage> chatMessages = new List<OpenAI.Chat.ChatMessage>()
                 {
                     new SystemChatMessage("You are a mental health crisis detection system. Your role is to identify immediate safety concerns that require professional intervention. Be sensitive but accurate. Only flag genuine crises, not everyday struggles."),
                     new UserChatMessage(prompt),

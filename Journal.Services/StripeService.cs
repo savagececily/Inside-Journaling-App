@@ -27,8 +27,10 @@ public class StripeService : IStripeService
         StripeConfiguration.ApiKey = _settings.SecretKey;
     }
 
-    public async Task<string> CreateCheckoutSessionAsync(string userId, string email, CancellationToken cancellationToken)
+    public async Task<string> CreateCheckoutSessionAsync(string userId, string email, UserTier tier, CancellationToken cancellationToken)
     {
+        var priceId = _settings.GetPriceIdForTier(tier);
+
         var options = new SessionCreateOptions
         {
             Mode = "subscription",
@@ -37,7 +39,7 @@ public class StripeService : IStripeService
             {
                 new SessionLineItemOptions
                 {
-                    Price = _settings.PriceId,
+                    Price = priceId,
                     Quantity = 1,
                 }
             },
@@ -47,16 +49,30 @@ public class StripeService : IStripeService
             ClientReferenceId = userId, // Store userId for webhook processing
             Metadata = new Dictionary<string, string>
             {
-                { "user_id", userId }
+                { "user_id", userId },
+                { "tier", tier.ToString() }
+            },
+            SubscriptionData = new SessionSubscriptionDataOptions
+            {
+                Metadata = new Dictionary<string, string>
+                {
+                    { "user_id", userId },
+                    { "tier", tier.ToString() }
+                }
             }
         };
 
         var service = new SessionService();
         var session = await service.CreateAsync(options, cancellationToken: cancellationToken);
 
-        _logger.LogInformation("Created Stripe checkout session {SessionId} for user {UserId}", session.Id, userId);
+        _logger.LogInformation("Created Stripe checkout session {SessionId} for user {UserId} (tier: {Tier})", session.Id, userId, tier);
 
         return session.Url;
+    }
+
+    public Task<string> CreateCheckoutSessionAsync(string userId, string email, CancellationToken cancellationToken)
+    {
+        return CreateCheckoutSessionAsync(userId, email, UserTier.Premium, cancellationToken);
     }
 
     public async Task<string> CreateCustomerPortalSessionAsync(string userId, CancellationToken cancellationToken)
@@ -138,13 +154,17 @@ public class StripeService : IStripeService
         var session = stripeEvent.Data.Object as Session;
         if (session == null) return;
 
-        var userId = session.Metadata["user_id"];
+        var userId = session.Metadata?.GetValueOrDefault("user_id") ?? session.ClientReferenceId;
+        if (string.IsNullOrEmpty(userId)) return;
+
         // Customer and Subscription can be either string IDs or expanded objects
         // Access the ID property which exists on both
         var customerId = session.Customer?.Id ?? session.CustomerId;
         var subscriptionId = session.Subscription?.Id ?? session.SubscriptionId;
 
-        _logger.LogInformation("Checkout completed for user {UserId}, subscription {SubscriptionId}", userId, subscriptionId);
+        var tier = DetermineTierFromSession(session);
+
+        _logger.LogInformation("Checkout completed for user {UserId}, subscription {SubscriptionId}, tier {Tier}", userId, subscriptionId, tier);
 
         // Update user record with Stripe IDs
         var user = await _userService.GetUserByIdAsync(userId);
@@ -155,8 +175,8 @@ public class StripeService : IStripeService
             await _userService.CreateOrUpdateUserAsync(user);
         }
 
-        // Activate premium (no expiration for active subscription)
-        await _quotaService.UpgradeToPremiumAsync(userId, expiresAt: null, cancellationToken);
+        // Activate tier (no expiration for active subscription)
+        await _quotaService.UpgradeToTierAsync(userId, tier, expiresAt: null, cancellationToken);
     }
 
     private async Task HandleSubscriptionUpdatedAsync(Event stripeEvent, CancellationToken cancellationToken)
@@ -173,14 +193,55 @@ public class StripeService : IStripeService
             return;
         }
 
-        // Update premium status based on subscription state
+        // Update subscription status based on state
         if (subscription.Status == "active")
         {
-            // For active subscriptions, we don't set an expiration
-            // The webhook will notify us if the subscription is cancelled or expires
-            await _quotaService.UpgradeToPremiumAsync(user.userId, expiresAt: null, cancellationToken);
-            _logger.LogInformation("Premium renewed for user {UserId} (active subscription)", user.userId);
+            var tier = DetermineTierFromSubscription(subscription);
+            await _quotaService.UpgradeToTierAsync(user.userId, tier, expiresAt: null, cancellationToken);
+            _logger.LogInformation("{Tier} renewed for user {UserId} (active subscription)", tier, user.userId);
         }
+    }
+
+    private UserTier DetermineTierFromSession(Session session)
+    {
+        if (session.Metadata != null && session.Metadata.TryGetValue("tier", out var tierStr))
+        {
+            if (Enum.TryParse<UserTier>(tierStr, true, out var parsedTier))
+            {
+                return parsedTier;
+            }
+        }
+        return UserTier.Premium;
+    }
+
+    private UserTier DetermineTierFromSubscription(Subscription subscription)
+    {
+        if (subscription.Metadata != null && subscription.Metadata.TryGetValue("tier", out var tierStr))
+        {
+            if (Enum.TryParse<UserTier>(tierStr, true, out var parsedTier))
+            {
+                return parsedTier;
+            }
+        }
+
+        var priceId = subscription.Items?.Data?.FirstOrDefault()?.Price?.Id;
+        if (!string.IsNullOrEmpty(priceId))
+        {
+            if (!string.IsNullOrEmpty(_settings.ProPriceId) && priceId == _settings.ProPriceId)
+            {
+                return UserTier.Pro;
+            }
+            if (!string.IsNullOrEmpty(_settings.PremiumPriceId) && priceId == _settings.PremiumPriceId)
+            {
+                return UserTier.Premium;
+            }
+            if (!string.IsNullOrEmpty(_settings.PriceId) && priceId == _settings.PriceId)
+            {
+                return UserTier.Premium;
+            }
+        }
+
+        return UserTier.Premium;
     }
 
     private async Task HandleSubscriptionDeletedAsync(Event stripeEvent, CancellationToken cancellationToken)

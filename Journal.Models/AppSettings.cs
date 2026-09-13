@@ -40,5 +40,6 @@ namespace Journal.Models
         public string DatabaseName { get; set; } = string.Empty;
         public string JournalEntryContainer { get; set; } = string.Empty;
         public string UserContainer { get; set; } = string.Empty;
+        public string ChatSessionContainer { get; set; } = "ChatSessions";
     }
 }

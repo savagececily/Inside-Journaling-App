@@ -18,6 +18,7 @@ namespace Journal.Server.Controllers
         private readonly ICosmosDbService _cosmosService;
         private readonly IBlobStorageService _blobService;
         private readonly IUserService _userService;
+        private readonly IChatService? _chatService;
 
         public UserController(
             ILogger<UserController> logger, 
@@ -25,7 +26,8 @@ namespace Journal.Server.Controllers
             IStripeService stripeService,
             ICosmosDbService cosmosService,
             IBlobStorageService blobService,
-            IUserService userService)
+            IUserService userService,
+            IChatService? chatService = null)
         {
             _logger = logger;
             _quotaService = quotaService;
@@ -33,6 +35,7 @@ namespace Journal.Server.Controllers
             _cosmosService = cosmosService;
             _blobService = blobService;
             _userService = userService;
+            _chatService = chatService;
         }
 
         /// <summary>
@@ -53,8 +56,9 @@ namespace Journal.Server.Controllers
                 
                 return Ok(new
                 {
-                    tier = quota.Tier.ToString().ToLower(),
+                    tier = quota.EffectiveTier.ToString().ToLower(),
                     isPremium = quota.IsPremiumActive,
+                    isPro = quota.IsProActive,
                     premiumExpiresAt = quota.PremiumExpiresAt,
                     usage = new
                     {
@@ -62,8 +66,8 @@ namespace Journal.Server.Controllers
                         {
                             used = quota.EntriesThisMonth,
                             limit = quota.AIAnalysisQuotaLimit,
-                            remaining = Math.Max(0, quota.AIAnalysisQuotaLimit - quota.EntriesThisMonth),
-                            percentUsed = quota.AIAnalysisQuotaLimit > 0 
+                            remaining = quota.AIAnalysisQuotaLimit == int.MaxValue ? int.MaxValue : Math.Max(0, quota.AIAnalysisQuotaLimit - quota.EntriesThisMonth),
+                            percentUsed = (quota.AIAnalysisQuotaLimit > 0 && quota.AIAnalysisQuotaLimit != int.MaxValue) 
                                 ? (int)((quota.EntriesThisMonth / (double)quota.AIAnalysisQuotaLimit) * 100)
                                 : 0
                         },
@@ -71,9 +75,18 @@ namespace Journal.Server.Controllers
                         {
                             used = quota.VoiceEntriesThisMonth,
                             limit = quota.VoiceQuotaLimit,
-                            remaining = Math.Max(0, quota.VoiceQuotaLimit - quota.VoiceEntriesThisMonth),
-                            percentUsed = quota.VoiceQuotaLimit > 0 
+                            remaining = quota.VoiceQuotaLimit == int.MaxValue ? int.MaxValue : Math.Max(0, quota.VoiceQuotaLimit - quota.VoiceEntriesThisMonth),
+                            percentUsed = (quota.VoiceQuotaLimit > 0 && quota.VoiceQuotaLimit != int.MaxValue)
                                 ? (int)((quota.VoiceEntriesThisMonth / (double)quota.VoiceQuotaLimit) * 100)
+                                : 0
+                        },
+                        chat = new
+                        {
+                            used = quota.ChatMessagesThisMonth,
+                            limit = quota.ChatQuotaLimit,
+                            remaining = quota.ChatQuotaLimit == int.MaxValue ? int.MaxValue : Math.Max(0, quota.ChatQuotaLimit - quota.ChatMessagesThisMonth),
+                            percentUsed = (quota.ChatQuotaLimit > 0 && quota.ChatQuotaLimit != int.MaxValue)
+                                ? (int)((quota.ChatMessagesThisMonth / (double)quota.ChatQuotaLimit) * 100)
                                 : 0
                         }
                     },
@@ -140,11 +153,17 @@ namespace Journal.Server.Controllers
             }
         }
 
+        public class UpgradeRequest
+        {
+            public string? Tier { get; set; }
+            public string? Plan { get; set; }
+        }
+
         /// <summary>
-        /// Upgrade to premium via Stripe Checkout
+        /// Upgrade subscription via Stripe Checkout
         /// </summary>
         [HttpPost("upgrade")]
-        public async Task<ActionResult> UpgradeToPremium(CancellationToken cancellationToken = default)
+        public async Task<ActionResult> UpgradeToPremium([FromQuery] string? tier = null, [FromBody] UpgradeRequest? request = null, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -156,9 +175,24 @@ namespace Journal.Server.Controllers
 
             try
             {
-                _logger.LogInformation("User {UserId} requested premium upgrade", userId);
+                var requestedTierString = tier ?? request?.Tier ?? request?.Plan ?? "Premium";
+                UserTier userTier;
+                if (string.Equals(requestedTierString, "Pro", StringComparison.OrdinalIgnoreCase))
+                {
+                    userTier = UserTier.Pro;
+                }
+                else if (string.Equals(requestedTierString, "Premium", StringComparison.OrdinalIgnoreCase))
+                {
+                    userTier = UserTier.Premium;
+                }
+                else
+                {
+                    return BadRequest("Invalid tier specified. Allowed tiers are 'Premium' or 'Pro'.");
+                }
+
+                _logger.LogInformation("User {UserId} requested {Tier} upgrade", userId, userTier);
                 
-                var checkoutUrl = await _stripeService.CreateCheckoutSessionAsync(userId, email, cancellationToken);
+                var checkoutUrl = await _stripeService.CreateCheckoutSessionAsync(userId, email, userTier, cancellationToken);
                 
                 return Ok(new { checkoutUrl });
             }
@@ -252,7 +286,13 @@ namespace Journal.Server.Controllers
                 // 2. Delete all journal entries from Cosmos DB
                 await _cosmosService.DeleteAllUserEntriesAsync(userId, cancellationToken);
 
-                // 3. Delete user quota data
+                // 3. Delete all chat sessions
+                if (_chatService != null)
+                {
+                    await _chatService.DeleteAllUserSessionsAsync(userId);
+                }
+
+                // 4. Delete user quota data
                 await _quotaService.DeleteUserQuotaAsync(userId, cancellationToken);
 
                 // 4. Get user record for Stripe subscription info (before deleting)

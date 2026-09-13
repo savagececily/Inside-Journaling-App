@@ -116,6 +116,7 @@ namespace Journal.Server
             builder.Services.AddSingleton<IDataExportService, DataExportService>();
             builder.Services.AddSingleton<IStreakService, StreakService>();
             builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
+            builder.Services.AddSingleton<IChatService, ChatService>();
 
             // Development-only sign-in. The controller additionally requires a
             // non-production environment, so configuration alone cannot enable it.

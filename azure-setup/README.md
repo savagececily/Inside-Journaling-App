@@ -23,7 +23,7 @@ The backend and frontend are deployed independently.
 | Static Web App (production) | `inside-journal-app` |
 | Static Web App (development) | `inside-journal-app-dev` |
 | Cosmos DB | `inside-journaling-app-cosmosdb`, database `JournalDb` |
-| Cosmos containers | `Users`, `JournalEntries`, `UserQuotas`, `TokenUsage` |
+| Cosmos containers | `Users` (`/userId`), `JournalEntries` (`/journalEntryId`), `UserQuotas` (`/userId`), `TokenUsage` (`/userId`), `ChatSessions` (`/userId`) |
 | Blob Storage | `sainsidejournalingapp`, container `journal-audio` |
 | Azure AI Foundry | `Inside-Journaling-App-Foundry` (`gpt-4o-mini`, `gpt-4o`) |
 | Managed identity (production) | `Inside-Journaling-App-UAMI` |
