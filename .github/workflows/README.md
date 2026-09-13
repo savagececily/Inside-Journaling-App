@@ -179,11 +179,11 @@ git push --force
 
 ## Best Practices
 
- **Always test locally before pushing**
- **Review PR preview before merging**
- **Deploy to development first, then production**
- **Monitor logs after deployment**
- **Keep secrets up to date**
+- Always test locally before pushing
+- Review PR preview before merging
+- Deploy to development first, then production
+- Monitor logs after deployment
+- Keep secrets up to date
 
 ## Archive
 
