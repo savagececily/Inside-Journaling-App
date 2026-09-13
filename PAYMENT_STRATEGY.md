@@ -108,6 +108,8 @@ dotnet add package Stripe.net
     "PublishableKey": "pk_test_...",
     "WebhookSecret": "whsec_...",
     "PriceId": "price_...",
+    "PremiumPriceId": "price_...",
+    "ProPriceId": "price_...",
     "SuccessUrl": "https://inside-journal.app/premium/success",
     "CancelUrl": "https://inside-journal.app/premium/cancel"
   }
@@ -120,6 +122,7 @@ Create `Journal.Services/IStripeService.cs`:
 ```csharp
 public interface IStripeService
 {
+    Task<string> CreateCheckoutSessionAsync(string userId, string email, UserTier tier, CancellationToken cancellationToken);
     Task<string> CreateCheckoutSessionAsync(string userId, string email, CancellationToken cancellationToken);
     Task<string> CreateCustomerPortalSessionAsync(string userId, CancellationToken cancellationToken);
     Task HandleWebhookEventAsync(string payload, string signature, CancellationToken cancellationToken);

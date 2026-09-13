@@ -1,7 +1,19 @@
+using Journal.Models;
+
 namespace Journal.Services;
 
 public interface IStripeService
 {
+    /// <summary>
+    /// Creates a Stripe Checkout session for upgrading to a specified plan tier
+    /// </summary>
+    /// <param name="userId">The user's unique identifier</param>
+    /// <param name="email">The user's email address</param>
+    /// <param name="tier">The target tier (Premium or Pro)</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The Stripe Checkout session URL</returns>
+    Task<string> CreateCheckoutSessionAsync(string userId, string email, UserTier tier, CancellationToken cancellationToken);
+
     /// <summary>
     /// Creates a Stripe Checkout session for upgrading to premium
     /// </summary>

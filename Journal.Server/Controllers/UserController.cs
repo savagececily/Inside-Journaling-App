@@ -140,11 +140,17 @@ namespace Journal.Server.Controllers
             }
         }
 
+        public class UpgradeRequest
+        {
+            public string? Tier { get; set; }
+            public string? Plan { get; set; }
+        }
+
         /// <summary>
-        /// Upgrade to premium via Stripe Checkout
+        /// Upgrade subscription via Stripe Checkout
         /// </summary>
         [HttpPost("upgrade")]
-        public async Task<ActionResult> UpgradeToPremium(CancellationToken cancellationToken = default)
+        public async Task<ActionResult> UpgradeToPremium([FromQuery] string? tier = null, [FromBody] UpgradeRequest? request = null, CancellationToken cancellationToken = default)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -156,9 +162,15 @@ namespace Journal.Server.Controllers
 
             try
             {
-                _logger.LogInformation("User {UserId} requested premium upgrade", userId);
+                var requestedTierString = tier ?? request?.Tier ?? request?.Plan ?? "Premium";
+                if (!Enum.TryParse<UserTier>(requestedTierString, true, out var userTier) || requestedTierString.Equals("Free", StringComparison.OrdinalIgnoreCase))
+                {
+                    userTier = UserTier.Premium;
+                }
+
+                _logger.LogInformation("User {UserId} requested {Tier} upgrade", userId, userTier);
                 
-                var checkoutUrl = await _stripeService.CreateCheckoutSessionAsync(userId, email, cancellationToken);
+                var checkoutUrl = await _stripeService.CreateCheckoutSessionAsync(userId, email, userTier, cancellationToken);
                 
                 return Ok(new { checkoutUrl });
             }
