@@ -7,7 +7,7 @@ This repository uses GitHub Actions to automatically deploy the Inside Journal a
 ### Backend API Deployment
 **File**: `backend-api-deploy.yml`
 
-Deploys the .NET 8.0 backend API to Azure App Service (`inside-journal-api`).
+Deploys the .NET 10.0 backend API to Azure App Service (`inside-journal-api`).
 
 **Triggers**:
 - **Automatic**: Pushes to `main` branch when backend files change
@@ -132,7 +132,7 @@ az webapp deployment list --name inside-journal-api --resource-group InsideJourn
 
 ### Backend Deployment Fails
 1. **Authentication Error**: Verify Azure credentials in secrets
-2. **Build Fails**: Check .NET version matches (8.x)
+2. **Build Fails**: Check .NET version matches (10.x)
 3. **Tests Fail**: Fix failing tests before deploying
 
 ### Frontend Deployment Fails
@@ -179,11 +179,11 @@ git push --force
 
 ## Best Practices
 
- **Always test locally before pushing**
- **Review PR preview before merging**
- **Deploy to development first, then production**
- **Monitor logs after deployment**
- **Keep secrets up to date**
+- Always test locally before pushing
+- Review PR preview before merging
+- Deploy to development first, then production
+- Monitor logs after deployment
+- Keep secrets up to date
 
 ## Archive
 

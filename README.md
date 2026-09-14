@@ -64,7 +64,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 - Application Insights for monitoring
 
 ### Backend
-- **.NET 8** Web API
+- **.NET 10** Web API
 - RESTful API architecture
 - Service-oriented design pattern
 - Comprehensive error handling and logging
@@ -82,7 +82,7 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 
 ### Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Node.js 22+](https://nodejs.org/)
 - [Azure Subscription](https://azure.microsoft.com/free/)
 - Azure CLI (for deployment)
