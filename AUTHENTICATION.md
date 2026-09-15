@@ -238,47 +238,18 @@ The backend code is already set up to handle Microsoft authentication. Ensure th
 - `Microsoft:TenantId` - Use "common" or your tenant ID
 - `Microsoft:ClientId` - Your Application (client) ID from Step 1.3
 
-### Step 5: Configure Web App
+### Step 5: Configure Universal Client (Expo)
 
-#### 5.1 Update Environment Variables
+#### 5.1 Update Constants
 
-Create or update `.env` file in `journal.client`:
-
-```env
-VITE_MICROSOFT_CLIENT_ID=YOUR_APPLICATION_CLIENT_ID_HERE
-VITE_MICROSOFT_TENANT_ID=common
-```
-
-#### 5.2 Install Dependencies
-
-The web app requires the MSAL browser library:
-
-```bash
-cd journal.client
-npm install @azure/msal-browser
-```
-
-### Step 6: Configure Mobile App
-
-#### 6.1 Update Constants
-
-Edit `Journal.Mobile/src/utils/constants.ts`:
+Edit `Journal.UI/src/utils/constants.ts`:
 
 ```typescript
 export const MICROSOFT_CLIENT_ID = 'YOUR_APPLICATION_CLIENT_ID_HERE';
 export const MICROSOFT_TENANT_ID = 'common';
 ```
 
-#### 6.2 Install Dependencies
-
-The mobile app requires react-native-app-auth:
-
-```bash
-cd Journal.Mobile
-npm install react-native-app-auth
-```
-
-#### 6.3 Configure iOS (if building for iOS)
+#### 5.2 Configure iOS (if building for iOS)
 
 1. Open `ios/Journal.xcworkspace` in Xcode
 2. Add a URL scheme:
@@ -304,7 +275,7 @@ npm install react-native-app-auth
 }
 ```
 
-#### 6.4 Configure Android (if building for Android)
+#### 5.3 Configure Android (if building for Android)
 
 1. Edit `android/app/src/main/AndroidManifest.xml`
 2. Add the following inside the `<application>` tag:
@@ -322,18 +293,18 @@ npm install react-native-app-auth
 </activity>
 ```
 
-### Step 7: Testing
+### Step 6: Testing
 
-#### 7.1 Test Web App
+#### 6.1 Test Universal Web App
 
-1. Start the web app: `npm run dev` (in `journal.client`)
+1. Start the web app: `npm run web` (in `Journal.UI`)
 2. Click "Sign in with Microsoft"
 3. You should be redirected to Microsoft login
 4. After successful login, you'll be redirected back to the app
 
-#### 7.2 Test Mobile App
+#### 6.2 Test Mobile App
 
-1. Start the mobile app: `npm start` (in `Journal.Mobile`)
+1. Start the mobile app: `npm start` (in `Journal.UI`)
 2. Test on a device or simulator
 3. Click "Sign in with Microsoft"
 4. You should see the Microsoft login flow

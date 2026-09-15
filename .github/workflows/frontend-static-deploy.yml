@@ -4,13 +4,13 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'journal.client/**'
+      - 'Journal.UI/**'
       - '.github/workflows/frontend-static-deploy.yml'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches: [ main ]
     paths:
-      - 'journal.client/**'
+      - 'Journal.UI/**'
       - '.github/workflows/frontend-static-deploy.yml'
   workflow_dispatch:
     inputs:
@@ -42,27 +42,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: journal.client/package-lock.json
+          cache-dependency-path: Journal.UI/package-lock.json
 
       - name: Install dependencies
-        working-directory: journal.client
+        working-directory: Journal.UI
         run: npm ci
 
       - name: Build frontend
-        working-directory: journal.client
-        run: npm run build
+        working-directory: Journal.UI
+        run: npm run build:web
         env:
-          VITE_API_URL: https://inside-journal-api-development.azurewebsites.net/api
-          VITE_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID_DEV }}
-          VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING_DEV }}
+          EXPO_PUBLIC_API_URL: https://inside-journal-api-development.azurewebsites.net/api
+          EXPO_PUBLIC_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DEV }}
           action: "upload"
-          app_location: "journal.client/dist"
+          app_location: "Journal.UI/dist"
           skip_app_build: true
           skip_api_build: true
 
@@ -89,27 +87,25 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: journal.client/package-lock.json
+          cache-dependency-path: Journal.UI/package-lock.json
 
       - name: Install dependencies
-        working-directory: journal.client
+        working-directory: Journal.UI
         run: npm ci
 
       - name: Build frontend
-        working-directory: journal.client
-        run: npm run build
+        working-directory: Journal.UI
+        run: npm run build:web
         env:
-          VITE_API_URL: https://inside-journal-api.azurewebsites.net/api
-          VITE_API_BASE_URL: https://inside-journal-api.azurewebsites.net
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-          VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING }}
+          EXPO_PUBLIC_API_URL: https://inside-journal-api.azurewebsites.net/api
+          EXPO_PUBLIC_API_BASE_URL: https://inside-journal-api.azurewebsites.net
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "upload"
-          app_location: "journal.client/dist"
+          app_location: "Journal.UI/dist"
           skip_app_build: true
           skip_api_build: true
 
@@ -137,28 +133,26 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: journal.client/package-lock.json
+          cache-dependency-path: Journal.UI/package-lock.json
 
       - name: Install dependencies
         if: github.event.action != 'closed'
-        working-directory: journal.client
+        working-directory: Journal.UI
         run: npm ci
 
       - name: Build frontend
         if: github.event.action != 'closed'
-        working-directory: journal.client
-        run: npm run build
+        working-directory: Journal.UI
+        run: npm run build:web
         env:
-          VITE_API_URL: https://inside-journal-api-development.azurewebsites.net/api
-          VITE_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID_DEV }}
-          VITE_APPLICATIONINSIGHTS_CONNECTION_STRING: ${{ secrets.VITE_APPLICATIONINSIGHTS_CONNECTION_STRING_DEV }}
+          EXPO_PUBLIC_API_URL: https://inside-journal-api-development.azurewebsites.net/api
+          EXPO_PUBLIC_API_BASE_URL: https://inside-journal-api-development.azurewebsites.net
 
       - name: Deploy PR Preview to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_DEV }}
           action: ${{ github.event.action == 'closed' && 'close' || 'upload' }}
-          app_location: "journal.client/dist"
+          app_location: "Journal.UI/dist"
           skip_app_build: true
           skip_api_build: true

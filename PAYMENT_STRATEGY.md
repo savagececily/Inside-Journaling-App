@@ -448,26 +448,15 @@ builder.Services.AddSingleton<IStripeService, StripeService>();
 
 ---
 
-#### Frontend Setup (React)
+#### Universal Client Setup (Expo)
 
-**1. Install Stripe SDK**
-```bash
-cd journal.client
-npm install @stripe/stripe-js
-```
+**1. Upgrade Component**
 
-**2. Create Upgrade Component**
-
-`src/components/UpgradeModal.tsx`:
+`Journal.UI/src/components/subscription/UpgradeModal.tsx`:
 ```typescript
 import { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-
-export function UpgradeModal({ isOpen, onClose, token }: Props) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+import { UpgradeModal } from '../../components/subscription/UpgradeModal';
+```
 
   const handleUpgrade = async () => {
     setLoading(true);
@@ -761,7 +750,7 @@ export function UpgradeButton({ userId, token }: Props) {
 
 **Install Required Package:**
 ```bash
-cd Journal.Mobile
+cd Journal.UI
 npx expo install expo-web-browser
 ```
 
@@ -772,32 +761,8 @@ npx expo install expo-web-browser
 **Update the success page to detect mobile browsers:**
 
 ```typescript
-// journal.client/src/pages/PremiumSuccess.tsx
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-
-export function PremiumSuccess() {
-  const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id');
-  const [isMobile] = useState(() => {
-    // Detect if opened from mobile app
-    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  });
-
-  useEffect(() => {
-    // Auto-redirect desktop users after 3 seconds
-    if (!isMobile) {
-      const timer = setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobile]);
-
-  return (
-    <div className="success-page">
- <div className="success-icon"></div>
-      <h1>Payment Complete!</h1>
+// Journal.UI/src/screens/settings/SubscriptionScreen.tsx
+```
       
       {isMobile ? (
         <>
@@ -1062,7 +1027,7 @@ stripe listen --print-secret
 1. **In Mobile Simulator/Device:**
 ```bash
 # Run mobile app
-cd Journal.Mobile
+cd Journal.UI
 npm start
 ```
 

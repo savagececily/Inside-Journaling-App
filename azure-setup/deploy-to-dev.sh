@@ -15,7 +15,7 @@ echo "=========================================="
 RESOURCE_GROUP="InsideJournalingAppRG"
 WEBAPP_NAME="inside-journal-api"
 SLOT_NAME="development"
-FRONTEND_DIR="journal.client"
+FRONTEND_DIR="Journal.UI"
 BACKEND_DIR="Journal.Server"
 OUTPUT_DIR="publish-dev"
 
@@ -26,7 +26,7 @@ echo ""
 
 # Check current directory
 if [ ! -f "Journal.sln" ]; then
-    echo "❌ Error: Must run from repository root"
+    echo "Error: Must run from repository root"
     exit 1
 fi
 
@@ -38,11 +38,11 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 ###############################################################################
-# Step 1: Build Frontend (React + Vite)
+# Step 1: Build Frontend (Expo Web)
 ###############################################################################
 
 echo ""
-echo "⚛️  Step 1: Building React frontend..."
+echo "Step 1: Building Expo Web frontend..."
 echo ""
 
 cd "$FRONTEND_DIR"
@@ -51,17 +51,11 @@ cd "$FRONTEND_DIR"
 echo "Installing npm dependencies..."
 npm ci
 
-# Get App Insights connection string for build
-APPINSIGHTS_CONNECTION=$(az monitor app-insights component show \
-    --app "inside-journaling-app" \
-    --resource-group "$RESOURCE_GROUP" \
-    --query connectionString -o tsv)
+# Build Expo web bundle
+echo "Building Expo web bundle..."
+npm run build:web
 
-# Build with Vite
-echo "Building with Vite..."
-VITE_APPLICATIONINSIGHTS_CONNECTION_STRING="$APPINSIGHTS_CONNECTION" npm run build
-
-echo "✅ Frontend built successfully"
+echo "Frontend built successfully"
 
 cd ..
 
@@ -70,7 +64,7 @@ cd ..
 ###############################################################################
 
 echo ""
-echo "📦 Step 2: Copying frontend to backend..."
+echo "Step 2: Copying frontend to backend..."
 echo ""
 
 rm -rf "$BACKEND_DIR/wwwroot"/*
@@ -78,26 +72,26 @@ cp -r "$FRONTEND_DIR/dist"/* "$BACKEND_DIR/wwwroot/"
 cp PRIVACY_POLICY.md "$BACKEND_DIR/wwwroot/"
 cp TERMS_OF_SERVICE.md "$BACKEND_DIR/wwwroot/"
 
-echo "✅ Frontend copied to wwwroot"
+echo "Frontend copied to wwwroot"
 
 ###############################################################################
 # Step 3: Run Tests
 ###############################################################################
 
 echo ""
-echo "🧪 Step 3: Running unit tests..."
+echo "Step 3: Running unit tests..."
 echo ""
 
 dotnet test Journal.Tests/Journal.Tests.csproj --configuration Release
 
-echo "✅ Tests passed"
+echo "Tests passed"
 
 ###############################################################################
 # Step 4: Publish Backend (.NET)
 ###############################################################################
 
 echo ""
-echo "🔨 Step 4: Publishing .NET backend..."
+echo "Step 4: Publishing .NET backend..."
 echo ""
 
 rm -rf "$OUTPUT_DIR"
@@ -107,14 +101,14 @@ dotnet publish "$BACKEND_DIR/Journal.Server.csproj" \
     -o "$OUTPUT_DIR" \
     --no-restore
 
-echo "✅ Backend published"
+echo "Backend published"
 
 ###############################################################################
 # Step 5: Deploy to Development Slot
 ###############################################################################
 
 echo ""
-echo "🚀 Step 5: Deploying to Azure development slot..."
+echo "Step 5: Deploying to Azure development slot..."
 echo ""
 
 # Create zip package
@@ -133,14 +127,14 @@ az webapp deployment source config-zip \
 rm deploy-package.zip
 rm -rf "$OUTPUT_DIR"
 
-echo "✅ Deployed to development slot"
+echo "Deployed to development slot"
 
 ###############################################################################
 # Step 6: Restart Slot
 ###############################################################################
 
 echo ""
-echo "♻️  Step 6: Restarting development slot..."
+echo "Step 6: Restarting development slot..."
 echo ""
 
 az webapp restart \
@@ -148,14 +142,14 @@ az webapp restart \
     --resource-group "$RESOURCE_GROUP" \
     --slot "$SLOT_NAME"
 
-echo "✅ Slot restarted"
+echo "Slot restarted"
 
 ###############################################################################
 # Step 7: Health Check
 ###############################################################################
 
 echo ""
-echo "🏥 Step 7: Performing health check..."
+echo "Step 7: Performing health check..."
 echo ""
 
 SLOT_URL="https://inside-journal-api-development.azurewebsites.net"
@@ -165,9 +159,9 @@ sleep 30
 
 echo "Testing endpoint..."
 if curl -f -s "$SLOT_URL" > /dev/null; then
-    echo "✅ Health check passed"
+    echo "Health check passed"
 else
-    echo "⚠️  Warning: Health check failed. App may still be starting."
+    echo "Warning: Health check failed. App may still be starting."
     echo "   Check logs: az webapp log tail --name $WEBAPP_NAME --resource-group $RESOURCE_GROUP --slot $SLOT_NAME"
 fi
 
@@ -177,7 +171,7 @@ fi
 
 echo ""
 echo "=========================================="
-echo "✅ Deployment Complete!"
+echo "Deployment Complete"
 echo "=========================================="
 echo ""
 echo "🌐 Development Slot URL:"

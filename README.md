@@ -1,82 +1,69 @@
 # Inside Journaling App
 
-A modern, AI-powered journaling application for personal growth and wellness tracking. Built with React, .NET, and Azure services.
+A modern, AI-powered journaling application for personal growth and wellness tracking. Built with Expo (Universal App for iOS, Android, and Web), .NET 10, and Azure services.
 
 ## Overview
 
-Inside Journaling App is a full-stack web application that helps users track their wellness through journaling. The application uses Azure Cognitive Services and OpenAI to provide intelligent insights, sentiment analysis, and personalized feedback on journal entries.
+Inside Journaling App is a full-stack universal application that helps users track their wellness through journaling. The application uses Azure Cognitive Services and OpenAI to provide intelligent insights, sentiment analysis, personalized affirmations, and virtual support companion chat.
 
 ## Key Features
 
-### **Voice Recording**
+### Voice Recording
 - Record journal entries using your voice
 - Automatic speech-to-text transcription via Azure Speech Services
-- Real-time recording timer and visual feedback
-- Audio preview and playback
+- Real-time recording timer and audio playback
 
-### **AI-Powered Analysis**
-- **Sentiment Analysis**: Automatically detects emotional tone (Positive, Negative, Neutral, Mixed)
-- **Key Phrase Extraction**: Identifies important topics and themes in your entries
-- **AI-Generated Summaries**: Contextual summaries with confidence scores
-- **GPT-4o-mini Affirmations**: Personalized encouraging messages tailored to your entry
-- **Crisis Detection**: Intelligent screening with GPT-4o for safety support
+### AI-Powered Analysis
+- Sentiment Analysis: Automatically detects emotional tone (Positive, Negative, Neutral, Mixed)
+- Key Phrase Extraction: Identifies important topics and themes in your entries
+- AI-Generated Summaries: Contextual summaries with confidence scores
+- Affirmations: Personalized encouraging messages tailored to your entry
+- Crisis Detection: Intelligent screening for safety support and 24/7 resources
+- Virtual Support Companion: Interactive AI chat with context on your journaling history
 
-### **Trend Visualization**
+### Trend Visualization
 - Visual charts showing sentiment trends over time
-- Emotional patterns and insights
-- Track your mental wellness journey
-- Dashboard overview of your progress
+- Emotional patterns, word clouds, and time patterns
+- Monthly calendar view with daily sentiment indicators
+- Streak counter and milestone tracking
 
-### **Secure Authentication**
-- Google OAuth integration
+### Secure Authentication
+- Google OAuth and Microsoft Entra ID integration
 - JWT-based authentication
+- Biometric authentication (Face ID, Touch ID, Fingerprint) with PIN fallback
 - Secure user data management
- & Performance**
+
+### Scalability and Performance
 - Azure Cosmos DB for scalable NoSQL data storage with partition optimization
 - Azure Blob Storage for audio files
-- In-memory response caching (15-25% cost reduction)
-- Retry policies with exponential backoff for resilience
-- Rate limiting for abuse prevention
-- Reliable and secure data persistence
+- In-memory response caching for cost reduction
+- Rate limiting and quota protection
+- Offline sync with background synchronization
 
-## Mobile Application
+## Technology Stack
 
-A native iOS and Android mobile app built with **React Native (Expo)** with complete feature parity to the web application.
-
-### Features
-- **Full Journal Management**: Create, edit, delete entries with voice recording and speech-to-text
-- **Offline-First Architecture**: Complete offline support with automatic background sync
-- **Data Visualizations**: Sentiment charts, streak counter, calendar view, word clouds, time patterns
-- **Crisis Support**: Emergency hotlines, breathing exercises, grounding techniques
-- **Push Notifications**: Customizable daily reminders, streak alerts, achievement notifications
-- **Biometric Security**: Face ID/Touch ID/Fingerprint authentication with PIN fallback
-- **Native Features**: Dark mode, haptic feedback, deep linking
-- **Google OAuth**: Secure authentication with token management
-
-**[View Mobile Features Documentation ](MOBILE_FEATURES.md)**
-
-## Architecture
-
-### Frontend
-- **React 19** with TypeScript
-- **Vite** for fast development and building
-- Modern UI with responsive design
-- Application Insights for monitoring
+### Universal Client (Expo / React Native)
+- Expo SDK 54 / React Native 0.81
+- React 19 and TypeScript
+- React Navigation 7
+- React Query (TanStack) 5
+- Universal deployment targeting iOS, Android, and Web
 
 ### Backend
-- **.NET 10** Web API
-- RESTful API architecture
-- Service-oriented design pattern
-- Comprehensive error handling and logging
+- .NET 10 Web API
+- C# 13
+- Service-oriented architecture with ASP.NET Core
+- Entity and repository pattern with Azure SDKs
 
-### Azure Serviceswith user quota and token tracking
-- **Azure Blob Storage**: Audio file storage
-- **Azure Cognitive Services**: Text Analytics for sentiment and key phrases
-- **Azure OpenAI**: Dual deployments (GPT-4o-mini, GPT-4o) for cost optimization
-- **Azure Speech Services**: Speech-to-text transcription
-- **Application Insights**: Comprehensive m personalized affirmations
-- **Azure Speech Services**: Speech-to-text transcription
-- **Application Insights**: Monitoring and telemetry
+### Cloud Infrastructure
+- Azure App Service
+- Azure Static Web Apps
+- Azure Cosmos DB
+- Azure Blob Storage
+- Azure OpenAI (Foundry)
+- Azure Cognitive Services
+- Azure Application Insights
+- Stripe Payment Gateway
 
 ## Getting Started
 
@@ -92,15 +79,10 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd Journal
+   cd Inside-Journaling-App
    ```
 
-2. **Configure Azure Services**
-   - Create an Azure account and resource group
-   - Set up required Azure services (see [azure-setup/README.md](azure-setup/README.md))
-   - Configure `appsettings.json` with your Azure service connections
-
-3. **Backend Setup**
+2. **Backend Setup**
    ```bash
    cd Journal.Server
    dotnet restore
@@ -108,16 +90,21 @@ A native iOS and Android mobile app built with **React Native (Expo)** with comp
    dotnet run
    ```
 
-4. **Frontend Setup**
+3. **Frontend / Mobile App Setup (Expo)**
    ```bash
-   cd journal.client
+   cd Journal.UI
    npm install
-   npm run dev
+   
+   # Run for Web:
+   npm run web
+   
+   # Run for iOS / Android:
+   npm start
    ```
 
-5. **Access the Application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
+4. **Access the Application**
+   - Web App: http://localhost:8081
+   - Backend API: http://localhost:5079 (Swagger: http://localhost:5079/swagger)
 
 ## Configuration
 
@@ -127,14 +114,8 @@ Configuration is loaded from `appsettings.json` and can be overridden by environ
 
 **Key Settings:**
 - `CosmosDb:Endpoint`: https://inside-journaling-app-cosmosdb.documents.azure.com:443/
-- `CosmosDb:DatabaseName`: JournalDb
+- `CosmosDb:DatabaseName`: inside-journaling-app (or inside-journaling-app-dev)
 - `AzureOpenAI:Endpoint`: https://inside-journaling-app-foundry.cognitiveservices.azure.com/
-- `AzureOpenAI:AffirmationDeploymentName`: gpt-4o-mini (for affirmations)
-- `AzureOpenAI:CrisisDeploymentName`: gpt-4o (for crisis detection)
-
-### Environment Variables
-- `ManagedIdentityClientId`: Managed identity client ID (136abc9f-ef3a-4073-a6d2-e6f915ba1f0f)
-- `APPLICATIONINSIGHTS_CONNECTION_STRING`: Application Insights connection string
 
 See [appsettings.Example.json](Journal.Server/appsettings.Example.json) for a complete configuration template.
 
@@ -142,32 +123,27 @@ See [appsettings.Example.json](Journal.Server/appsettings.Example.json) for a co
 
 ```
 Journal/
-├── journal.client/     # React frontend (Web)
+├── Journal.UI/         # Universal client (iOS, Android, Web via Expo)
 │   ├── src/
-│   │   ├── components/             # React components
-│   │   ├── services/               # API and utility services
-│   │   ├── contexts/               # React contexts
+│   │   ├── components/             # Reusable UI components
+│   │   ├── screens/                # Screen views (Journal, Insights, Chat, Profile, Crisis)
+│   │   ├── services/               # API, auth, storage, sync services
+│   │   ├── contexts/               # React Context state providers
 │   │   ├── hooks/                  # Custom React hooks
-│   │   └── types/                  # TypeScript type definitions
-│   └── public/                     # Static assets
-├── Journal.Mobile/ # React Native app (iOS/Android)
-│   ├── src/
-│   │   ├── components/             # UI components
-│   │   ├── screens/                # App screens
-│   │   ├── services/               # Services (sync, notifications, etc.)
-│   │   ├── contexts/               # State management
-│   │   ├── hooks/                  # Custom hooks
-│   │   └── navigation/             # React Navigation setup
+│   │   ├── navigation/             # React Navigation setup
+│   │   └── types/                  # TypeScript definitions
 │   └── app.json                    # Expo configuration
 ├── Journal.Server/     # .NET Web API
 │   ├── Controllers/                # API controllers
-│   └── Properties/                 # Server configuration
-├── Journal.Services/   # Business logic layer
+│   ├── Properties/                 # Server launch profiles
+│   └── Services/                   # Web API specific helpers
+├── Journal.Services/   # Core business logic layer
 │   ├── CosmosDbService.cs          # Database operations
-│   ├── BlobStorageService.cs       # File storage
+│   ├── BlobStorageService.cs       # Audio file storage
 │   ├── JournalAnalysisService.cs   # AI analysis
+│   ├── ChatService.cs              # Virtual support companion
 │   ├── SpeechToTextService.cs      # Voice transcription
-│   └── UserService.cs              # User management
+│   └── UserService.cs              # User management & quotas
 ├── Journal.Models/     # Shared data models
 └── Journal.Tests/      # Unit tests
 ```
@@ -178,6 +154,21 @@ Journal/
 ```bash
 cd Journal.Tests
 dotnet test
+```
+
+See [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing documentation.
+
+## Documentation
+
+[Documentation Index](DOCS_INDEX.md)
+
+- [Azure Setup and Deployment](azure-setup/README.md)
+- [Testing Guide](TESTING_GUIDE.md)
+- [Mobile and Universal Features](MOBILE_FEATURES.md)
+- [Authentication](AUTHENTICATION.md)
+- [Payment Strategy](PAYMENT_STRATEGY.md)
+- [Privacy Policy](PRIVACY_POLICY.md)
+- [Terms of Service](TERMS_OF_SERVICE.md)
 ```
 
 See [TESTING_GUIDE.md](TESTING_GUIDE.md) for detailed testing documentation.
@@ -204,24 +195,23 @@ dotnet publish -c Release
 
 ## Documentation
 
-**[ Complete Documentation Index ](DOCS_INDEX.md)** - Quick navigation to all project documentation
+[Complete Documentation Index](DOCS_INDEX.md) - Quick navigation to all project documentation
 
 ### Getting Started
-- [README.md](README.md) - This file, project overview and quick start
-- [Azure Setup & Deployment](azure-setup/README.md) - Azure resources, configuration, and deployment
-- [Testing Guide](TESTING_GUIDE.md) - How to test the application end-to-end
+- [README.md](README.md) - Project overview and quick start
+- [azure-setup/README.md](azure-setup/README.md) - Azure resources, configuration, and deployment
+- [TESTING_GUIDE.md](TESTING_GUIDE.md) - How to test the application end-to-end
 
 ### Feature Documentation
-- **[Web Features](WEB_FEATURES.md)** - Complete web app feature reference (voice, AI analysis, visualizations, crisis support)
-- **[Mobile Features](MOBILE_FEATURES.md)** - Complete mobile app feature reference (offline sync, notifications, biometrics, dark mode)
+- [MOBILE_FEATURES.md](MOBILE_FEATURES.md) - Complete feature reference (journaling, voice, AI analysis, chat, offline sync, notifications, biometrics)
 
 ### Technical Documentation
-- [Authentication](AUTHENTICATION.md) - Easy Auth, JWT, and OAuth provider setup
-- [Payment Strategy](PAYMENT_STRATEGY.md) - Freemium model and Stripe integration
+- [AUTHENTICATION.md](AUTHENTICATION.md) - Easy Auth, JWT, and OAuth provider setup
+- [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md) - Freemium model and Stripe integration
 
 ### Legal
-- [Privacy Policy](PRIVACY_POLICY.md) - Data collection, usage, and user rights
-- [Terms of Service](TERMS_OF_SERVICE.md) - User agreement and service terms
+- [PRIVACY_POLICY.md](PRIVACY_POLICY.md) - Data collection, usage, and user rights
+- [TERMS_OF_SERVICE.md](TERMS_OF_SERVICE.md) - User agreement and service terms
 
 ## Security
 

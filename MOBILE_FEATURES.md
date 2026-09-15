@@ -454,4 +454,4 @@ Complete URL scheme support for navigation and sharing.
  **Sprint 5:** Polish & Testing
  **Sprint 6:** App Store Deployment
 
-**[View Web Features](WEB_FEATURES.md)** | **[View Testing Guide](TESTING_GUIDE.md)**
+**[Documentation Index](DOCS_INDEX.md)** | **[View Testing Guide](TESTING_GUIDE.md)**

@@ -27,54 +27,80 @@ Your Inside Journaling App now includes:
 ### Step 1: Start the Backend
 
 ```bash
-cd /Users/cecilysavage/GitHub/Journal/Journal.Server
+cd Journal.Server
 dotnet run
 ```
 
-The backend will start on `https://localhost:7270` (or the port specified in launchSettings.json)
+The backend will start on `http://localhost:5079` (or the port specified in launchSettings.json)
 
-### Step 2: Start the Frontend
+### Step 2: Start the Frontend / Universal App
 
 Open a new terminal:
 
 ```bash
-cd /Users/cecilysavage/GitHub/Journal/journal.client
-npm run dev
+cd Journal.UI
+npm run web
+# Or run on mobile:
+npm start
 ```
-
-The frontend will start on `http://localhost:54551/`
 
 ### Step 3: Test AI Analysis
 
 1. **Create Your First Entry**
-   - In the left sidebar, type a journal entry (e.g., "I had a wonderful day today! I feel grateful for my friends and family.")
-   - Click "Save & Analyze Entry"
-   - Watch the button change to "Analyzing with AI..." 
- - You'll see a message: " AI is analyzing your entry for sentiment, key phrases, and generating insights..."
+   - Type a journal entry (e.g., "I had a wonderful day today! I feel grateful for my friends and family.")
+   - Save and analyze entry
+   - The entry will be analyzed for sentiment, key phrases, summary, and affirmations
 
 2. **View AI Results**
-   - The entry will appear in the main section with:
-     - **Sentiment Badge** (color-coded: green for positive, red for negative, etc.)
-     - **AI Summary** - A contextual summary of your entry
-     - **Affirmation** - A personalized encouraging message from GPT-4
-     - **Key Phrases** - Important topics extracted from your text
+   - The entry will appear with:
+     - Sentiment Badge (color-coded)
+     - AI Summary - A contextual summary of your entry
+     - Affirmation - A personalized encouraging message from GPT-4o-mini
+     - Key Phrases - Important topics extracted from your text
 
 3. **Test Different Sentiments**
    Try creating entries with different emotional tones:
    
-   - **Positive**: "Today was amazing! I accomplished so much and feel really proud of myself."
-   - **Negative**: "I'm feeling really stressed and overwhelmed with everything going on."
-   - **Neutral**: "Today was a regular day. I went to work, came home, and had dinner."
-   - **Mixed**: "Work was frustrating, but I had a great evening with friends afterward."
+   - Positive: "Today was amazing! I accomplished so much and feel really proud of myself."
+   - Negative: "I'm feeling really stressed and overwhelmed with everything going on."
+   - Neutral: "Today was a regular day. I went to work, came home, and had dinner."
+   - Mixed: "Work was frustrating, but I had a great evening with friends afterward."
 
 ### Step 4: View Trends
 
-1. **After creating 3-5 entries**, you'll see the " Your Trends" section appear in the sidebar
-2. Click the "Show" button to expand the trends
-3. You'll see:
-   - **Total Entries** - How many journal entries you've created
-   - **Recent Trend** - Analysis of your last 5 entries
-   - **Sentiment Distribution** - Visual bar chart showing breakdown by sentiment type
+1. Navigate to the Insights tab
+2. You'll see:
+   - Total Entries
+   - Sentiment Timeline Chart
+   - Common Themes Word Cloud
+   - Journal Calendar
+   - Data Export
+
+## Playwright End-to-End Testing
+
+End-to-end browser tests are powered by Playwright to validate all user flows (Authentication, Navigation, Journaling, Virtual Support Chat, and Profile/Upgrades).
+
+### Run Playwright Tests
+
+```bash
+cd Journal.UI
+
+# Run all end-to-end tests
+npm run test:e2e
+
+# Run tests in interactive UI mode
+npm run test:e2e:ui
+
+# Run tests in headed browser mode
+npm run test:e2e:headed
+```
+
+The Playwright test suite automatically boots up the Expo web server on `http://localhost:8081` and executes the spec suites located in `Journal.UI/e2e/`:
+- `auth.spec.ts`: Login page, OAuth buttons, Terms of Service, and Privacy Policy.
+- `navigation.spec.ts`: Bottom tab bar navigation across Journal, Insights, Support, and Profile tabs.
+- `journal.spec.ts`: Journal entry lists, text creation, voice recording controls, and saving.
+- `chat.spec.ts`: Virtual support companion chat, conversations drawer, and crisis detection banners.
+- `profile-and-upgrade.spec.ts`: Monthly quotas, tier badges, Stripe Checkout upgrade modal, and billing portal.
 
 ## What to Look For
 

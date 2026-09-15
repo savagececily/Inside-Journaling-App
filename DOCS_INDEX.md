@@ -13,9 +13,8 @@ Quick reference to all Inside Journaling App documentation.
 | Document | Covers |
 | --- | --- |
 | [README.md](README.md) | Project overview, tech stack, local development, configuration |
-| [WEB_FEATURES.md](WEB_FEATURES.md) | Web app features: voice recording, AI analysis, visualizations, crisis support |
-| [MOBILE_FEATURES.md](MOBILE_FEATURES.md) | Mobile app features: offline sync, notifications, biometrics, dark mode, deep linking |
-| [AUTHENTICATION.md](AUTHENTICATION.md) | Easy Auth, JWT, Google and Microsoft OAuth setup for web and mobile |
+| [MOBILE_FEATURES.md](MOBILE_FEATURES.md) | Universal Expo client features: journaling, AI analysis, chat, offline sync, notifications, biometrics |
+| [AUTHENTICATION.md](AUTHENTICATION.md) | Easy Auth, JWT, Google and Microsoft OAuth setup |
 | [PAYMENT_STRATEGY.md](PAYMENT_STRATEGY.md) | Freemium model, Stripe Checkout, mobile in-app purchases, webhooks |
 | [TESTING_GUIDE.md](TESTING_GUIDE.md) | Unit tests, integration tests, manual test procedures |
 | [azure-setup/README.md](azure-setup/README.md) | Azure resource inventory, app settings, deployment scripts |
@@ -26,11 +25,11 @@ Quick reference to all Inside Journaling App documentation.
 
 ## Architecture
 
-The application is split into two independently deployed pieces:
+The application is structured into:
 
+- **Universal Client** - Expo (iOS, Android, and Web) in [Journal.UI](Journal.UI)
 - **Backend API** - ASP.NET Core 10 on Azure App Service (`inside-journal-api`), with a `development` slot
-- **Frontend** - React and Vite on Azure Static Web Apps (`inside-journal-app`)
-- **Mobile** - React Native and Expo, consuming the same API
+- **Static Web Hosting** - Azure Static Web Apps (`inside-journal-app`), serving the Expo web export bundle
 
 All Azure service access uses Managed Identity. Configuration comes from `appsettings.json` and App Service application settings; Azure App Configuration is not used.
 
